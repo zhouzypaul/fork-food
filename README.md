@@ -1,6 +1,6 @@
 cs0320 Term Project 2021
 
-###Team Members: 
+### Team Members: 
 
 Alan Gu, Ed Xing, Sean Zhan, Paul Zhou
 
@@ -31,9 +31,9 @@ Paul Zhou:
 - Weakness: Anything related to frontend
 
 
-##Project Idea(s): 
+## Project Idea(s): 
 
-###Idea 1: Cliq (Decision Making App)
+### Idea 1: Cliq (Decision Making App)
 
 **Problem**: Coming up with and agreeing on ideas in group outings.
 
@@ -60,7 +60,7 @@ Allows for a personalized experience that is both social and fruitful
 Requires networking and is generally unfamiliar territory
 Allows for interaction and conversation between friends, necessary for planning and maintaining social interactions
 
-###Idea 2: 
+### Idea 2: 
 
 **Problem**: It often happens that we are interested in some field and gain more experience in that field (software engineering, for example). However, it is hard to come up with a project to work on, or find people who have similar interests as you and want to work on a project together.
 
@@ -92,7 +92,7 @@ Allows for interaction and conversation between friends, necessary for planning 
     
     - The users want to be able to have a personalized experience on this platform, where they can have access to their past activities.
 
-###Idea 3: Tradr
+### Idea 3: Tradr
 
 **Problem**: I have so many unwanted items, but nothing to trade them for. Also I hate using money.
 
