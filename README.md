@@ -60,6 +60,8 @@ Allows for a personalized experience that is both social and fruitful
 Requires networking and is generally unfamiliar territory
 Allows for interaction and conversation between friends, necessary for planning and maintaining social interactions
 
+**HTA Approval (dpark20):** Idea approved; make sure the algorithm is more complex than just adding up scores for each activity option based on each ranking. Perhaps take into account what/when needs to be weighed more heavily, and for which users! Be sure to add something that makes this project unique.
+
 ### Idea 2: 
 
 **Problem**: It often happens that we are interested in some field and gain more experience in that field (software engineering, for example). However, it is hard to come up with a project to work on, or find people who have similar interests as you and want to work on a project together.
@@ -91,6 +93,8 @@ Allows for interaction and conversation between friends, necessary for planning 
     - This would require the implementation of a backend database that stores the users’ info securely. This backend also needs to be able to communicate with the frontend in real time for an interactive experience.
     
     - The users want to be able to have a personalized experience on this platform, where they can have access to their past activities.
+
+**HTA Approval (dpark20):** Idea approved (contingent). This has been done before, so make sure you are doing something unique to add more depth into the project! The account system shouldn't be the focus of your project; look to add something that gives users a greater reason to use your application.
 
 ### Idea 3: Tradr
 
@@ -127,6 +131,9 @@ Allows for interaction and conversation between friends, necessary for planning 
         - Group items by category and allow user specified search
 
     - Match users with items based on preferences as determined by recommendation algorithm? classification algorithm
+
+**HTA Approval (dpark20):** Idea approved (contingent). Like before, this has been done before, so make sure you are doing something unique to add more depth into the project!
+
 
 
 Mentor TA: Put your mentor TA's name and email here once you're assigned one!
