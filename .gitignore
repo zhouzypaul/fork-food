@@ -1,1 +1,28 @@
 .idea
+.vscode
+
+
+# react ignores
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+fork-react/node_modules
+fork-react/.pnp
+fork-react/.pnp.js
+
+# testing
+fork-react/coverage
+
+# production
+fork-react/build
+
+# misc
+fork-react/.DS_Store
+fork-react/.env.local
+fork-react/.env.development.local
+fork-react/.env.test.local
+fork-react/.env.production.local
+
+fork-react/npm-debug.log*
+fork-react/yarn-debug.log*
+fork-react/yarn-error.log*
