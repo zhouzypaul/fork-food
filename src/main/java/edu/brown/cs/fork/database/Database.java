@@ -15,28 +15,34 @@ import java.sql.Statement;
  * make prepared statements with the connected database.
  */
 public class Database {
-  private Connection conn;
+  private static Connection conn = null;
+  private boolean connected = false;
 
   /**
-   * Constructor. Make connection to database.
-   *
-   * @param databasePath path to database file
-   * @throws SQLErrorException   when an error with SQL is encountered
-   * @throws NoSuchFileException when the path does not point to a database file
+   * Constructor.
    */
-  public Database(String databasePath) throws SQLErrorException, NoSuchFileException {
-    try {
-      // Check if file exists
-      if (!(new File(databasePath)).exists()) {
-        throw new NoSuchFileException("no file found at " + databasePath);
-      }
-      Class.forName("org.sqlite.JDBC");
-      this.conn = DriverManager.getConnection("jdbc:sqlite:" + databasePath);
-      Statement stat = conn.createStatement();
-      stat.executeUpdate("PRAGMA foreign_keys=ON;");
-    } catch (SQLException | ClassNotFoundException e) {
-      throw new SQLErrorException("could not connect to sqlite database at " + databasePath);
-    }
+  public Database() { }
+
+  /**
+   * Initialize database connection, only wipes cache if new database is connected.
+   * @param filename name of the database
+   * @return whether it's new connection
+   * @throws SQLException sql exception
+   * @throws ClassNotFoundException class not found
+   */
+  public void initDatabase(String filename) throws SQLException, ClassNotFoundException {
+    this.connected = true;
+    Class.forName("org.sqlite.JDBC");
+    String urlToDB = "jdbc:sqlite:" + filename;
+    conn = DriverManager.getConnection(urlToDB);
+  }
+
+  public Connection getConn() {
+    return this.conn;
+  }
+
+  public boolean isConnected() {
+    return this.connected;
   }
 
   /**

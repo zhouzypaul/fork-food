@@ -1,6 +1,11 @@
 .idea
 .vscode
+.DS_store
 
+target/
+
+data/yelp_academic_dataset_business.*
+data/*.sqlite
 
 # react ignores
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.

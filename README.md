@@ -4,6 +4,22 @@ cs0320 Term Project 2021
 
 Alan Gu, Ed Xing, Sean Zhan, Paul Zhou
 
+### Data Preparation
+
+We downloaded restaurants data in json format from Yelp, and we used Yelp's script to turn the json file into a csv file, then we used a python package csv-to-sqlite to convert the csv file into a sqlite file.
+
+Dataset is downloaded from:
+
+https://www.yelp.com/dataset
+
+Script to transform the json file (each line represents a json object) into a csv file:
+
+https://github.com/Yelp/dataset-examples/issues/43
+
+csv file to sqlite file:
+
+https://pypi.org/project/csv-to-sqlite/
+
 ### Team Strengths and Weaknesses:
 
 Alan Gu:
