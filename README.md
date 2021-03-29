@@ -49,7 +49,7 @@ term-project-...
 
 // load databases
 load rest data/business.sqlite
-load user data/business.sqlite
+load user data/users.sqlite
 ```
 
 ### Team Strengths and Weaknesses:
