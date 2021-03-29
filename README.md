@@ -20,6 +20,38 @@ csv file to sqlite file:
 
 https://pypi.org/project/csv-to-sqlite/
 
+### How To Run
+
+- Get all ```sqlite``` data from: [here](https://drive.google.com/drive/folders/1GUGTRPzdTwJg88stwNtSrPvzzjVUiwq4?usp=sharing)
+
+- Put all ```sqlite``` data into the project folder such that it follows the following structure:
+
+```
+term-project-...
+    |
+    |- data
+    |    |- business.sqlite
+    |    |- users.sqlite
+    |    |- ...
+    |- src
+    |- tests
+    . 
+    .
+```
+
+- Execute ```mvn package```
+
+- Then, use the following commands to load in database
+
+```
+// start the gui
+./run --gui
+
+// load databases
+load rest data/business.sqlite
+load user data/business.sqlite
+```
+
 ### Team Strengths and Weaknesses:
 
 Alan Gu:

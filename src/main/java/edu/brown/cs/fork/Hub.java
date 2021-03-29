@@ -10,7 +10,7 @@ public class Hub {
   private static final Users userDB = new Users();
   private static final Restaurants restDB = new Restaurants();
 
-  private ActionLoadDB loadDB;
+  private final ActionLoadDB loadDB = new ActionLoadDB();
 
   public Hub() { }
 

@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import com.google.gson.Gson;
@@ -71,6 +72,8 @@ public final class Main {
     // Setup Spark Routes
     Spark.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
     Spark.exception(Exception.class, new ExceptionPrinter());
+
+    Spark.post("/test", new HandlerAllRestaurants());
   }
 
 

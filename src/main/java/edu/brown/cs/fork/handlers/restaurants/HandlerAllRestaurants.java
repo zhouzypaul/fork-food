@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class AllRestaurants implements Route {
+public class HandlerAllRestaurants implements Route {
   private static final Gson GSON = new Gson();
 
-  public AllRestaurants() {  }
+  public HandlerAllRestaurants() {  }
 
   @Override
   public Object handle(Request req, Response res) {
