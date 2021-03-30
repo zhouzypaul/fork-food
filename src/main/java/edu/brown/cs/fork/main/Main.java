@@ -3,6 +3,8 @@ package edu.brown.cs.fork.main;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import com.google.gson.Gson;
@@ -29,6 +31,7 @@ public final class Main {
   }
 
   private String[] args;
+  private final Hub hub = new Hub();
 
   private Main(String[] args) {
     this.args = args;
@@ -45,11 +48,13 @@ public final class Main {
     if (options.has("gui")) {
       runSparkServer((int) options.valueOf("port"));
     }
+
+    hub.run();
   }
 
   private void runSparkServer(int port) {
     Spark.port(port);
-    Spark.externalStaticFileLocation("maps-react/build/");
+    Spark.externalStaticFileLocation("fork-react/build/");
     Spark.options("/*", (request, response) -> {
       String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
       if (accessControlRequestHeaders != null) {
@@ -65,10 +70,10 @@ public final class Main {
       return "OK";
     });
     // Setup Spark Routes
-    Spark.before((request, response) ->
-            response.header("Access-Control-Allow-Origin", "*"));
+    Spark.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
     Spark.exception(Exception.class, new ExceptionPrinter());
-//    Spark.post("/url", new UrlHandler());
+
+    Spark.post("/test", new HandlerAllRestaurants());
   }
 
 
