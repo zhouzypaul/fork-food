@@ -4,15 +4,17 @@ import java.util.List;
 
 /**
  * a Naive Bayes classifier to recommend data.
+ * @param <R> a type of recommendable
+ * @param <L> a type of labeled Data
  */
-public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData>
-        implements Recommender {
-  public NaiveBayesClassifier(List<LabeledData> trainingData, List<Recommendable> testData) {
+public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData<R>>
+        implements Recommender<R> {
+  public NaiveBayesClassifier(List<LabeledData<R>> trainingData, List<Recommendable> testData) {
     // TODO:
   }
 
   @Override
-  public List<Recommendable> recommend(int n) {
+  public List<R> recommend(int n) {
     return null;
   }
 

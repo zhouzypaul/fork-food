@@ -1,14 +1,13 @@
 package edu.brown.cs.fork.restaurants;
 
 import edu.brown.cs.fork.recommendation.LabeledData;
-import edu.brown.cs.fork.recommendation.Recommendable;
 
 /**
  * TODO:
  */
-public class LabeledRestaurant implements LabeledData {
+public class LabeledRestaurant implements LabeledData<Restaurant> {
   @Override
-  public Recommendable getData() {
+  public Restaurant getData() {
     // TODO:
     return null;
   }
