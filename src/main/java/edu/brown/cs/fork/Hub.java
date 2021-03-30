@@ -1,24 +1,23 @@
 package edu.brown.cs.fork;
 
 import edu.brown.cs.fork.actions.ActionLoadDB;
-import edu.brown.cs.fork.database.Database;
-import edu.brown.cs.fork.database.queries.Restaurants;
-import edu.brown.cs.fork.database.queries.Users;
+import edu.brown.cs.fork.database.queries.QueryRestaurants;
+import edu.brown.cs.fork.database.queries.QueryUsers;
 
 public class Hub {
   private final Repl repl = new Repl();
-  private static final Users userDB = new Users();
-  private static final Restaurants restDB = new Restaurants();
+  private static final QueryUsers userDB = new QueryUsers();
+  private static final QueryRestaurants restDB = new QueryRestaurants();
 
   private final ActionLoadDB loadDB = new ActionLoadDB();
 
   public Hub() { }
 
-  public static Users getUserDB() {
+  public static QueryUsers getUserDB() {
     return userDB;
   }
 
-  public static Restaurants getRestDB() {
+  public static QueryRestaurants getRestDB() {
     return restDB;
   }
 

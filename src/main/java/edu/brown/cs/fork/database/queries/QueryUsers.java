@@ -6,12 +6,12 @@ import edu.brown.cs.fork.database.Database;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class Users {
+public class QueryUsers {
   private Database db = new Database();
   private Connection conn;
   private static final Gson GSON = new Gson();
 
-  public Users() {
+  public QueryUsers() {
 
   }
 

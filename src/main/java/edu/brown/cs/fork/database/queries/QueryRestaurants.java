@@ -16,12 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Restaurants {
+public class QueryRestaurants {
   private Database db = new Database();
   private Connection conn;
   private static final Gson GSON = new Gson();
 
-  public Restaurants() { }
+  public QueryRestaurants() { }
 
   public void initRestaurants(String dbPath) {
     try {

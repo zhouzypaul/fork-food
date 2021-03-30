@@ -1,15 +1,15 @@
 package edu.brown.cs.fork.actions;
 
 import edu.brown.cs.fork.Hub;
-import edu.brown.cs.fork.database.queries.Restaurants;
-import edu.brown.cs.fork.database.queries.Users;
+import edu.brown.cs.fork.database.queries.QueryRestaurants;
+import edu.brown.cs.fork.database.queries.QueryUsers;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ActionLoadDB implements TriggerAction {
-  private final Restaurants restDB;
-  private final Users userDB;
+  private final QueryRestaurants restDB;
+  private final QueryUsers userDB;
 
   public ActionLoadDB() {
     this.restDB = Hub.getRestDB();
