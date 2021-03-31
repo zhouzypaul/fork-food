@@ -2,7 +2,7 @@ cs0320 Term Project 2021
 
 ### Team Members: 
 
-Alan Gu, Ed Xing, Sean Zhan, Paul Zhou
+Alan Gu, Edward Xing, Sean Zhan, Paul Zhou
 
 ### Data Preparation
 
