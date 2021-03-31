@@ -2,7 +2,7 @@ import TextBox from "./TextBox";
 import {useState} from "react";
 import TopBar from "./TopBar";
 import {useDispatch} from "react-redux";
-import {login} from "../actions/login";
+import {login} from "../actions";
 
 function Login(props) {
   const [username, setUsername] = useState("");

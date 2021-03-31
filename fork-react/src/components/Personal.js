@@ -1,6 +1,6 @@
 import TextBox from "./TextBox";
 import {useDispatch, useSelector} from "react-redux";
-import {logout} from "../actions/login";
+import {logout} from "../actions";
 
 function Personal(props) {
   const user = useSelector(state => state.user);
