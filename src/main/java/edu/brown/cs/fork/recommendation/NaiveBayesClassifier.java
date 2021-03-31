@@ -3,7 +3,9 @@ package edu.brown.cs.fork.recommendation;
 import edu.brown.cs.fork.exceptions.NoTrainDataException;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * a Naive Bayes classifier to recommend data. This generative classifier assumes that the input
@@ -19,7 +21,7 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
   private final int[] attrDim;
   private final int numClasses;
   private double[] priorProb;
-  private List<List<Double>> classCondProb;
+  private List<List<List<Double>>> classCondProb;
   private final List<L> trainingData;
   private final List<R> testData;
 
@@ -47,6 +49,7 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
   @Override
   public List<R> recommend(int n) {
     this.train();
+    // TODO:
     return null;
   }
 
@@ -97,8 +100,9 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
    * get the class conditional probabilities (P(X=x|Y=y) for all x, y) from the training set.
    * This class conditional probabilities are saved to this.classCondProb.
    *
-   * The 1st index of this.classCondProb indexes into the class label, while the second index
-   * indexes into the attribute dimension.
+   * The 1st index of this.classCondProb indexes into the class label, while the 2nd index
+   * indexes into the attribute, and the 3rd index indexes into the possible value of the attribute
+   * (the dimension of the given attribute).
    */
   private void getClassCondProb() {
 
@@ -107,9 +111,41 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
       int label = labeledData.getLabel();
     }
 
+    // init
+    this.classCondProb = new LinkedList<>();
+
     // iterate through each of the class labels
     for (int c = 0; c < this.numClasses; c++) {
-      // iterate through the
+
+      // init conditional prob for current class
+      List<List<Double>> classProb = new LinkedList<>();
+
+      // get all training data with label c
+      int finalC = c;
+      List<L> dataInClass = this.trainingData.stream().filter(data -> data.getLabel() == finalC)
+              .collect(Collectors.toList());
+
+      // iterate over all the attributes
+      for (int attr = 0; attr < this.numAttr; attr++) {
+        List<Double> attrProb = new LinkedList<>();
+
+        // iterate over all the possible value of the current attribute
+        for (int attrValue = 0; attrValue < this.attrDim[attr]; attrValue++) {
+          int finalAttr = attr;
+          int finalAttrValue = attrValue;
+          // number of data points in classData that have attrValue for attr
+          int numDataAttr = (int) dataInClass.stream()
+                  .filter(data -> data.getData().getAttr()[finalAttr] == finalAttrValue).count();
+          attrProb.add(attrValue,
+                  (double) (numDataAttr + 1) / (dataInClass.size() + this.attrDim[attr]));
+        }
+
+        // record attrProb at the end of iterating over the current attr
+        classProb.add(attr, attrProb);
+      }
+
+      // record condProb at the end of iterating over the current class c
+      this.classCondProb.add(c, classProb);
     }
   }
 }
