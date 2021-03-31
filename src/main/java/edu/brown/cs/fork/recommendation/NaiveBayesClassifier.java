@@ -3,8 +3,10 @@ package edu.brown.cs.fork.recommendation;
 import edu.brown.cs.fork.exceptions.NoTrainDataException;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -47,10 +49,33 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
   }
 
   @Override
-  public List<R> recommend(int n) {
+  public List<R> recommend(int n, int classLabel) {
+    // if not enough test data, just return all of them
+    if (this.testData.size() <= n) {
+      return this.testData;
+    }
+    // if enough test data
     this.train();
-    // TODO:
-    return null;
+    Map<R, Double> dataToProb = new HashMap<>();
+    // iterate through test data to calculate the posterior probability
+    for (R dataPoint : this.testData) {
+      double prior = this.priorProb[classLabel];  // P(Y=y)
+      double likelihood = 1;  // P(X=x|Y=y)
+      for (int attr = 0; attr < this.numAttr; attr++) {
+        likelihood = likelihood
+                * this.classCondProb.get(classLabel).get(attr).get(dataPoint.getAttr()[attr]);
+      }
+      double posterior = prior * likelihood;  // P(Y=y|X=x)
+      dataToProb.put(dataPoint, posterior);
+    }
+    // sort dataToProb by descending order
+    this.testData.sort((o1, o2) -> -Double.compare(dataToProb.get(o1), dataToProb.get(o2)));
+    // defensive copy the top results
+    List<R> recommendation = new LinkedList<>();
+    for (int i = 0; i < n; i++) {
+      recommendation.add(this.testData.get(i));
+    }
+    return recommendation;
   }
 
   /**
@@ -99,6 +124,8 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
   /**
    * get the class conditional probabilities (P(X=x|Y=y) for all x, y) from the training set.
    * This class conditional probabilities are saved to this.classCondProb.
+   * Laplace smoothing is used in this method: we pretend to have observed 1 training example from
+   * each of the possible attributes.
    *
    * The 1st index of this.classCondProb indexes into the class label, while the 2nd index
    * indexes into the attribute, and the 3rd index indexes into the possible value of the attribute
