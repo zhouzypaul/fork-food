@@ -1,13 +1,17 @@
 import TextBox from "./TextBox";
 import {useState} from "react";
 import TopBar from "./TopBar";
+import {useDispatch} from "react-redux";
+import {login} from "../actions/login";
 
 function Login(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+
   const verify = () => {
-    if (username === "ed" && password === "xing") {
-      alert("Yay")
+    if ((username === "ed" && password === "xing") || (username === "sean" && password === "zhan")) {
+      dispatch(login(username));
       props.history.push('/home');
     }
   }
@@ -21,7 +25,7 @@ function Login(props) {
         <br/>
         <TextBox initial="password" change={setPassword} type="password"/>
         <br/>
-        <button onClick={verify}>
+        <button onClick={verify} onKeyPress={verify}>
           sign in
         </button>
       </div>
