@@ -23,4 +23,9 @@ public class Restaurant implements Recommendable {
     // TODO:
     return null;
   }
+
+  @Override
+  public int[] getAttrDim() {
+    return new int[0];
+  }
 }
