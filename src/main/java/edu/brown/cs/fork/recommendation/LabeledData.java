@@ -12,7 +12,7 @@ public interface LabeledData<R extends Recommendable> {
   R getData();
 
   /**
-   * get the label portion of the tuple.
+   * get the label portion of the tuple. The label should be in range(0, R.getNumClasses()).
    * @return the int label.
    */
   int getLabel();
