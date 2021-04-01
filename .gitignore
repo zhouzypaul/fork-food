@@ -5,8 +5,9 @@
 
 target/
 
-data/yelp_academic_dataset_business.*
-data/*.sqlite
+data/*.csv
+data/*.json
+data/*.sqlite3
 
 # react ignores
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.

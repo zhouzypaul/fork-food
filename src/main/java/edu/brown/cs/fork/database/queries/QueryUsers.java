@@ -5,6 +5,8 @@ import edu.brown.cs.fork.database.Database;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QueryUsers {
   private Database db = new Database();
@@ -26,5 +28,10 @@ public class QueryUsers {
 
   public boolean isConnected() {
     return db.isConnected();
+  }
+
+  public List<String> getAllUsers() throws SQLException {
+    List<String> results = new ArrayList<>();
+    return results;
   }
 }

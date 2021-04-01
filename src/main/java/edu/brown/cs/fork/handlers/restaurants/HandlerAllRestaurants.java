@@ -27,6 +27,7 @@ public class HandlerAllRestaurants implements Route {
       try {
         ret = Hub.getRestDB().getAllRestaurants();
       } catch (SQLException e) {
+        err = e.getMessage();
         System.out.println(e.getMessage());
       }
     }

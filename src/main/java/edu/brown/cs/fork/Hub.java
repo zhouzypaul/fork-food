@@ -1,6 +1,7 @@
 package edu.brown.cs.fork;
 
 import edu.brown.cs.fork.actions.ActionLoadDB;
+import edu.brown.cs.fork.actions.ActionPreprocess;
 import edu.brown.cs.fork.database.queries.QueryRestaurants;
 import edu.brown.cs.fork.database.queries.QueryUsers;
 
@@ -10,6 +11,7 @@ public class Hub {
   private static final QueryRestaurants restDB = new QueryRestaurants();
 
   private final ActionLoadDB loadDB = new ActionLoadDB();
+  private final ActionPreprocess preprocess = new ActionPreprocess();
 
   public Hub() { }
 
@@ -28,5 +30,6 @@ public class Hub {
 
   public void setupHub() {
     this.repl.registerAction(loadDB);
+    this.repl.registerAction(preprocess);
   }
 }

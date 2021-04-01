@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public class QueryRestaurants {
-  private Database db = new Database();
+  private final Database db = new Database();
   private Connection conn;
   private static final Gson GSON = new Gson();
 

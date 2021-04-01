@@ -20,6 +20,31 @@ csv file to sqlite file:
 
 https://pypi.org/project/csv-to-sqlite/
 
+#### SQL Commands to Preprocess Data
+
+```
+// keep only restaurants data
+DELETE FROM yelp_academic_dataset_business AS bus WHERE
+bus.categories NOT LIKE '%Food%' OR
+bus.categories NOT LIKE '%Restaurants%'
+
+// in DB Browser, attach reviews.sqlite3 to yelp_academic_dataset_business.sqlite3
+// then create a table in yelp_academic_dataset called reviews containing all business reviews
+INSERT INTO reviews SELECT * FROM review.yelp_academic_dataset_review
+
+// detach reviews.sqlite3, then
+// create another table that has another column numReviews representing
+// the number of reviews for each restaurant
+CREATE TABLE restaurants AS SELECT * FROM (
+SELECT COUNT(reviews.stars) as numReviews, rest.business_id as rev_id
+FROM reviews, yelp_academic_dataset_business AS rest
+WHERE reviews.business_id = rest.business_id GROUP BY rest.business_id 
+) AS new INNER JOIN yelp_academic_dataset_business
+ON rev_id = yelp_academic_dataset_business.business_id
+```
+
+These SQL commands are much faster than the naive, deprecated ```ActionPreprocess.java``` in ```actions/```.
+
 ### How To Run
 
 - Get all ```sqlite``` data from: [here](https://drive.google.com/drive/folders/1GUGTRPzdTwJg88stwNtSrPvzzjVUiwq4?usp=sharing)
@@ -30,7 +55,7 @@ https://pypi.org/project/csv-to-sqlite/
 term-project-...
     |
     |- data
-    |    |- business.sqlite
+    |    |- restaurants.sqlite
     |    |- users.sqlite
     |    |- ...
     |- src
@@ -48,7 +73,7 @@ term-project-...
 ./run --gui
 
 // load databases
-load rest data/business.sqlite
+load rest data/restaurants.sqlite
 load user data/users.sqlite
 ```
 
