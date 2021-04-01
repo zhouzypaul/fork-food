@@ -12,9 +12,10 @@ function Personal(props) {
   return (
     <div className="content">
       <div className="title-text">profile</div>
-      {user}
-      <button>update preferences</button>
-      <button onClick={exit}>log out</button>
+      @{user}
+      <br/>
+      <button className="primary-button">update preferences</button>
+      <button className="secondary-button" onClick={exit}>log out</button>
     </div>
   );
 }

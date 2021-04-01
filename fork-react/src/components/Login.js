@@ -25,7 +25,7 @@ function Login(props) {
         <br/>
         <TextBox initial="password" change={setPassword} type="password"/>
         <br/>
-        <button onClick={verify} onKeyPress={verify}>
+        <button className="buttons" onClick={verify} onKeyPress={verify}>
           sign in
         </button>
       </div>
