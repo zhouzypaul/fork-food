@@ -10,7 +10,7 @@ function Login(props) {
   const dispatch = useDispatch();
 
   const verify = () => {
-    if ((username === "ed" && password === "xing") || (username === "sean" && password === "zhan")) {
+    if ((username === "ed" && password === "xing") || (username === "carot" && password === "cheng")) {
       dispatch(login(username));
       props.history.push('/home');
     }
@@ -25,7 +25,7 @@ function Login(props) {
         <br/>
         <TextBox initial="password" change={setPassword} type="password"/>
         <br/>
-        <button className="buttons" onClick={verify} onKeyPress={verify}>
+        <button className="primary-button" onClick={verify} onKeyPress={verify}>
           sign in
         </button>
       </div>

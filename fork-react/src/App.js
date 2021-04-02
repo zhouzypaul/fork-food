@@ -9,6 +9,8 @@ import Home from "./components/Home";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
 import {useSelector} from "react-redux";
+import Host from "./components/Host";
+import Join from "./components/Join";
 
 function App() {
   const user = useSelector(state => state.user);
@@ -20,6 +22,8 @@ function App() {
         <Route path="/home" component={user !== "" ? Home : Start}/>
         <Route path="/profile" component={user !== "" ? Profile : Start}/>
         <Route path="/settings" component={user !== "" ? Settings : Start}/>
+        <Route path="/host" component={user !== "" ? Host : Start}/>
+        <Route path="/join" component={user !== "" ? Join : Start}/>
       </Router>
     </div>
   );
