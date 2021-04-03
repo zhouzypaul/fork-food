@@ -30,6 +30,6 @@ public class Hub {
 
   public void setupHub() {
     this.repl.registerAction(loadDB);
-    this.repl.registerAction(preprocess);
+//    this.repl.registerAction(preprocess);
   }
 }

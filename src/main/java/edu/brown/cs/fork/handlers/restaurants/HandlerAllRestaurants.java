@@ -20,7 +20,7 @@ public class HandlerAllRestaurants implements Route {
   @Override
   public Object handle(Request req, Response res) {
     String err = "";
-    List<String> ret = new ArrayList<>();
+    List<Map<String, String>> ret = new ArrayList<>();
     if (!Hub.getRestDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
