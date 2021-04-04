@@ -2,10 +2,16 @@ package edu.brown.cs.fork.restaurants;
 
 import edu.brown.cs.fork.recommendation.Recommendable;
 
+import java.util.List;
+
 /**
  * TODO:
  */
 public class Restaurant implements Recommendable {
+  private int id;
+  private String name;
+  private List<String> categories;
+
   @Override
   public int getNumAttr() {
     // TODO:

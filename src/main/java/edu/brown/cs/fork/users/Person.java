@@ -8,6 +8,8 @@ import java.util.List;
  * TODO:
  */
 public class Person {
+  private int userId;
+  private String name;
 
   private List<LabeledRestaurant> preference;
 
@@ -15,6 +17,22 @@ public class Person {
    * TODO:
    */
   public Person() {
+  }
+
+  /**
+   * TODO:
+   * @return
+   */
+  public int getId() {
+    return 0;
+  }
+
+  /**
+   * TODO:
+   * @return
+   */
+  public String getName() {
+    return null;
   }
 
   public List<LabeledRestaurant> getIndividualPreference() {
