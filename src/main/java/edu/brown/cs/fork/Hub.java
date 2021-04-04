@@ -52,5 +52,6 @@ public class Hub {
     REST_DB.initRestaurants("data/restaurants.sqlite3");
     USER_DB.initUsers("data/users.sqlite3");
     this.repl.registerAction(loadDB);
+    this.repl.registerAction(preprocess);
   }
 }
