@@ -5,37 +5,49 @@ import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 import java.util.List;
 
 /**
- * TODO:
+ * A Person data structure. This contains the data and methods a person in the fork app needs.
  */
 public class Person {
-  private int userId;
-  private String name;
-
-  private List<LabeledRestaurant> preference;
+  private final String userId;
+  private final List<LabeledRestaurant> preference;
+  private final double gottenWay;
 
   /**
-   * TODO:
+   * constructor for the Person object.
+   * @param userId - id for the Person.
+   * @param preference - a list of labeled restaurants, representing the preference of the person,
+   *                   and used as training data for that person's group.
+   * @param gottenWay - a double indicating if that person has gotten their way recently. This
+   *                  double is between 0 and 1, with 0 meaning haven't gotten their way at all,
+   *                  and 1 meaning always gotten their way.
    */
-  public Person() {
+  public Person(String userId, List<LabeledRestaurant> preference, double gottenWay) {
+    this.userId = userId;
+    this.preference = preference;
+    this.gottenWay = gottenWay;
   }
 
   /**
-   * TODO:
-   * @return
+   * getter for the id field.
+   * @return the user id of the user.
    */
-  public int getId() {
-    return 0;
+  public String getId() {
+    return this.userId;
   }
 
   /**
-   * TODO:
-   * @return
+   * getter for the preference field.
+   * @return the preference list of the user.
    */
-  public String getName() {
-    return null;
-  }
-
   public List<LabeledRestaurant> getIndividualPreference() {
     return this.preference;
+  }
+
+  /**
+   * getter for the gottenWay field.
+   * @return the gottenWay double.
+   */
+  public double getGottenWay() {
+    return this.gottenWay;
   }
 }

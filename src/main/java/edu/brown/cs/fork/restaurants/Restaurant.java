@@ -5,17 +5,17 @@ import edu.brown.cs.fork.recommendation.Recommendable;
 import java.util.List;
 
 /**
- * TODO:
+ * A restaurant data structure. This implements the Recommendable interface.
+ * This data structure holds all the data a restaurant has.
  */
 public class Restaurant implements Recommendable {
-  private int id;
+  private String id;
   private String name;
   private List<String> categories;
 
   @Override
   public int getNumAttr() {
-    // TODO:
-    return 0;
+    return 3;
   }
 
   @Override

@@ -2,31 +2,35 @@ package edu.brown.cs.fork.users;
 
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- * TODO:
+ * A Group data structure. This holds a list of Person data structures.
  */
 public class Group {
-  private List<Person> people;
+  private final List<Person> people;
 
-  public Group() {
-    // TODO:
+  /**
+   * Constructor for the Group.
+   * @param people a list of Person in the group
+   */
+  public Group(List<Person> people) {
+    this.people = people;
   }
 
   /**
-   * Add a person to the group.
-   * @param p - the Person to add to the group.
+   * get the collective preference of the group. THe collective preference is the concatenated
+   * list of each individual's preference in the group.
+   *
+   * @return the collective preference as a list of LabeledRestaurant.
    */
-  public void addPerson(Person p) {
-    people.add(p);
-  }
-
-
   public List<LabeledRestaurant> getCollectivePreference() {
-    // TODO:
-    // I imagine we get go through the list of people, run it through the algo, and get some list of
-    // restaurants returned.
-    return null;
+    List<LabeledRestaurant> collectivePref = new LinkedList<>();
+    for (Person p : this.people) {
+      List<LabeledRestaurant> individualPref = p.getIndividualPreference();
+      collectivePref.addAll(individualPref);
+    }
+    return collectivePref;
   }
 }
