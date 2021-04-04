@@ -64,18 +64,27 @@ term-project-...
     .
 ```
 
-- Execute ```mvn package```
-
-- Then, use the following commands to load in database
-
+- Execute 
+  
 ```
-// start the gui
+// compiles project
+mvn package
+
+// stars the backend, databases will be automatically loaded
 ./run --gui
 
-// load databases
-load rest data/restaurants.sqlite
-load user data/users.sqlite
+// load custom databases
+load rest path_to_custom_restaurants_db
+load user path_to_custom_user_db
 ```
+
+### API Documentation
+
+```/test``` no required body, returns all restaurants in format ```[{"name": rest_name, "state": rest_state}, ...]``` this endpoint was for initial dataflow testing.
+
+```/getRestByID``` body format: ```{"id": rest_id}```, returns restaurant with ```rest_id``` in format ```{"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}``` For the specific format, please refer to ```database/queries/QueryRestaurants/getRestaurantsWithPrep```.
+
+```/```
 
 ### Team Strengths and Weaknesses:
 

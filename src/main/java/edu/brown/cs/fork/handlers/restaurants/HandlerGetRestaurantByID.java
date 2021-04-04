@@ -3,7 +3,6 @@ package edu.brown.cs.fork.handlers.restaurants;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
-import edu.brown.cs.fork.exceptions.SQLErrorException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import spark.Request;
@@ -15,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Handler for getRestaurantByID in QueryRestaurants
+ * Handler for getRestaurantByID in QueryRestaurants.
  */
 public class HandlerGetRestaurantByID implements Route {
   private static final Gson GSON = new Gson();
@@ -36,13 +35,13 @@ public class HandlerGetRestaurantByID implements Route {
       err = "ERROR: No database connected";
     } else {
       try {
-        rest = Hub.getRestDB().getRestaurantByID(id);
-      } catch (SQLException | SQLErrorException e) {
+        rest = Hub.getRestDB().queryRestaurantsByID(id);
+      } catch (SQLException e) {
         err = e.getMessage();
         System.out.println(e.getMessage());
       }
     }
-    Map<String, Object> variables = ImmutableMap.of("restaurant", rest, "err", err);
+    Map<String, Object> variables = ImmutableMap.of("restaurants", rest, "err", err);
 
     return GSON.toJson(variables);
   }

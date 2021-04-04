@@ -1,8 +1,6 @@
 package edu.brown.cs.fork.database.queries;
 
-import com.google.gson.Gson;
 import edu.brown.cs.fork.database.Database;
-import edu.brown.cs.fork.exceptions.SQLErrorException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +17,9 @@ import java.util.Map;
 public class QueryRestaurants {
   private final Database db = new Database();
   private Connection conn;
-  private static final Gson GSON = new Gson();
+  private static final int SEVEN = 7;
+  private static final int EIGHT = 8;
+  private static final int NINE = 9;
 
   /**
    * Constructor.
@@ -65,35 +65,63 @@ public class QueryRestaurants {
     return results;
   }
 
-  // function that parses a categories string into a list of strings
+  /**
+   * SQl query that selects all restaurants (selective attributes).
+   * @return sql query string that would return all restaurants
+   */
+  public String selectRestaurants() {
+    return new StringBuilder().append("SELECT res.name, res.stars, res.numReviews, ")
+      .append("res.categories, res.'attributes.RestaurantsTakeOut', ")
+      .append("res.'attributes.RestaurantsDelivery', res.'attributes.RestaurantsGoodForGroups', ")
+      .append("res.'attributes.Alcohol', res.'attributes.GoodForKids' ")
+      .append("FROM restaurants as res ").toString();
+  }
 
   /**
-   * Queries a restaurant by its ID.
-   * @param id id of restaurant
-   * @return a Map representing the restaurant
+   * Get restaurant with given id.
+   * @param id id of restaurant of interest
+   * @return a PreparedStatement ready to be executed
    * @throws SQLException SQLException
-   * @throws SQLErrorException SQLErrorException
    */
-  public Map<String, String> getRestaurantByID(String id) throws SQLException, SQLErrorException {
-    Map<String, String> rest = new HashMap<>();
-    String sql = "SELECT " +
-      "res.name, res.stars, res.numReviews, res.categories, res.'attributes.RestaurantsTakeOut', " +
-      "res.'attributes.RestaurantsDelivery', res.'attributes.RestaurantsGoodForGroups', " +
-      "res.'attributes.Alcohol', res.'attributes.GoodForKids' " +
-      "FROM restaurants as res WHERE res.business_id = ?;";
+  private PreparedStatement prepGetRestaurantByID(String id) throws SQLException {
+    String sql = selectRestaurants() + "WHERE res.business_id = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
     prep.setString(1, id);
+    return prep;
+  }
+
+  /**
+   * Executes prepGetRestaurantByID with given id.
+   * @param id id of restaurant of interest
+   * @return restaurant with given id
+   * @throws SQLException SQLException
+   */
+  public Map<String, String> queryRestaurantsByID(String id) throws SQLException {
+    PreparedStatement prep = prepGetRestaurantByID(id);
+    return getRestaurantsWithPrep(prep).get(0);
+  }
+
+  /**
+   * Queries restaurants based on the given PreparedStatement.
+   * @param prep a PreparedStatement that filters all restaurants
+   * @return all restaurants according to input prep
+   * @throws SQLException SQLException
+   */
+  public List<Map<String, String>> getRestaurantsWithPrep(PreparedStatement prep)
+      throws SQLException {
+    List<Map<String, String>> results = new ArrayList<>();
     ResultSet rs = prep.executeQuery();
     while (rs.next()) {
+      Map<String, String> rest = new HashMap<>();
       String name = rs.getString(1);
       String numStars = rs.getString(2);
       String numReviews = rs.getString(3);
       String categories = rs.getString(4);
       String takeout = rs.getString(5);
       String delivery = rs.getString(6);
-      String goodForGroups = rs.getString(7);
-      String alcohol = rs.getString(8);
-      String goodForKids = rs.getString(9);
+      String goodForGroups = rs.getString(SEVEN);
+      String alcohol = rs.getString(EIGHT);
+      String goodForKids = rs.getString(NINE);
       rest.put("name", name);
       rest.put("numStars", numStars);
       rest.put("numReviews", numReviews);
@@ -103,9 +131,10 @@ public class QueryRestaurants {
       rest.put("goodForGroups", goodForGroups);
       rest.put("alcohol", alcohol);
       rest.put("goodForKids", goodForKids);
+      results.add(rest);
     }
     prep.close();
     rs.close();
-    return rest;
+    return results;
   }
 }
