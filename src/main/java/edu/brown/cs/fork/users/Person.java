@@ -1,5 +1,6 @@
 package edu.brown.cs.fork.users;
 
+import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 
 import java.util.List;
@@ -20,8 +21,13 @@ public class Person {
    * @param gottenWay - a double indicating if that person has gotten their way recently. This
    *                  double is between 0 and 1, with 0 meaning haven't gotten their way at all,
    *                  and 1 meaning always gotten their way.
+   * @throws OutOfRangeException if gotten way if not between 0 and 1.
    */
-  public Person(String userId, List<LabeledRestaurant> preference, double gottenWay) {
+  public Person(String userId, List<LabeledRestaurant> preference, double gottenWay)
+          throws OutOfRangeException {
+    if (gottenWay < 0 || gottenWay > 1) {
+      throw new OutOfRangeException("gottenWay should be between 0 and 1");
+    }
     this.userId = userId;
     this.preference = preference;
     this.gottenWay = gottenWay;

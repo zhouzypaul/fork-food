@@ -1,6 +1,6 @@
 package edu.brown.cs.fork.restaurants;
 
-import edu.brown.cs.fork.exceptions.IllegalLabelException;
+import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.recommendation.LabeledData;
 
 /**
@@ -17,11 +17,11 @@ public class LabeledRestaurant implements LabeledData<Restaurant> {
    * @param label - the label for the data (either 1 or 0). 1 corresponds to the user liking the
    *              restaurant, and 0 corresponds to dislike.
    *
-   * @throws IllegalLabelException when the label is not 1 or 0
+   * @throws OutOfRangeException when the label is not 1 or 0
    */
-  public LabeledRestaurant(Restaurant data, int label) throws IllegalLabelException {
+  public LabeledRestaurant(Restaurant data, int label) throws OutOfRangeException {
     if ((label != 0) && (label != 1)) {
-      throw new IllegalLabelException("Restaurant Label can only be 0 or 1");
+      throw new OutOfRangeException("Restaurant Label can only be 0 or 1");
     }
     this.data = data;
     this.label = label;
