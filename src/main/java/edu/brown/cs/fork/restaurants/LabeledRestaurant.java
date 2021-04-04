@@ -14,7 +14,8 @@ public class LabeledRestaurant implements LabeledData<Restaurant> {
   /**
    * constructor for a LabeledRestaurant.
    * @param data - the Restaurant object.
-   * @param label - the label for the data (either 1 or 0).
+   * @param label - the label for the data (either 1 or 0). 1 corresponds to the user liking the
+   *              restaurant, and 0 corresponds to dislike.
    *
    * @throws IllegalLabelException when the label is not 1 or 0
    */
