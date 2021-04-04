@@ -1,5 +1,6 @@
 package edu.brown.cs.fork.restaurants;
 
+import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.recommendation.Recommendable;
 
 /**
@@ -21,7 +22,7 @@ public class Restaurant implements Recommendable {
   private final String id;
   private final String name;
   private final String foodType;
-  private final int star;
+  private final double star;
   private final int numReviews;
   private final double distance;
   // dim of attributes
@@ -50,9 +51,14 @@ public class Restaurant implements Recommendable {
    * @param star - the average star (review) the restaurant has.
    * @param numReviews - number of review the restaurant received.
    * @param distance - distance of the restaurant to the user.
+   *
+   * @throws OutOfRangeException - when one of star, numReview, distance is negative.
    */
-  public Restaurant(String id, String name, String foodType, int star, int numReviews,
-                    double distance) {
+  public Restaurant(String id, String name, String foodType, double star, int numReviews,
+                    double distance) throws OutOfRangeException {
+    if (star < 0 || star > 5 || numReviews < 0 || distance < 0) {
+      throw new OutOfRangeException("all of stars, numReviews, distance have to be non-negative");
+    }
     this.id = id;
     this.name = name;
     this.foodType = foodType;
@@ -89,7 +95,7 @@ public class Restaurant implements Recommendable {
    * getter for the star field.
    * @return the star.
    */
-  public int getStar() {
+  public double getStar() {
     return this.star;
   }
 
@@ -247,7 +253,7 @@ public class Restaurant implements Recommendable {
   /**
    * get the dimension of each of the attributes.
    *
-   * @return [4, 30, 3, 5]
+   * @return [4, 17, 3, 5]
    */
   @Override
   public int[] getAttrDim() {

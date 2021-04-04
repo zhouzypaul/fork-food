@@ -25,11 +25,11 @@ public class GroupTest implements ITest {
    */
   @Override
   public void setUp() {
-    Restaurant kfc = new Restaurant("1", "KFC", "Burgers", 3,
-            1000, 1);
-    Restaurant denden = new Restaurant("2", "Den Den", "Chinese", 4,
-            200, 1.5);
     try {
+      Restaurant kfc = new Restaurant("1", "KFC", "Burgers", 3,
+              1000, 1);
+      Restaurant denden = new Restaurant("2", "Den Den", "Chinese", 4,
+              200, 1.5);
       // person 1
       LabeledRestaurant labelKfc1 = new LabeledRestaurant(kfc, 0);
       LabeledRestaurant labelDenden1 = new LabeledRestaurant(denden, 1);
