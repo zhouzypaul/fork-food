@@ -4,7 +4,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.handlers.login.LoginHandler;
+import edu.brown.cs.fork.handlers.login.RegistrationHandler;
 import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
+import edu.brown.cs.fork.sockets.GroupSocket;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import com.google.gson.Gson;
@@ -74,6 +77,12 @@ public final class Main {
     Spark.exception(Exception.class, new ExceptionPrinter());
 
     Spark.post("/test", new HandlerAllRestaurants());
+    // handles registering new users
+    Spark.post("/register", new RegistrationHandler());
+    // handles user login
+    Spark.post("/login", new LoginHandler());
+    // websocket
+    Spark.webSocket("/socket", GroupSocket.class);
   }
 
 

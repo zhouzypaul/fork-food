@@ -1,8 +1,11 @@
 import TextBox from "./TextBox";
-import {useState} from "react";
+import { useState } from "react";
 import TopBar from "./TopBar";
-import {useDispatch} from "react-redux";
-import {login} from "../actions";
+import { useDispatch } from "react-redux";
+import { login } from "../actions";
+import axios from 'axios';
+
+const SERVER_URL = 'http://localhost:4567';
 
 function NewUser(props) {
   const [username, setUsername] = useState("");
@@ -13,24 +16,50 @@ function NewUser(props) {
 
   const createUser = () => {
     if (password === confirm) {
-      dispatch(login(username));
-      props.history.push('/home');
+      // register user in backend
+      registerUser(username, password);
+
     } else {
-        setError("Passwords do not match");
+      setError("Passwords do not match");
     }
   }
 
-  return(
+  const registerUser = (username, hash) => {
+    const toSend = {
+      // username and password
+      username: username,
+      password: password
+    };
+    let config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    };
+
+    axios
+      .post(`${SERVER_URL}/register`, toSend, config)
+      .then((response) => {
+        dispatch(login(username));
+        props.history.push('/home');
+        console.log("registered");
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  return (
     <>
-      <TopBar to="/" showOptions={false}/>
+      <TopBar to="/" showOptions={false} />
       <div className="login">
         <div className="title-text">join fork</div>
         <div className="login-error">
-            {error}
+          {error}
         </div>
-        <TextBox initial="username" change={setUsername} type="text"/>
-        <TextBox initial="password" change={setPassword} type="password"/>
-        <TextBox initial="confirm password" change={setConfirm} type="password"/>
+        <TextBox initial="username" change={setUsername} type="text" />
+        <TextBox initial="password" change={setPassword} type="password" />
+        <TextBox initial="confirm password" change={setConfirm} type="password" />
         <button className="primary-button" onClick={createUser}>
           join
         </button>
