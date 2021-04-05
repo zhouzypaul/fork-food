@@ -1,6 +1,5 @@
 import TopBar from "./TopBar";
 import {useRef, useState} from "react";
-import ReactCodeInput from "react-code-input";
 import Code from "./Code";
 
 function Join() {
@@ -11,6 +10,8 @@ function Join() {
       <TopBar showOptions={true} to="/home"/>
       <div className="content">
         <Code change={setValues}/>
+        <br/>
+        <button className="primary-button">join</button>
       </div>
     </>
   );

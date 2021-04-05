@@ -17,8 +17,8 @@ function TopBar (props) {
         </Link>
       </span>
       <span className="options" ref={options}>
-        <Link className="links" to="/profile">Profile</Link>
-        <Link className="links" to="/settings">Settings</Link>
+        <Link className="links" to="/profile">profile</Link>
+        <Link className="links" to="/settings">settings</Link>
       </span>
     </div>
   );

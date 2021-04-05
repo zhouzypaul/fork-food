@@ -3,45 +3,40 @@ import {useState} from "react";
 import TopBar from "./TopBar";
 import {useDispatch} from "react-redux";
 import {login} from "../actions";
-import {Link} from "react-router-dom";
 
-function Login(props) {
+function NewUser(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
-  const verify = () => {
-    if ((username === "ed" && password === "xing") || (username === "carot" && password === "cheng")) {
+  const createUser = () => {
+    if (password === confirm) {
       dispatch(login(username));
       props.history.push('/home');
     } else {
-      setError("username or password is incorrect")
+        setError("Passwords do not match");
     }
   }
-  
+
   return(
     <>
       <TopBar to="/" showOptions={false}/>
       <div className="login">
-        <div className="title-text">hungry?</div>
+        <div className="title-text">join fork</div>
         <div className="login-error">
             {error}
         </div>
         <TextBox initial="username" change={setUsername} type="text"/>
         <TextBox initial="password" change={setPassword} type="password"/>
-        <button className="primary-button" onClick={verify} onKeyPress={verify}>
-          sign in
+        <TextBox initial="confirm password" change={setConfirm} type="password"/>
+        <button className="primary-button" onClick={createUser}>
+          join
         </button>
-        <div className="divider"/>
-        <Link to="/newuser">
-          <button className="secondary-button">
-            join
-          </button>
-        </Link>
       </div>
     </>
   );
 }
 
-export default Login;
+export default NewUser;

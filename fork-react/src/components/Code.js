@@ -33,9 +33,14 @@ function Code(props) {
     const key = e.key;
     const name = e.target.name;
     if (e.target.value.length > 0) {
-      if (key !== "Backspace" && e.target.value !== document.getSelection().toString()) {
+      const selected = document.getSelection().toString();
+      if (key !== "Backspace" && e.target.value !== selected) {
         e.preventDefault();
         e.stopPropagation();
+      } else if (key === selected) {
+        e.preventDefault();
+        e.stopPropagation();
+        jump(e);
       }
     } else {
       if (key === "Backspace") {
