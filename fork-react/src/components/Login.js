@@ -19,6 +19,14 @@ function Login(props) {
       setError("username or password is incorrect")
     }
   }
+
+  const submit = (e) => {
+    console.log("hi")
+    const key = e.key;
+    if (key === "Enter") {
+      verify();
+    }
+  }
   
   return(
     <>
@@ -28,9 +36,9 @@ function Login(props) {
         <div className="login-error">
             {error}
         </div>
-        <TextBox initial="username" change={setUsername} type="text"/>
-        <TextBox initial="password" change={setPassword} type="password"/>
-        <button className="primary-button" onClick={verify} onKeyPress={verify}>
+        <TextBox initial="username" change={setUsername} type="text" onKeyDown={submit}/>
+        <TextBox initial="password" change={setPassword} type="password" onKeyDown={submit}/>
+        <button className="primary-button" onClick={verify}>
           sign in
         </button>
         <div className="divider"/>

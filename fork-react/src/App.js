@@ -12,6 +12,7 @@ import {useSelector} from "react-redux";
 import Host from "./components/Host";
 import Join from "./components/Join";
 import NewUser from './components/NewUser';
+import Survey from './components/Survey';
 
 function App() {
   const user = useSelector(state => state.user);
@@ -26,6 +27,7 @@ function App() {
         <Route path="/settings" component={user !== "" ? Settings : Start}/>
         <Route path="/host" component={user !== "" ? Host : Start}/>
         <Route path="/join" component={user !== "" ? Join : Start}/>
+        <Route path="/survey" component={user !== "" ? Survey : Start}/>
       </Router>
     </div>
   );

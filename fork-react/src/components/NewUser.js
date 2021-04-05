@@ -14,9 +14,17 @@ function NewUser(props) {
   const createUser = () => {
     if (password === confirm) {
       dispatch(login(username));
-      props.history.push('/home');
+      props.history.push('/survey');
     } else {
         setError("Passwords do not match");
+    }
+  }
+
+  const submit = (e) => {
+    console.log("hi")
+    const key = e.key;
+    if (key === "Enter") {
+      createUser();
     }
   }
 
@@ -28,9 +36,9 @@ function NewUser(props) {
         <div className="login-error">
             {error}
         </div>
-        <TextBox initial="username" change={setUsername} type="text"/>
-        <TextBox initial="password" change={setPassword} type="password"/>
-        <TextBox initial="confirm password" change={setConfirm} type="password"/>
+        <TextBox initial="username" change={setUsername} onKeyDown={submit} type="text"/>
+        <TextBox initial="password" change={setPassword} onKeyDown={submit} type="password"/>
+        <TextBox initial="confirm password" change={setConfirm} onKeyDown={submit} type="password"/>
         <button className="primary-button" onClick={createUser}>
           join
         </button>

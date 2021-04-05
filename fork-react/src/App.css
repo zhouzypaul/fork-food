@@ -20,7 +20,7 @@
 
 .top-bar {
   position: sticky;
-  top: 0;
+  top: 16px;
   margin-top: 16px;
   display: flex;
   flex-direction: row;
@@ -150,6 +150,38 @@
   min-height: 20px;
 }
 
+.survey {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: space-around;
+  justify-content: flex-start;
+  max-width: 60vw;
+}
+
+.survey-box {
+  font: inherit;
+  flex-grow: 1;
+  margin: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  background-color: gainsboro;
+  outline: none;
+}
+
+.survey-box:focus {
+  background-color: #DDAFF995;
+}
+
+.exit-home {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 16px;
+}
+
 .divider {
   margin: 16px;
   color: gainsboro;
@@ -239,10 +271,6 @@
   height: 200px;
   border-radius: 50%;
   animation: pulse ease-in-out 1.6s infinite;
-}
-
-body {
-  overflow: hidden;
 }
 
 @keyframes move {

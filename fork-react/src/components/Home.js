@@ -1,7 +1,15 @@
 import TopBar from "./TopBar";
 import {Link} from "react-router-dom";
+import { useEffect } from "react";
 
 function Home() {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = null;
+    }
+  });
+
   return (
     <>
       <TopBar to='/home' showOptions={true}/>
