@@ -115,11 +115,10 @@ public class QueryUsers {
     return results;
   }
 
-  private boolean upsertUserInfo(String userId, List<String> colsToUpdate, List<String> info) {
+  public boolean upsertUserInfo(String userId, List<String> colsToUpdate, List<String> info) {
     if (colsToUpdate.size() != info.size()) {
       return false;
     }
-
     // build update string
     // example: pref_high_review='1000', pref_num_reviews='2000'
     StringBuilder sb = new StringBuilder();
@@ -174,9 +173,9 @@ public class QueryUsers {
     val.append("('").append(userId).append("', ");
     for (int i = 0; i < info.size(); i++) {
       if (i == info.size() - 1) {
-        sb.append("'").append(info.get(i)).append("'");
+        val.append("'").append(info.get(i)).append("'");
       } else {
-        sb.append("'").append(info.get(i)).append("', ");
+        val.append("'").append(info.get(i)).append("', ");
       }
     }
     val.append(")");

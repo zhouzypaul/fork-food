@@ -21,7 +21,7 @@ public class HandlerAllUsers implements Route {
   public Object handle(Request req, Response res) {
     String err = "";
     List<Map<String, String>> ret = new ArrayList<>();
-    if (!Hub.getRestDB().isConnected()) {
+    if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
       try {

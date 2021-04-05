@@ -27,7 +27,7 @@ public class HandlerGetUserByID implements Route {
     String err = "";
     List<Map<String, String>> users = new ArrayList<>();
     Map<String, String> user = new HashMap<>();
-    if (!Hub.getRestDB().isConnected()) {
+    if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
       try {

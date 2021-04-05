@@ -9,7 +9,10 @@ import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
 import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
 import edu.brown.cs.fork.handlers.users.HandlerAllUsers;
+import edu.brown.cs.fork.handlers.users.HandlerDeleteUser;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserByID;
+import edu.brown.cs.fork.handlers.users.HandlerRegisterUser;
+import edu.brown.cs.fork.handlers.users.HandlerUpsertUser;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import com.google.gson.Gson;
@@ -84,9 +87,10 @@ public final class Main {
     Spark.post("/getAllUsers", new HandlerAllUsers());
     Spark.post("/getUserByID", new HandlerGetUserByID());
     Spark.post("/getAllUserIds", new HandlerAllUserIds());
+    Spark.post("/registerUser", new HandlerRegisterUser());
+    Spark.post("/deleteUser", new HandlerDeleteUser());
+    Spark.post("/upsertUser", new HandlerUpsertUser());
   }
-
-
 
   /**
    * Display an error page when an exception occurs in the server.

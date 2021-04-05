@@ -42,7 +42,7 @@ public class ActionPreprocess implements TriggerAction {
     PreparedStatement prep = this.restConn.prepareStatement(sql);
     ResultSet rs = prep.executeQuery();
     while (rs.next()) {
-      String pattern  = "[^,]+";
+      String pattern = "[^,]+";
       Pattern r = Pattern.compile(pattern);
       String cat = rs.getString(1);
       Matcher m = r.matcher(cat);

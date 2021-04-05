@@ -96,7 +96,11 @@ load user path_to_custom_user_db
 
 - ```/getAllUserIds``` no required body, returns all ```userId```s.
 
-- ```/```
+- ```/registerUser``` body format: ```{"id": user_id, "pwd": user_pwd}```, returns whether the action is successful
+
+- ```/deleteUser``` body format: ```{"id": user_id}```, returns whether the action is successful
+
+- ```/upsertUser``` body format: ```{"id": user_id, "colsToUpdate": col_to_update_separated_by_commas, "info": info_to_update_separated_by_commas}```. This will update user table with new information if the user exists, or inserts a new user info row if the user doesn't exist. OP! Current limitation: doesn't support updating/inserting with the ```categories``` column since info in that column is separated by commas.
 
 ### Team Strengths and Weaknesses:
 
