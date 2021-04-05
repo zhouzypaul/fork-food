@@ -10,32 +10,35 @@ import spark.Response;
 import spark.Route;
 
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Handler for getRestaurantByID in QueryRestaurants.
+ * Handler for getting restaurants within a certain radius.
  */
-public class HandlerGetRestaurantByID implements Route {
+public class HandlerGetRestByRad implements Route {
   private static final Gson GSON = new Gson();
 
   /**
    * Constructor.
    */
-  public HandlerGetRestaurantByID() {  }
+  public HandlerGetRestByRad() {  }
 
   @Override
   public Object handle(Request req, Response res) throws JSONException {
     JSONObject data = new JSONObject(req.body());
-    String id = data.getString("id");
+    Double rad = data.getDouble("radius");
+    Double lat = data.getDouble("lat");
+    Double lon = data.getDouble("lon");
 
     String err = "";
-    Map<String, String> rest = new HashMap<>();
+    List<Map<String, String>> rest = new ArrayList<>();
     if (!Hub.getRestDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
       try {
-        rest = Hub.getRestDB().queryRestaurantsByID(id);
+        rest = Hub.getRestDB().queryRestByRad(rad, lat, lon);
       } catch (SQLException e) {
         err = e.getMessage();
         System.out.println(e.getMessage());

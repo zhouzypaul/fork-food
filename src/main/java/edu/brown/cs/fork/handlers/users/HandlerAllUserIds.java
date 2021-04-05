@@ -12,26 +12,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class HandlerAllUsers implements Route {
+public class HandlerAllUserIds implements Route {
   private static final Gson GSON = new Gson();
 
-  public HandlerAllUsers() {  }
+  public HandlerAllUserIds() { }
 
   @Override
-  public Object handle(Request req, Response res) {
+  public Object handle(Request req, Response res) throws Exception {
     String err = "";
-    List<Map<String, String>> ret = new ArrayList<>();
+    List<String> ret = new ArrayList<>();
     if (!Hub.getRestDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
       try {
-        ret = Hub.getUserDB().queryAllUsers();
+        ret = Hub.getUserDB().queryAllUserIds();
       } catch (SQLException e) {
         err = e.getMessage();
         System.out.println(e.getMessage());
       }
     }
-    Map<String, Object> variables = ImmutableMap.of("users", ret, "err", err);
+    Map<String, Object> variables = ImmutableMap.of("userIds", ret, "err", err);
 
     return GSON.toJson(variables);
   }

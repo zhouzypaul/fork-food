@@ -20,6 +20,10 @@ public class QueryRestaurants {
   private static final int SEVEN = 7;
   private static final int EIGHT = 8;
   private static final int NINE = 9;
+  private static final int TEN = 10;
+  private static final int ONEONE = 11;
+  private static final double SIXNINE = 69.0;
+  private static final double ONEONEONE = 111.0;
 
   /**
    * Constructor.
@@ -69,36 +73,68 @@ public class QueryRestaurants {
    * SQl query that selects all restaurants (selective attributes).
    * @return sql query string that would return all restaurants
    */
-  public String selectRestaurants() {
+  private String selectRestaurants() {
     return new StringBuilder().append("SELECT res.name, res.stars, res.numReviews, ")
       .append("res.categories, res.'attributes.RestaurantsTakeOut', ")
       .append("res.'attributes.RestaurantsDelivery', res.'attributes.RestaurantsGoodForGroups', ")
-      .append("res.'attributes.Alcohol', res.'attributes.GoodForKids' ")
+      .append("res.'attributes.Alcohol', res.'attributes.GoodForKids', res.state, res.city ")
       .append("FROM restaurants as res ").toString();
-  }
-
-  /**
-   * Get restaurant with given id.
-   * @param id id of restaurant of interest
-   * @return a PreparedStatement ready to be executed
-   * @throws SQLException SQLException
-   */
-  private PreparedStatement prepGetRestaurantByID(String id) throws SQLException {
-    String sql = selectRestaurants() + "WHERE res.business_id = ?;";
-    PreparedStatement prep = this.conn.prepareStatement(sql);
-    prep.setString(1, id);
-    return prep;
   }
 
   /**
    * Executes prepGetRestaurantByID with given id.
    * @param id id of restaurant of interest
-   * @return restaurant with given id
+   * @return restaurant with given id in a list
    * @throws SQLException SQLException
    */
-  public Map<String, String> queryRestaurantsByID(String id) throws SQLException {
-    PreparedStatement prep = prepGetRestaurantByID(id);
-    return getRestaurantsWithPrep(prep).get(0);
+  public List<Map<String, String>> queryRestByID(String id) throws SQLException {
+    String sql = selectRestaurants() + "WHERE res.business_id = ?;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, id);
+    return getRestaurantsWithPrep(prep);
+  }
+
+  /**
+   * Converts miles to latitude, longitude degrees.
+   * @param miles miles
+   * @return latitude, longitude degrees
+   */
+  private Double milesToEarth(Double miles) {
+    return miles / SIXNINE;
+  }
+
+  /**
+   * Converts miles to latitude, longitude degrees.
+   * @param km kilometers
+   * @return latitude, longitude degrees
+   */
+  private Double kmToEarth(Double km) {
+    return km / ONEONEONE;
+  }
+
+  /**
+   * Prepares statement to query restaurants in a bounding box defined by half and coors.
+   * @param half half of the side length of a square bounding box
+   * @param lat latitude of the center of the square bounding box
+   * @param lon longitude of the center of the square bounding box
+   * @return a PreparedStatement
+   */
+  public List<Map<String, String>> queryRestByRad(Double half, Double lat, Double lon)
+      throws SQLException {
+    double topLeftLat = lat + milesToEarth(half);
+    double topLeftLon = lon - milesToEarth(half);
+    double botRightLat = lat - milesToEarth(half);
+    double botRightLon = lon + milesToEarth(half);
+    String bbox1 = "WHERE res.latitude <= ? AND res.latitude >= ? AND ";
+    String bbox2 = "res.longitude >= ? AND res.longitude <= ?";
+    String sql = new StringBuilder().append(selectRestaurants())
+          .append(bbox1).append(bbox2).toString();
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, String.valueOf(topLeftLat));
+    prep.setString(2, String.valueOf(botRightLat));
+    prep.setString(3, String.valueOf(topLeftLon));
+    prep.setString(4, String.valueOf(botRightLon));
+    return getRestaurantsWithPrep(prep);
   }
 
   /**
@@ -107,7 +143,7 @@ public class QueryRestaurants {
    * @return all restaurants according to input prep
    * @throws SQLException SQLException
    */
-  public List<Map<String, String>> getRestaurantsWithPrep(PreparedStatement prep)
+  private List<Map<String, String>> getRestaurantsWithPrep(PreparedStatement prep)
       throws SQLException {
     List<Map<String, String>> results = new ArrayList<>();
     ResultSet rs = prep.executeQuery();
@@ -122,6 +158,8 @@ public class QueryRestaurants {
       String goodForGroups = rs.getString(SEVEN);
       String alcohol = rs.getString(EIGHT);
       String goodForKids = rs.getString(NINE);
+      String state = rs.getString(TEN);
+      String city = rs.getString(ONEONE);
       rest.put("name", name);
       rest.put("numStars", numStars);
       rest.put("numReviews", numReviews);
@@ -131,6 +169,8 @@ public class QueryRestaurants {
       rest.put("goodForGroups", goodForGroups);
       rest.put("alcohol", alcohol);
       rest.put("goodForKids", goodForKids);
+      rest.put("state", state);
+      rest.put("city", city);
       results.add(rest);
     }
     prep.close();

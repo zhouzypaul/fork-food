@@ -80,11 +80,23 @@ load user path_to_custom_user_db
 
 ### API Documentation
 
-```/test``` no required body, returns all restaurants in format ```[{"name": rest_name, "state": rest_state}, ...]``` this endpoint was for initial dataflow testing.
+#### restaurants
 
-```/getRestByID``` body format: ```{"id": rest_id}```, returns restaurant with ```rest_id``` in format ```{"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}``` For the specific format, please refer to ```database/queries/QueryRestaurants/getRestaurantsWithPrep```.
+- ```/test``` no required body, returns all restaurants. This endpoint was for initial dataflow testing.
 
-```/```
+- ```/getRestByID``` body format: ```{"id": rest_id}```, returns restaurant with ```rest_id``` in format ```{"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}``` For the specific format, please refer to ```database/queries/QueryRestaurants/getRestaurantsWithPrep```.
+
+- ```/getRestByRad``` body format: ```{“radius": rad, "lat": center_lat, "lon": center_lon}```, returns restaurants within the square bounding box with side length ```2*rad``` around the center coordinate.
+
+#### user
+
+- ```/getAllUsers``` no required body, returns all users in the database.
+
+- ```/getUserByID``` body format: ```{"id": user_id}```, returns user with ```user_id``` in format ```{"userID": "", "radius": "", "prefHighReview": "", "prefNumReviews": "", "categories": ""}```
+
+- ```/getAllUserIds``` no required body, returns all ```userId```s.
+
+- ```/```
 
 ### Team Strengths and Weaknesses:
 
