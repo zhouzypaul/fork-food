@@ -171,10 +171,6 @@
   outline: none;
 }
 
-.survey-box:focus {
-  background-color: #DDAFF995;
-}
-
 .exit-home {
   position: fixed;
   bottom: 0;

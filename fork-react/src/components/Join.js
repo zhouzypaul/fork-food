@@ -1,5 +1,5 @@
 import TopBar from "./TopBar";
-import {useRef, useState} from "react";
+import {useState} from "react";
 import Code from "./Code";
 
 function Join() {
