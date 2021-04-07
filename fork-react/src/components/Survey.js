@@ -2,6 +2,7 @@ import {useState, useEffect, useRef} from "react";
 import {Link} from "react-router-dom";
 import TopBar from "./TopBar";
 import {useSelector} from "react-redux";
+import axios from 'axios';
 
 const TYPES = ["burgers", "chinese", "pizza", "italian", "sushi", "indian",
   "vietnamese", "steak", "breakfast", "dessert"];
@@ -18,8 +19,9 @@ function Option(props) {
       e.target.style.backgroundColor = "gainsboro";
     }
   }
+
   return(
-    <button className="survey-box" onClick={toggle}>
+    <button className="survey-box" onClick={toggle} style={{backgroundColor: props.color}}>
       {props.value}
     </button>
   );
@@ -34,33 +36,67 @@ function Survey() {
   const priceRange = useRef({});
   const user = useSelector(state => state.user);
 
-  const generateBoxes = (options, handler, setter, ref) => {
-    let boxes = [];
+  const generateObjects = (options, ref) => {
     let selections = {};
-    let i = 1;
-    for (let t of options) {
-      boxes.push(<Option value={t} pick={handler} key={i}/>);
-      selections[t] = false;
-      i++;
-    }
+    options.forEach(op => {selections[op] = false});
     ref.current = selections;
+  }
+
+  const generateBoxes = (options, handler, setter) => {
+    const boxes = [];
+    let i = 1;
+    for (let op in options) {
+      if (options.hasOwnProperty(op)) {
+        boxes.push(<Option value={op} color={options[op] ? "#DDAFF980" : "gainsboro"} pick={handler} key={i}/>);
+        i++;
+      }
+    }
     setter(boxes);
   }
 
-  const changeSelect = (name) => {
+  const getPreferences = () => {
+    const toSend = {
+      username: user
+    }
+
+    let config = {
+      headers: {
+        "Content-Type": "application/json",
+        'Access-Control-Allow-Origin': '*',
+      }
+    }
+
+    axios.post("http://localhost:4567/getUserPref", toSend, config)
+      .then(response => {
+        const data = response.data;
+        const types = data['types'];
+        const prices = data['prices'];
+        setRadius(data['radius']);
+        types.forEach(t => selectType(t));
+        prices.forEach(p => selectPrice(p));
+        // generateBoxes(selectedTypes.current, selectType, setTypes);
+        // generateBoxes(priceRange.current, selectPrice, setPrices);
+      })
+
+      .catch(function (e) {
+        console.log(e);
+      })
+  }
+
+  const selectType = (name) => {
     selectedTypes.current[name] = !selectedTypes.current[name];
   }
 
-  const changePrice = (name) => {
+  const selectPrice = (name) => {
     priceRange.current[name] = !priceRange.current[name];
   }
 
   useEffect(() => {
-    generateBoxes(TYPES, changeSelect, setTypes, selectedTypes)
-  }, []);
-
-  useEffect(() => {
-    generateBoxes(PRICES, changePrice, setPrices, priceRange);
+    generateObjects(TYPES, selectedTypes);
+    generateObjects(PRICES, priceRange);
+    generateBoxes(selectedTypes.current, selectType, setTypes);
+    generateBoxes(priceRange.current, selectPrice, setPrices);
+    // getPreferences();
   }, []);
 
   const changeRange = (e) => {
