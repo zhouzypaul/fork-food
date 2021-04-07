@@ -1,6 +1,7 @@
 import {useState, useEffect, useRef} from "react";
 import {Link} from "react-router-dom";
 import TopBar from "./TopBar";
+import {useSelector} from "react-redux";
 
 const TYPES = ["burgers", "chinese", "pizza", "italian", "sushi", "indian",
   "vietnamese", "steak", "breakfast", "dessert"];
@@ -31,6 +32,7 @@ function Survey() {
   const [unit, setUnit] = useState("miles");
   const selectedTypes = useRef({});
   const priceRange = useRef({});
+  const user = useSelector(state => state.user);
 
   const generateBoxes = (options, handler, setter, ref) => {
     let boxes = [];
@@ -87,6 +89,7 @@ function Survey() {
       }
     }
     const toSend = {
+      username: user,
       types: typePref,
       price: pricePref,
       radius: radius
