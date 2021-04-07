@@ -21,7 +21,6 @@ function NewUser(props) {
   }
 
   const submit = (e) => {
-    console.log("hi")
     const key = e.key;
     if (key === "Enter") {
       createUser();
