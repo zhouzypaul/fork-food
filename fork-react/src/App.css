@@ -174,7 +174,7 @@
 
 #radius {
   margin: 0 16px;
-  width: 30vw;
+  width: 60%;
 }
 
 #radius-display {
@@ -185,7 +185,7 @@
   margin: 18px;
   display: flex;
   flex-direction: row;
-  width: 50vw;
+  width: 30vw;
   justify-content: space-around;
 }
 

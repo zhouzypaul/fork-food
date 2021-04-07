@@ -4,8 +4,9 @@ import TopBar from "./TopBar";
 import {useSelector} from "react-redux";
 import axios from 'axios';
 
-const TYPES = ["burgers", "chinese", "pizza", "italian", "sushi", "indian",
-  "vietnamese", "steak", "breakfast", "dessert"];
+const TYPES = ["coffee & tea", "chinese", "pizza", "italian", "japanese", "indian", "greek",
+  "middle eastern", "pizza", "vegan", "mexican", "thai", "american", "salad", "barbeque", "seafood",
+  "steak", "vietnamese", "steak", "breakfast", "dessert"];
 const PRICES = ["$", "$$", "$$$"];
 
 function Option(props) {
