@@ -1,23 +1,12 @@
 import TopBar from "./TopBar";
 import { useRef, useState } from "react";
 import Code from "./Code";
+import { Link } from "react-router-dom";
 
 function Join() {
+  // values same as room code
   const [values, setValues] = useState("");
   console.log(values);
-
-  const conn = new WebSocket("ws://localhost:4567/socket");
-  const [id, setId] = useState();
-  const [waitingRoom, setWaitingRoom] = useState([]);
-
-  conn.onmessage = (e) => {
-    let data = JSON.parse(e["data"])
-    if (data.type === 0) {
-      setId(data.payload.id)
-    } else {
-      setWaitingRoom(data.payload.id)
-    }
-  };
 
   return (
     <>
@@ -25,7 +14,10 @@ function Join() {
       <div className="content">
         <Code change={setValues} />
         <br />
-        <button className="primary-button">join</button>
+        <Link to={`/join${values}`}>
+          <button className="primary-button">join</button>
+        </Link>
+
       </div>
     </>
   );

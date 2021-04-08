@@ -41,7 +41,6 @@ function NewUser(props) {
       .post(`${SERVER_URL}/register`, toSend, config)
       .then((response) => {
         // if response is true, do this otherwise, say username already exists setError
-        console.log(response.data["okay"])
         if (response.data["okay"]) {
 
           dispatch(login(username));

@@ -1,21 +1,15 @@
+import { useRef } from "react";
 import TopBar from "./TopBar";
-import { useState, useRef } from "react";
-import { conn } from "../index.js";
 
-function Host() {
-  const code = Math.floor(1000 + Math.random() * 9000);
+function Host(props) {
 
-  const [id, setId] = useState();
-  const waitingRoom = useRef([]);
+  const roomCode = useRef(9999);
 
-  conn.onmessage = (e) => {
-    let data = JSON.parse(e["data"])
-    if (data.type === 0) {
-      setId(data.payload.id)
-    } else {
-      waitingRoom.current = data.payload.id
-    }
-  };
+  const roomProps = props.location.roomProps
+  if (roomProps) {
+    roomCode.current = roomProps.roomCode
+  }
+
 
   return (
     <>
@@ -24,10 +18,9 @@ function Host() {
         <div className="title-text">
           share the code
         </div>
-        <div className="code">{code}</div>
+        <div className="code">{roomCode.current}</div>
         <button className="primary-button">start</button>
       </div>
-      <div>{waitingRoom.current}</div>
     </>
   );
 }
