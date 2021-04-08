@@ -10,6 +10,7 @@ import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
 import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
 import edu.brown.cs.fork.handlers.users.HandlerDeleteUser;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPref;
+import edu.brown.cs.fork.handlers.users.HandlerInsertUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerRegisterUser;
 import edu.brown.cs.fork.handlers.users.HandlerUpdateUserPref;
 import joptsimple.OptionParser;
@@ -87,6 +88,7 @@ public final class Main {
     Spark.post("/deleteUser", new HandlerDeleteUser());
     Spark.post("/getAllUserIds", new HandlerAllUserIds());
     Spark.post("/getUserPref", new HandlerGetUserPref());
+    Spark.post("/insertUserPref", new HandlerInsertUserPref());
     Spark.post("/updateUserPref", new HandlerUpdateUserPref());
   }
 
