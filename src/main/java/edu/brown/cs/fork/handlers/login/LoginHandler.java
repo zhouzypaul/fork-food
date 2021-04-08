@@ -30,7 +30,7 @@ public class LoginHandler implements Route {
       // TODO: this line subject to change based on Sean
       boolean authenticated = authenticate(username, password);
 
-      Map<String, Object> variables = ImmutableMap.of("status", authenticated);
+      Map<String, Object> variables = ImmutableMap.of("okay", authenticated);
 
       return GSON.toJson(variables);
 

@@ -5,6 +5,4 @@ const rootReducer = combineReducers({
   user: userReducer
 })
 
-const socketConn = new WebSocket("ws://localhost:4567/socket")
-
-export { rootReducer, socketConn };
+export default rootReducer;

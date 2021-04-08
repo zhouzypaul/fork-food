@@ -41,9 +41,9 @@ public class RegistrationHandler implements Route {
 
       // TODO: this line subject to change based on Sean, should store theses values in database
       // salt is to prevent duplicate password attack, should be stored as well
-      tempFunc(username, hash, salt);
+      boolean complete = tempFunc(username, hash, salt);
 
-      Map<String, Object> variables = ImmutableMap.of("status", "complete");
+      Map<String, Object> variables = ImmutableMap.of("okay", complete);
 
       return GSON.toJson(variables);
 
@@ -54,7 +54,11 @@ public class RegistrationHandler implements Route {
     return null;
   }
 
-  private void tempFunc(String username, byte[] password, byte[] salt) {
-    System.out.println(username + ": " + Arrays.toString(password) + ": " + Arrays.toString(salt));
+  private boolean tempFunc(String username, byte[] password, byte[] salt) {
+    if (username.startsWith("E")) { // check if username already exists
+      return false;
+    }
+    System.out.println(username + ": " + Arrays.toString(password) + ": " + Arrays.toString(salt)); //put in database
+    return true;
   }
 }

@@ -40,9 +40,17 @@ function NewUser(props) {
     axios
       .post(`${SERVER_URL}/register`, toSend, config)
       .then((response) => {
-        dispatch(login(username));
-        props.history.push('/home');
-        console.log("registered");
+        // if response is true, do this otherwise, say username already exists setError
+        console.log(response.data["okay"])
+        if (response.data["okay"]) {
+
+          dispatch(login(username));
+          props.history.push('/home');
+          console.log("registered");
+        } else {
+          setError("Username already taken");
+        }
+
       })
       .catch(function (error) {
         console.log(error);

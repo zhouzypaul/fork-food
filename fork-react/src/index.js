@@ -4,10 +4,11 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { createStore } from "redux";
-import { rootReducer } from "./reducers/index";
+import rootReducer from "./reducers";
 import { Provider } from "react-redux";
 
 const store = createStore(rootReducer);
+const conn = new WebSocket("ws://localhost:4567/socket");
 
 ReactDOM.render(
   <Provider store={store}>
@@ -22,3 +23,5 @@ ReactDOM.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+export { conn };

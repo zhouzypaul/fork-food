@@ -31,7 +31,7 @@ function Login(props) {
     axios
       .post(`${SERVER_URL}/login`, toSend, config)
       .then((response) => {
-        if (response.data["status"]) {
+        if (response.data["okay"]) {
           dispatch(login(username));
           props.history.push('/home');
         } else {
