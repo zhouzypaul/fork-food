@@ -14,7 +14,13 @@ function Join() {
       <div className="content">
         <Code change={setValues} />
         <br />
-        <Link to={`/join${values}`}>
+        <Link to={{
+          pathname: `/room${values}`,
+          roomProps: {
+            roomCode: values,
+            isHost: false
+          }
+        }}>
           <button className="primary-button">join</button>
         </Link>
 

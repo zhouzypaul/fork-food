@@ -16,9 +16,10 @@ function Home() {
       </div>
       <div className="content">
         <Link to={{
-          pathname: `/host${roomCode}`,
+          pathname: `/room${roomCode}`,
           roomProps: {
-            roomCode: roomCode
+            roomCode: roomCode,
+            isHost: true
           }
         }}>
           <button className="primary-button" id="host-button">
