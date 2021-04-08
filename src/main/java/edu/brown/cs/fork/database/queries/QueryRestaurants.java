@@ -1,15 +1,23 @@
 package edu.brown.cs.fork.database.queries;
 
 import edu.brown.cs.fork.database.Database;
+import edu.brown.cs.fork.database.DistanceCalculator;
+import edu.brown.cs.fork.database.ForkUtils;
+import edu.brown.cs.fork.exceptions.OutOfRangeException;
+import edu.brown.cs.fork.restaurants.Restaurant;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class containing methods to query from the restaurants database.
@@ -17,12 +25,16 @@ import java.util.Map;
 public class QueryRestaurants {
   private final Database db = new Database();
   private Connection conn;
+  private static final double RAD = 6371.0;
   private static final int SEVEN = 7;
   private static final int EIGHT = 8;
   private static final int NINE = 9;
   private static final int TEN = 10;
   private static final int ONEONE = 11;
-  private static final int ONETWO = 11;
+  private static final int ONETWO = 12;
+  private static final int ONETHREE = 13;
+  private static final int ONEFOUR = 14;
+  private static final int ONEFIVE = 15;
   private static final double SIXNINE = 69.0;
   private static final double ONEONEONE = 111.0;
 
@@ -78,7 +90,8 @@ public class QueryRestaurants {
     return new StringBuilder().append("SELECT res.name, res.stars, res.numReviews, ")
       .append("res.categories, res.priceRange, res.'attributes.RestaurantsTakeOut', ")
       .append("res.'attributes.RestaurantsDelivery', res.'attributes.RestaurantsGoodForGroups', ")
-      .append("res.'attributes.Alcohol', res.'attributes.GoodForKids', res.state, res.city ")
+      .append("res.'attributes.Alcohol', res.'attributes.GoodForKids', ")
+      .append("res.state, res.city, res.business_id, res.latitude, res.longitude ")
       .append("FROM restaurants as res ").toString();
   }
 
@@ -138,6 +151,48 @@ public class QueryRestaurants {
     return getRestaurantsWithPrep(prep);
   }
 
+  public List<Restaurant> getTestingRests(Double half, Double lat, Double lon)
+      throws SQLException, NumberFormatException, OutOfRangeException {
+    List<Map<String, String>> restsInBBox = queryRestByRad(half, lat, lon);
+    List<Restaurant> results = new ArrayList<>();
+    for (Map<String, String> rest : restsInBBox) {
+      String businessId = rest.get("business_id");
+      String name = rest.get("name");
+      double star = Double.parseDouble(rest.get("numStars"));
+      int numReviews = Integer.parseInt(rest.get("numReviews"));
+
+      String priceRange = rest.get("priceRange");
+      int intPriceRange = 1;
+      if (!priceRange.isEmpty()) {
+        intPriceRange = Integer.parseInt(priceRange);
+      }
+
+      double restLat = Double.parseDouble(rest.get("latitude"));
+      double restLon = Double.parseDouble(rest.get("longitude"));
+      List<Double> restCoor = Arrays.asList(restLat, restLon);
+      List<Double> userCoor = Arrays.asList(lat, lon);
+      DistanceCalculator calc = new DistanceCalculator();
+      double dist = calc.getHaversineDistance(userCoor, restCoor, RAD);
+
+      String categories = rest.get("categories");
+      String pattern = "[^,\\s][^,]*[^,\\s]*";
+      Pattern r = Pattern.compile(pattern);
+      Matcher m = r.matcher(categories);
+      ForkUtils utils = new ForkUtils();
+      while (m.find()) {
+        List<String> allRestCategories = Collections.singletonList(m.group());
+        // allRestCategories might just be a single element list
+        List<String> overlapCategories = utils.getOverlap(allRestCategories);
+        for (String category : overlapCategories) {
+          results.add(
+              new Restaurant(businessId, name, category, star, numReviews, dist, intPriceRange)
+          );
+        }
+      }
+    }
+    return results;
+  }
+
   /**
    * Queries restaurants based on the given PreparedStatement.
    * @param prep a PreparedStatement that filters all restaurants
@@ -162,6 +217,9 @@ public class QueryRestaurants {
       String goodForKids = rs.getString(TEN);
       String state = rs.getString(ONEONE);
       String city = rs.getString(ONETWO);
+      String businessId = rs.getString(ONETHREE);
+      String latitude = rs.getString(ONEFOUR);
+      String longitude = rs.getString(ONEFIVE);
       rest.put("name", name);
       rest.put("numStars", numStars);
       rest.put("numReviews", numReviews);
@@ -174,6 +232,9 @@ public class QueryRestaurants {
       rest.put("goodForKids", goodForKids);
       rest.put("state", state);
       rest.put("city", city);
+      rest.put("business_id", businessId);
+      rest.put("latitude", latitude);
+      rest.put("longitude", longitude);
       results.add(rest);
     }
     prep.close();

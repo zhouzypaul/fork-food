@@ -1,7 +1,14 @@
 package edu.brown.cs.fork.database.queries;
 
 import com.google.gson.Gson;
+import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
+import edu.brown.cs.fork.database.DistanceCalculator;
+import edu.brown.cs.fork.database.ForkUtils;
+import edu.brown.cs.fork.exceptions.OutOfRangeException;
+import edu.brown.cs.fork.restaurants.LabeledRestaurant;
+import edu.brown.cs.fork.restaurants.Restaurant;
+import edu.brown.cs.fork.users.Person;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,9 +16,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class containing methods to query from the user database.
@@ -23,6 +33,8 @@ public class QueryUsers {
   private static final int SEVEN = 7;
   private static final int EIGHT = 8;
   private static final int NINE = 9;
+  private static final int TEN = 10;
+  private static final double RAD = 6371.0;
 
   public QueryUsers() {  }
 
@@ -142,13 +154,13 @@ public class QueryUsers {
     while (rs.next()) {
       String userId = rs.getString(1);
       String businessId = rs.getString(2);
-      String foodType = rs.getString(3);
-      String star = rs.getString(4);
-      String priceRange = rs.getString(5);
-      String numReviews = rs.getString(6);
-      String distance = rs.getString(SEVEN);
-      String label = rs.getString(EIGHT);
-      String timestamp = rs.getString(NINE);
+      String foodType = rs.getString(4);
+      String star = rs.getString(5);
+      String priceRange = rs.getString(6);
+      String numReviews = rs.getString(SEVEN);
+      String distance = rs.getString(EIGHT);
+      String label = rs.getString(NINE);
+      String timestamp = rs.getString(TEN);
       List<String> vals = Arrays.asList(userId, businessId, foodType, star,
           priceRange, numReviews, distance, label, timestamp);
       for (int i = 0; i < cols.size(); i++) {
@@ -223,32 +235,95 @@ public class QueryUsers {
     }
   }
 
+  // for swiping
+  public boolean insertUserPref(String userId, Double userLat, Double userLon,
+                                List<String> restIDs, List<String> likeOrDislike) {
+    String sql = insertStr();
+    if (restIDs.size() != likeOrDislike.size()) {
+      return false;
+    }
 
-  // this will be for naive bayes, we should return a Person here
-  // for now putting in List<Map<String, String>> so things won't break
-  public List<Map<String, String>> getUserInfo(String userId) throws SQLException {
+    try {
+      PreparedStatement prep = this.conn.prepareStatement(sql);
+      for (int i = 0; i < restIDs.size(); i++) {
+        Map<String, String> rest = Hub.getRestDB().queryRestByID(restIDs.get(i)).get(0);
+        prep.setString(1, userId);
+        prep.setString(2, rest.get("business_id"));
+        prep.setString(4, rest.get("numStars"));
+        prep.setString(5, rest.get("priceRange"));
+        prep.setString(6, rest.get("numReviews"));
+
+        // calculate distance here
+        Double restLat = Double.parseDouble(rest.get("latitude"));
+        Double restLon = Double.parseDouble(rest.get("longitude"));
+        DistanceCalculator calc = new DistanceCalculator();
+        List<Double> userCoor = Arrays.asList(userLat, userLon);
+        List<Double> restCoor = Arrays.asList(restLat, restLon);
+        String dist = String.valueOf(calc.getHaversineDistance(userCoor, restCoor, RAD));
+
+        prep.setString(SEVEN, dist);
+        prep.setString(EIGHT, likeOrDislike.get(i));
+        prep.setString(NINE, "");
+
+        String categories = rest.get("categories");
+        String pattern = "[^,\\s][^,]*[^,\\s]*";
+        Pattern r = Pattern.compile(pattern);
+        Matcher m = r.matcher(categories);
+        ForkUtils utils = new ForkUtils();
+        while (m.find()) {
+          List<String> allRestCategories = Collections.singletonList(m.group());
+          // allRestCategories might just be a single element list
+          List<String> overlapCategories = utils.getOverlap(allRestCategories);
+          for (String category : overlapCategories) {
+            prep.setString(3, category);
+            prep.executeUpdate();
+          }
+        }
+      }
+      return true;
+    } catch (SQLException | NullPointerException | IndexOutOfBoundsException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  public List<LabeledRestaurant> trainRowsToLabeledRests(String userId)
+      throws SQLException, NumberFormatException, OutOfRangeException {
+    List<LabeledRestaurant> results = new ArrayList<>();
     String sql = "SELECT * FROM training WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
     prep.setString(1, userId);
     ResultSet rs = prep.executeQuery();
-    List<Map<String, String>> results = new ArrayList<>();
     while (rs.next()) {
-      Map<String, String> rest = new HashMap<>();
       String businessId = rs.getString(2);
-      String foodType = rs.getString(3);
-      String star = rs.getString(4);
-      String priceRange = rs.getString(5);
-      String numReview = rs.getString(6);
-      String distance = rs.getString(SEVEN);
-      String label = rs.getString(EIGHT);
-      String timestamp = rs.getString(NINE);
-      rest.put("businessId", businessId);
-      // more put statements here
-      results.add(rest);
+      String name = rs.getString(3);
+      String foodType = rs.getString(4);
+      double star = Double.parseDouble(rs.getString(5));
+      String priceRange = rs.getString(6);
+
+      int intPriceRange = 1;
+      if (!priceRange.isEmpty()) {
+        intPriceRange = Integer.parseInt(priceRange);
+      }
+
+      int numReviews = Integer.parseInt(rs.getString(SEVEN));
+      double distance = Double.parseDouble(rs.getString(EIGHT));
+      int label = Integer.parseInt(rs.getString(NINE));
+
+      Restaurant rest =
+          new Restaurant(businessId, name, foodType, star, numReviews, distance, intPriceRange);
+
+      LabeledRestaurant labeledRest = new LabeledRestaurant(rest, label);
+      results.add(labeledRest);
     }
     prep.close();
     rs.close();
     return results;
+  }
+
+  public Person trainRowsToPerson(String userId) throws OutOfRangeException, SQLException {
+    List<LabeledRestaurant> rests = trainRowsToLabeledRests(userId);
+    return new Person(userId, rests, 1.0);
   }
 
   /**

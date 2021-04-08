@@ -79,7 +79,7 @@ public class HandlerUpdateUserPref implements Route {
     }
 
     List<String> colsToSet = Arrays.asList("userId", "business_id", "foodType", "star",
-        "priceRange", "distance", "label");
+        "priceRange", "distance", "label", "timestamp", "numReviews", "name");
 
     String err = "";
     boolean success = false;
@@ -92,7 +92,7 @@ public class HandlerUpdateUserPref implements Route {
         for (int i = 0; i < priceRanges.size(); i++) {
           for (int j = 0; j < foodTypes.size(); j++) {
             List<String> info = Arrays.asList(userId, "", matchFoodTypes(foodTypes.get(i)), "3.0",
-                matchPriceRanges(priceRanges.get(j)), distance, "1");
+                matchPriceRanges(priceRanges.get(j)), distance, "1", "", "60", "");
             success = Hub.getUserDB().insertUserPref(userId, colsToSet, info);
           }
         }

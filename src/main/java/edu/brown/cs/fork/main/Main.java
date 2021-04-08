@@ -83,10 +83,10 @@ public final class Main {
     Spark.post("/test", new HandlerAllRestaurants());
     Spark.post("/getRestByID", new HandlerGetRestByID());
     Spark.post("/getRestByRad", new HandlerGetRestByRad());
-    Spark.post("/getUserByID", new HandlerGetUserPref());
-    Spark.post("/getAllUserIds", new HandlerAllUserIds());
     Spark.post("/registerUser", new HandlerRegisterUser());
     Spark.post("/deleteUser", new HandlerDeleteUser());
+    Spark.post("/getAllUserIds", new HandlerAllUserIds());
+    Spark.post("/getUserPref", new HandlerGetUserPref());
     Spark.post("/updateUserPref", new HandlerUpdateUserPref());
   }
 

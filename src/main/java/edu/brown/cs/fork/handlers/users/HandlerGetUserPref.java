@@ -38,7 +38,7 @@ public class HandlerGetUserPref implements Route {
         priceRanges = user.get("priceRange");
         radius = Double.parseDouble(user.get("distance").get(0));
       } catch (SQLException | NumberFormatException e) {
-        err = e.getMessage();
+        err = "ERROR: " + e.getMessage();
         System.out.println("ERROR: " + e.getMessage());
       }
     }
