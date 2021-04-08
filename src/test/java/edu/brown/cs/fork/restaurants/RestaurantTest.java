@@ -68,8 +68,8 @@ public class RestaurantTest implements ITest {
     assertEquals(Double.compare(12.2, this.r.getDistance()), 0);
     assertEquals(4, this.r.getNumAttr());
     assertEquals(2, this.r.getNumClasses());
-    assertEquals(Arrays.toString(new int[]{3, 15, 2, 4}), Arrays.toString(this.r.getAttr()));
-    assertEquals(Arrays.toString(new int[]{4, 17, 3, 5}), Arrays.toString(this.r.getAttrDim()));
+    assertEquals(Arrays.toString(new int[]{3, 20, 2, 4}), Arrays.toString(this.r.getAttr()));
+    assertEquals(Arrays.toString(new int[]{4, 20, 3, 5}), Arrays.toString(this.r.getAttrDim()));
     this.tearDown();
   }
 }

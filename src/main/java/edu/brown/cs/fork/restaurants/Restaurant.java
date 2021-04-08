@@ -25,6 +25,10 @@ public class Restaurant implements Recommendable {
   private final double star;
   private final int numReviews;
   private final double distance;
+  private final String[] allFoodTypes = new String[] {"Burgers", "Chinese", "Pizza", "Italian",
+      "Sushi Bars", "Indian", "Vietnamese", "Steakhouses", "Breakfast & Brunch", "Desserts",
+      "Coffee & Tea", "Greek", "Middle Eastern", "Vegan", "Mexican", "Thai", "American",
+      "Salad", "Barbeque", "Seafood"};
   // dim of attributes
   // a restaurant object has 4 recommendable features, each with dimension
   // 1) the distance to the user: dimension of 4 (separated into 4 bins: close, walk, drive, far)
@@ -32,7 +36,7 @@ public class Restaurant implements Recommendable {
   // 3) the number of reviews: dimension of 3 (separated into 3 bins: low, med, high)
   // 4) the star review: dimension of 5 (separated into 5 bins, one for each integer star)
   private final int dimDistance = 4;
-  private final int dimFoodType = 17;
+  private final int dimFoodType = this.allFoodTypes.length;
   private final int dimStar = 5;
   private final int dimNumReviews = 3;
   // mapping of attributes
@@ -181,41 +185,14 @@ public class Restaurant implements Recommendable {
    * @return an bin index.
    */
   private int mapFoodType() {
-    if (this.foodType.contains("Burgers")) {
-      return 0;
-    } else if (this.foodType.contains("Chinese")) {
-      return 1;
-    } else if (this.foodType.contains("Pizza")) {
-      return 2;
-    } else if (this.foodType.contains("Italian")) {
-      return 3;
-    } else if (this.foodType.contains("Sushi Bars")) {
-      return 4;
-    } else if (this.foodType.contains("Indian")) {
-      return 5;
-    } else if (this.foodType.contains("Vietnamese")) {
-      return 6;
-    } else if (this.foodType.contains("Steakhouses")) {
-      return 7;
-    } else if (this.foodType.contains("Chicken Wings")) {
-      return 8;
-    } else if (this.foodType.contains("Barbeque")) {
-      return 9;
-    } else if (this.foodType.contains("Tacos")) {
-      return 10;
-    } else if (this.foodType.contains("American")) {
-      return 11;
-    } else if (this.foodType.contains("Falafel")) {
-      return 12;
-    } else if (this.foodType.contains("Salad")) {
-      return 13;
-    } else if (this.foodType.contains("Thai")) {
-      return 14;
-    } else if (this.foodType.contains("Ramen")) {
-      return 15;
-    } else {
-      return 16;
+    // if one of the food types we care about
+    for (int i = 0; i < this.dimFoodType; i++) {
+      if (this.foodType.equals(this.allFoodTypes[i])) {
+        return i;
+      }
     }
+    // if of food type "others"
+    return this.dimFoodType;
   }
 
   /**
