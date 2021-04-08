@@ -24,9 +24,9 @@ public class PersonTest implements ITest {
   public void setUp() {
     try {
       Restaurant kfc = new Restaurant("1", "KFC", "Burgers", 3,
-              1000, 1, "3");
+              1000, 1, 3);
       Restaurant denden = new Restaurant("2", "Den Den", "Chinese", 4,
-              200, 1.5, "3");
+              200, 1.5, 3);
       LabeledRestaurant labelKfc = new LabeledRestaurant(kfc, 0);
       LabeledRestaurant labelDenden = new LabeledRestaurant(denden, 1);
       List<LabeledRestaurant> pref = new LinkedList<>();

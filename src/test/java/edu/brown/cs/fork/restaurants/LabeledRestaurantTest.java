@@ -21,7 +21,7 @@ public class LabeledRestaurantTest implements ITest {
   public void setUp() {
     try {
       this.r = new Restaurant("1", "kfc", "Ramen", 4.5,
-              1000, 12.2, "3");
+              1000, 12.2, 3);
       this.l = new LabeledRestaurant(r, 1);
     } catch (OutOfRangeException e) {
       this.tearDown();

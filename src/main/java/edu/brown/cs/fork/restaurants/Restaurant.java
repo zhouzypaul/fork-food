@@ -25,7 +25,7 @@ public class Restaurant implements Recommendable {
   private final double star;
   private final int numReviews;
   private final double distance;
-  private final String priceRange;
+  private final int priceRange;
   private final String[] allFoodTypes = new String[] {"Burgers", "Chinese", "Pizza", "Italian",
       "Sushi Bars", "Indian", "Vietnamese", "Steakhouses", "Breakfast & Brunch", "Desserts",
       "Coffee & Tea", "Greek", "Middle Eastern", "Vegan", "Mexican", "Thai", "American",
@@ -63,8 +63,9 @@ public class Restaurant implements Recommendable {
    * @throws OutOfRangeException - when one of star, numReview, distance is negative.
    */
   public Restaurant(String id, String name, String foodType, double star, int numReviews,
-                    double distance, String priceRange) throws OutOfRangeException {
-    if (star < 0 || star > 5 || numReviews < 0 || distance < 0) {
+                    double distance, int priceRange) throws OutOfRangeException {
+    if (star < 0 || star > 5 || numReviews < 0 || distance < 0 || priceRange > 3
+            || priceRange < 0) {
       throw new OutOfRangeException("all of stars, numReviews, distance have to be non-negative");
     }
     this.id = id;
@@ -128,7 +129,7 @@ public class Restaurant implements Recommendable {
    * getter for the price range field.
    * @return the price range.
    */
-  public String getPriceRange() {
+  public int getPriceRange() {
     return priceRange;
   }
 
@@ -247,9 +248,9 @@ public class Restaurant implements Recommendable {
    * @return a bin index
    */
   private int mapPriceRange() {
-    if (this.priceRange.equals("1")) {
+    if (this.priceRange == 1) {
       return 0;
-    } else if (this.priceRange.equals("2")) {
+    } else if (this.priceRange == 2) {
       return 1;
     } else {
       return 2;

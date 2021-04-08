@@ -21,7 +21,7 @@ public class RestaurantTest implements ITest {
   public void setUp() {
     try {
       this.r = new Restaurant("1", "kfc", "Ramen", 4.5,
-              1000, 12.2, "3");
+              1000, 12.2, 3);
     } catch (OutOfRangeException e) {
       this.tearDown();
       fail();
@@ -44,13 +44,13 @@ public class RestaurantTest implements ITest {
   public void testConstructor() {
     this.setUp();
     assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", -1, 10, 10, "3"));
+            "Burges", -1, 10, 10, 3));
     assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 10, 10, 10, "3"));
+            "Burges", 10, 10, 10, 3));
     assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 3, -3, 10, "3"));
+            "Burges", 3, -3, 10, 3));
     assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 3, 10, -10, "3"));
+            "Burges", 3, 10, -10, 3));
     this.tearDown();
   }
 

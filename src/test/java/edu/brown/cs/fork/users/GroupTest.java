@@ -27,9 +27,9 @@ public class GroupTest implements ITest {
   public void setUp() {
     try {
       Restaurant kfc = new Restaurant("1", "KFC", "Burgers", 3,
-              1000, 1, "3");
+              1000, 1, 3);
       Restaurant denden = new Restaurant("2", "Den Den", "Chinese", 4,
-              200, 1.5, "3");
+              200, 1.5, 3);
       // person 1
       LabeledRestaurant labelKfc1 = new LabeledRestaurant(kfc, 0);
       LabeledRestaurant labelDenden1 = new LabeledRestaurant(denden, 1);
