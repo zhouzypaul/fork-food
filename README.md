@@ -90,17 +90,17 @@ load user path_to_custom_user_db
 
 #### user
 
-- ```/getAllUsers``` no required body, returns all users in the database.
-
-- ```/getUserByID``` body format: ```{"id": user_id}```, returns user with ```user_id``` in format ```{"userID": "", "radius": "", "prefHighReview": "", "prefNumReviews": "", "categories": ""}```
-
 - ```/getAllUserIds``` no required body, returns all ```userId```s.
 
 - ```/registerUser``` body format: ```{"id": user_id, "pwd": user_pwd}```, returns whether the action is successful
 
 - ```/deleteUser``` body format: ```{"id": user_id}```, returns whether the action is successful
 
-- ```/insertUserInfo``` body format: ```{"id": user_id, "colsToUpdate": col_to_update_separated_by_dashes, "info": info_to_update_separated_by_dashes}```. This will insert a new user info row to the table ```training```. Note that if we want to update users' ```foodType``` preference, the categories will be concatenated with ```,``` with no space in between. For example, ```{"id":"1", "colsToUpdate":"priceRange-categories", "info":"2-Chinese,Salad"}``` will create 2 rows in the database, where the ```foodType``` for this user is ```Chinese``` in the first row and ```Salad``` in the second row.
+- ```/getUserPref``` gets user's survey response from /user/training table. body format: ```{"id": user_id}```, returns user with ```user_id``` in format ```{"userID": "", "radius": "", "prefHighReview": "", "prefNumReviews": "", "categories": ""}```
+
+- ```/updateUserPref``` updates user's survey response in /user/training table. body format: ```{"username": user_id, "types": arr_of_food_types, "price": arr_of_preferred_price_ranges, "radius": preferred_radius}```
+
+- ```/insertUserPref``` inserts user's swiping responses into /user/training table. body format: ```{"username": user_id, "latitude": lat, "longitude": lon, "business_id_arr", arr_of_recommended_restaurants, "swipe_decision_arr", arr_of_1s_and_0s}``` 
 
 ### Team Strengths and Weaknesses:
 

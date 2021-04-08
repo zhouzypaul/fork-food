@@ -21,4 +21,8 @@ public class ForkUtils {
     }
     return overlap;
   }
+
+  public boolean isInCategories(String anyCategory) {
+    return CATEGORIES.contains(anyCategory);
+  }
 }

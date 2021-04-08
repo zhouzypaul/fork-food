@@ -180,13 +180,11 @@ public class QueryRestaurants {
       Matcher m = r.matcher(categories);
       ForkUtils utils = new ForkUtils();
       while (m.find()) {
-        List<String> allRestCategories = Collections.singletonList(m.group());
-        // allRestCategories might just be a single element list
-        List<String> overlapCategories = utils.getOverlap(allRestCategories);
-        for (String category : overlapCategories) {
+        String restCategory = Collections.singletonList(m.group()).get(0);
+        if (utils.isInCategories(restCategory)) {
           results.add(
-              new Restaurant(businessId, name, category, star, numReviews, dist, intPriceRange)
-          );
+              new Restaurant(businessId, name, restCategory,
+                star, numReviews, dist, intPriceRange));
         }
       }
     }

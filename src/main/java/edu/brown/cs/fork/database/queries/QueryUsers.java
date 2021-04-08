@@ -110,8 +110,8 @@ public class QueryUsers {
   public String insertStr() {
     StringBuilder sb = new StringBuilder();
     sb.append("INSERT INTO training (userId, business_id, foodType, star, ");
-    sb.append("priceRange, numReviews, distance, label, timestamp) VALUES ");
-    sb.append("(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    sb.append("priceRange, numReviews, distance, label, timestamp, name) VALUES ");
+    sb.append("(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     return sb.toString();
   }
 
@@ -128,6 +128,7 @@ public class QueryUsers {
       prep.setString(SEVEN, "");
       prep.setString(EIGHT, "");
       prep.setString(NINE, "");
+      prep.setString(TEN, "");
       int affectedRows = prep.executeUpdate();
       return (affectedRows == 1);
     } catch (SQLException e) {
@@ -264,6 +265,7 @@ public class QueryUsers {
         prep.setString(SEVEN, dist);
         prep.setString(EIGHT, likeOrDislike.get(i));
         prep.setString(NINE, "");
+        prep.setString(TEN, rest.get("name"));
 
         String categories = rest.get("categories");
         String pattern = "[^,\\s][^,]*[^,\\s]*";
@@ -271,11 +273,9 @@ public class QueryUsers {
         Matcher m = r.matcher(categories);
         ForkUtils utils = new ForkUtils();
         while (m.find()) {
-          List<String> allRestCategories = Collections.singletonList(m.group());
-          // allRestCategories might just be a single element list
-          List<String> overlapCategories = utils.getOverlap(allRestCategories);
-          for (String category : overlapCategories) {
-            prep.setString(3, category);
+          String restCategory = Collections.singletonList(m.group()).get(0);
+          if (utils.isInCategories(restCategory)) {
+            prep.setString(3, restCategory);
             prep.executeUpdate();
           }
         }
