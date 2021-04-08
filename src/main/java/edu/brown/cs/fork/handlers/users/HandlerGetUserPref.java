@@ -14,10 +14,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HandlerGetUserByID implements Route {
+public class HandlerGetUserPref implements Route {
   private static final Gson GSON = new Gson();
 
-  public HandlerGetUserByID() {  }
+  public HandlerGetUserPref() {  }
 
   @Override
   public Object handle(Request req, Response res) throws Exception {
@@ -25,26 +25,25 @@ public class HandlerGetUserByID implements Route {
     String id = data.getString("id");
 
     String err = "";
-    List<Map<String, String>> users = new ArrayList<>();
-    Map<String, String> user = new HashMap<>();
+    Map<String, List<String>> user = new HashMap<>();
+    List<String> foodTypes = new ArrayList<>();
+    List<String> priceRanges = new ArrayList<>();
+    double radius = 0.0;
     if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
       try {
-        users = Hub.getUserDB().queryUserByID(id);
-        if (users.size() == 0) {
-          err = "ERROR: No user with ID: " + id + " is found.";
-        } else if (users.size() == 1) {
-          user = users.get(0);
-        } else {
-          err = "ERROR: Something is wrong, requested ID: " + id + " has duplicates.";
-        }
-      } catch (SQLException e) {
+        user = Hub.getUserDB().getUserPref(id);
+        foodTypes = user.get("foodType");
+        priceRanges = user.get("priceRange");
+        radius = Double.parseDouble(user.get("distance").get(0));
+      } catch (SQLException | NumberFormatException e) {
         err = e.getMessage();
-        System.out.println(e.getMessage());
+        System.out.println("ERROR: " + e.getMessage());
       }
     }
-    Map<String, Object> variables = ImmutableMap.of("user", user, "err", err);
+    Map<String, Object> variables = ImmutableMap.of("types", foodTypes,
+        "prices", priceRanges, "radius", radius, "err", err);
 
     return GSON.toJson(variables);
   }

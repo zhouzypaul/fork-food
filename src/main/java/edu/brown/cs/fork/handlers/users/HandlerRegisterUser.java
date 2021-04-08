@@ -8,7 +8,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-import java.util.*;
+import java.util.Map;
 
 public class HandlerRegisterUser implements Route {
   private static final Gson GSON = new Gson();
@@ -26,7 +26,7 @@ public class HandlerRegisterUser implements Route {
     if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
-      success = Hub.getUserDB().registerUser(id, pwd);
+      success = Hub.getUserDB().registerUser(id, pwd) && Hub.getUserDB().insertBlankRow(id);
     }
     Map<String, Object> variables = ImmutableMap.of("success", success, "err", err);
 

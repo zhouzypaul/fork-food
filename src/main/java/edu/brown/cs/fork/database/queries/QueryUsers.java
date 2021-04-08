@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ public class QueryUsers {
   private Database db = new Database();
   private Connection conn;
   private static final Gson GSON = new Gson();
+  private static final int SEVEN = 7;
+  private static final int EIGHT = 8;
+  private static final int NINE = 9;
 
   public QueryUsers() {  }
 
@@ -44,36 +48,12 @@ public class QueryUsers {
   }
 
   /**
-   * Queries all users.
-   * @return a list of hashmaps representing users
-   * @throws SQLException SQLException
-   */
-  public List<Map<String, String>> queryAllUsers() throws SQLException {
-    String sql = "SELECT * FROM user;";
-    PreparedStatement prep = this.conn.prepareStatement(sql);
-    return getUsers(prep);
-  }
-
-  /**
-   * Queries a user info by its userId.
-   * @param id id of user
-   * @return a list of hashmaps representing users
-   * @throws SQLException SQLException
-   */
-  public List<Map<String, String>> queryUserByID(String id) throws SQLException {
-    String sql = "SELECT * FROM user WHERE user.userId = ?;";
-    PreparedStatement prep = this.conn.prepareStatement(sql);
-    prep.setString(1, id);
-    return getUsers(prep);
-  }
-
-  /**
    * Queries all userIds.
    * @return a list of string representing all user ids
    * @throws SQLException SQLException
    */
   public List<String> queryAllUserIds() throws SQLException {
-    String sql = "SELECT user.userId FROM user;";
+    String sql = "SELECT login.userId FROM login;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
     List<String> results = new ArrayList<>();
     ResultSet rs = prep.executeQuery();
@@ -115,40 +95,71 @@ public class QueryUsers {
     return results;
   }
 
-  public boolean upsertUserInfo(String userId, List<String> colsToUpdate, List<String> info) {
-    if (colsToUpdate.size() != info.size()) {
-      return false;
-    }
-    // build update string
-    // example: pref_high_review='1000', pref_num_reviews='2000'
+  public String insertStr() {
     StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < info.size(); i++) {
-      if (i == info.size() - 1) {
-        sb.append(colsToUpdate.get(i)).append("='").append(info.get(i)).append("'");
-      } else {
-        sb.append(colsToUpdate.get(i)).append("='").append(info.get(i)).append("', ");
-      }
-    }
-    String setStr = sb.toString();
+    sb.append("INSERT INTO training (userId, business_id, foodType, star, ");
+    sb.append("priceRange, numReviews, distance, label, timestamp) VALUES ");
+    sb.append("(?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    return sb.toString();
+  }
 
-    StringBuilder qStr = new StringBuilder();
-    qStr.append("UPDATE training SET ").append(setStr)
-      .append(" WHERE userId = ? AND business_id = '';");
-    String sql = qStr.toString();
-
+  public boolean insertBlankRow(String id) {
+    String sql = insertStr();
     try {
       PreparedStatement prep = this.conn.prepareStatement(sql);
-      prep.setString(1, userId);
-      int affectedRow = prep.executeUpdate();
-      if (affectedRow == 0) {
-        return insertUserPref(userId, colsToUpdate, info);
-      } else {
-        return true;
-      }
+      prep.setString(1, id);
+      prep.setString(2, "");
+      prep.setString(3, "");
+      prep.setString(4, "");
+      prep.setString(5, "");
+      prep.setString(6, "");
+      prep.setString(SEVEN, "");
+      prep.setString(EIGHT, "");
+      prep.setString(NINE, "");
+      int affectedRows = prep.executeUpdate();
+      return (affectedRows == 1);
     } catch (SQLException e) {
-      System.out.println("ERROR: Can't update user info with userId: " + userId);
+      System.out.println("ERROR: " + e.getMessage());
       return false;
     }
+  }
+
+  // for base preferences
+  public Map<String, List<String>> getUserPref(String id) throws SQLException {
+    Map<String, List<String>> results = new HashMap<>();
+    String sql = "SELECT * FROM training WHERE userId = ? AND business_id = '';";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, id);
+    ResultSet rs = prep.executeQuery();
+
+    List<String> cols = Arrays.asList("userId", "business_id", "foodType", "star",
+        "priceRange", "numReviews", "distance", "label", "timestamp");
+    for (String col : cols) {
+      List<String> empty = new ArrayList<>();
+      results.put(col, empty);
+    }
+
+    while (rs.next()) {
+      String userId = rs.getString(1);
+      String businessId = rs.getString(2);
+      String foodType = rs.getString(3);
+      String star = rs.getString(4);
+      String priceRange = rs.getString(5);
+      String numReviews = rs.getString(6);
+      String distance = rs.getString(SEVEN);
+      String label = rs.getString(EIGHT);
+      String timestamp = rs.getString(NINE);
+      List<String> vals = Arrays.asList(userId, businessId, foodType, star,
+          priceRange, numReviews, distance, label, timestamp);
+      for (int i = 0; i < cols.size(); i++) {
+        List<String> thisColList = results.get(cols.get(i));
+        thisColList.add(vals.get(i));
+        results.put(cols.get(i), thisColList);
+      }
+    }
+    prep.close();
+    rs.close();
+    return results;
   }
 
   public boolean insertUserPref(String userId, List<String> colsToSet, List<String> info) {
@@ -198,6 +209,21 @@ public class QueryUsers {
     }
   }
 
+  // deleting user base survey preferences for updating
+  public boolean deleteUserPref(String id) {
+    String sql = "DELETE FROM training WHERE userId = ? AND business_id = '';";
+    try {
+      PreparedStatement prep = this.conn.prepareStatement(sql);
+      prep.setString(1, id);
+      prep.executeUpdate();
+      return true;
+    } catch (SQLException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+
   // this will be for naive bayes, we should return a Person here
   // for now putting in List<Map<String, String>> so things won't break
   public List<Map<String, String>> getUserInfo(String userId) throws SQLException {
@@ -213,9 +239,9 @@ public class QueryUsers {
       String star = rs.getString(4);
       String priceRange = rs.getString(5);
       String numReview = rs.getString(6);
-      String distance = rs.getString(7);
-      String label = rs.getString(8);
-      String timestamp = rs.getString(9);
+      String distance = rs.getString(SEVEN);
+      String label = rs.getString(EIGHT);
+      String timestamp = rs.getString(NINE);
       rest.put("businessId", businessId);
       // more put statements here
       results.add(rest);
