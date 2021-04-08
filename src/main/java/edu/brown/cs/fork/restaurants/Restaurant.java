@@ -25,6 +25,7 @@ public class Restaurant implements Recommendable {
   private final double star;
   private final int numReviews;
   private final double distance;
+  private final String priceRange;
   private final String[] allFoodTypes = new String[] {"Burgers", "Chinese", "Pizza", "Italian",
       "Sushi Bars", "Indian", "Vietnamese", "Steakhouses", "Breakfast & Brunch", "Desserts",
       "Coffee & Tea", "Greek", "Middle Eastern", "Vegan", "Mexican", "Thai", "American",
@@ -35,10 +36,12 @@ public class Restaurant implements Recommendable {
   // 2) the food type: dimension of 30 (separated into 17 bins, one for each type)
   // 3) the number of reviews: dimension of 3 (separated into 3 bins: low, med, high)
   // 4) the star review: dimension of 5 (separated into 5 bins, one for each integer star)
+  // 5) the priceRange: dimension of 3 (low, med, high)
   private final int dimDistance = 4;
   private final int dimFoodType = this.allFoodTypes.length;
   private final int dimStar = 5;
   private final int dimNumReviews = 3;
+  private final int dimPriceRange = 3;
   // mapping of attributes
   private final double closeDistance = 0.2;  // in kilometers
   private final double walkDistance = 1;
@@ -55,11 +58,12 @@ public class Restaurant implements Recommendable {
    * @param star - the average star (review) the restaurant has.
    * @param numReviews - number of review the restaurant received.
    * @param distance - distance of the restaurant to the user.
+   * @param priceRange - the price range of the restaurant.
    *
    * @throws OutOfRangeException - when one of star, numReview, distance is negative.
    */
   public Restaurant(String id, String name, String foodType, double star, int numReviews,
-                    double distance) throws OutOfRangeException {
+                    double distance, String priceRange) throws OutOfRangeException {
     if (star < 0 || star > 5 || numReviews < 0 || distance < 0) {
       throw new OutOfRangeException("all of stars, numReviews, distance have to be non-negative");
     }
@@ -69,6 +73,7 @@ public class Restaurant implements Recommendable {
     this.star = star;
     this.numReviews = numReviews;
     this.distance = distance;
+    this.priceRange = priceRange;
   }
 
   /**
@@ -120,18 +125,27 @@ public class Restaurant implements Recommendable {
   }
 
   /**
+   * getter for the price range field.
+   * @return the price range.
+   */
+  public String getPriceRange() {
+    return priceRange;
+  }
+
+  /**
    * get the number of recommendable attributes a restaurant have.
    * A restaurant object has 4 recommendable features:
    * 1) the distance to the user
    * 2) the food type
    * 3) the number of reviews
    * 4) the star review
+   * 5) the price range
    *
-   * @return 4
+   * @return 5
    */
   @Override
   public int getNumAttr() {
-    return 4;
+    return 5;
   }
 
   /**
@@ -161,12 +175,13 @@ public class Restaurant implements Recommendable {
     attr[1] = this.mapFoodType();
     attr[2] = this.mapNumReviews();
     attr[3] = this.mapStar();
+    attr[4] = this.mapPriceRange();
     return attr;
   }
 
   /**
    * map the distance attribute to an int, representing the index of the bin of the attribute.
-   * @return an bin index.
+   * @return a bin index.
    */
   private int mapDistance() {
     if (this.distance <= this.closeDistance) {
@@ -182,7 +197,7 @@ public class Restaurant implements Recommendable {
 
   /**
    * map the foodType attribute to an int, representing the index of the bin of the attribute.
-   * @return an bin index.
+   * @return a bin index.
    */
   private int mapFoodType() {
     // if one of the food types we care about
@@ -197,7 +212,7 @@ public class Restaurant implements Recommendable {
 
   /**
    * map the numReviews attribute to an int, representing the index of the bin of the attribute.
-   * @return an bin index.
+   * @return a bin index.
    */
   private int mapNumReviews() {
     if (this.numReviews < this.lowNumReview) {
@@ -211,7 +226,7 @@ public class Restaurant implements Recommendable {
 
   /**
    * map the star attribute to an int, representing the index of the bin of the attribute.
-   * @return an bin index.
+   * @return a bin index.
    */
   private int mapStar() {
     if (this.star < 1) {
@@ -228,12 +243,27 @@ public class Restaurant implements Recommendable {
   }
 
   /**
+   * map the priceRange attribute to an int, representing the index of the bin of the attribute.
+   * @return a bin index
+   */
+  private int mapPriceRange() {
+    if (this.priceRange.equals("1")) {
+      return 0;
+    } else if (this.priceRange.equals("2")) {
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+
+  /**
    * get the dimension of each of the attributes.
    *
-   * @return [4, 17, 3, 5]
+   * @return [4, 17, 3, 5, 3]
    */
   @Override
   public int[] getAttrDim() {
-    return new int[]{this.dimDistance, this.dimFoodType, this.dimNumReviews, this.dimStar};
+    return new int[]{this.dimDistance, this.dimFoodType, this.dimNumReviews, this.dimStar,
+        this.dimPriceRange};
   }
 }

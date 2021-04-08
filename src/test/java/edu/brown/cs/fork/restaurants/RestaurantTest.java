@@ -21,7 +21,7 @@ public class RestaurantTest implements ITest {
   public void setUp() {
     try {
       this.r = new Restaurant("1", "kfc", "Ramen", 4.5,
-              1000, 12.2);
+              1000, 12.2, "3");
     } catch (OutOfRangeException e) {
       this.tearDown();
       fail();
@@ -44,13 +44,13 @@ public class RestaurantTest implements ITest {
   public void testConstructor() {
     this.setUp();
     assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", -1, 10, 10));
+            "Burges", -1, 10, 10, "3"));
     assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 10, 10, 10));
+            "Burges", 10, 10, 10, "3"));
     assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 3, -3, 10));
+            "Burges", 3, -3, 10, "3"));
     assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 3, 10, -10));
+            "Burges", 3, 10, -10, "3"));
     this.tearDown();
   }
 
@@ -66,10 +66,10 @@ public class RestaurantTest implements ITest {
     assertEquals(Double.compare(4.5, this.r.getStar()), 0);
     assertEquals(1000, this.r.getNumReviews());
     assertEquals(Double.compare(12.2, this.r.getDistance()), 0);
-    assertEquals(4, this.r.getNumAttr());
+    assertEquals(5, this.r.getNumAttr());
     assertEquals(2, this.r.getNumClasses());
-    assertEquals(Arrays.toString(new int[]{3, 20, 2, 4}), Arrays.toString(this.r.getAttr()));
-    assertEquals(Arrays.toString(new int[]{4, 20, 3, 5}), Arrays.toString(this.r.getAttrDim()));
+    assertEquals(Arrays.toString(new int[]{3, 20, 2, 4, 2}), Arrays.toString(this.r.getAttr()));
+    assertEquals(Arrays.toString(new int[]{4, 20, 3, 5, 3}), Arrays.toString(this.r.getAttrDim()));
     this.tearDown();
   }
 }
