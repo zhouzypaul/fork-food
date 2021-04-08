@@ -22,6 +22,7 @@ public class QueryRestaurants {
   private static final int NINE = 9;
   private static final int TEN = 10;
   private static final int ONEONE = 11;
+  private static final int ONETWO = 11;
   private static final double SIXNINE = 69.0;
   private static final double ONEONEONE = 111.0;
 
@@ -75,7 +76,7 @@ public class QueryRestaurants {
    */
   private String selectRestaurants() {
     return new StringBuilder().append("SELECT res.name, res.stars, res.numReviews, ")
-      .append("res.categories, res.'attributes.RestaurantsTakeOut', ")
+      .append("res.categories, res.priceRange, res.'attributes.RestaurantsTakeOut', ")
       .append("res.'attributes.RestaurantsDelivery', res.'attributes.RestaurantsGoodForGroups', ")
       .append("res.'attributes.Alcohol', res.'attributes.GoodForKids', res.state, res.city ")
       .append("FROM restaurants as res ").toString();
@@ -153,17 +154,19 @@ public class QueryRestaurants {
       String numStars = rs.getString(2);
       String numReviews = rs.getString(3);
       String categories = rs.getString(4);
-      String takeout = rs.getString(5);
-      String delivery = rs.getString(6);
-      String goodForGroups = rs.getString(SEVEN);
-      String alcohol = rs.getString(EIGHT);
-      String goodForKids = rs.getString(NINE);
-      String state = rs.getString(TEN);
-      String city = rs.getString(ONEONE);
+      String priceRange = rs.getString(5);
+      String takeout = rs.getString(6);
+      String delivery = rs.getString(SEVEN);
+      String goodForGroups = rs.getString(EIGHT);
+      String alcohol = rs.getString(NINE);
+      String goodForKids = rs.getString(TEN);
+      String state = rs.getString(ONEONE);
+      String city = rs.getString(ONETWO);
       rest.put("name", name);
       rest.put("numStars", numStars);
       rest.put("numReviews", numReviews);
       rest.put("categories", categories);
+      rest.put("priceRange", priceRange);
       rest.put("takeout", takeout);
       rest.put("delivery", delivery);
       rest.put("goodForGroups", goodForGroups);

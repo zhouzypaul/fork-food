@@ -132,7 +132,8 @@ public class QueryUsers {
     String setStr = sb.toString();
 
     StringBuilder qStr = new StringBuilder();
-    qStr.append("UPDATE user SET ").append(setStr).append(" WHERE userId = ?;");
+    qStr.append("UPDATE training SET ").append(setStr)
+      .append(" WHERE userId = ? AND business_id = '';");
     String sql = qStr.toString();
 
     try {
@@ -140,7 +141,7 @@ public class QueryUsers {
       prep.setString(1, userId);
       int affectedRow = prep.executeUpdate();
       if (affectedRow == 0) {
-        return insertUserInfo(userId, colsToUpdate, info);
+        return insertUserPref(userId, colsToUpdate, info);
       } else {
         return true;
       }
@@ -150,13 +151,13 @@ public class QueryUsers {
     }
   }
 
-  public boolean insertUserInfo(String userId, List<String> colsToSet, List<String> info) {
+  public boolean insertUserPref(String userId, List<String> colsToSet, List<String> info) {
     if (colsToSet.size() != info.size()) {
       return false;
     }
 
     // build insert string
-    // example: (userId, pref_high_review, pref_num_reviews)
+    // example: (userId, distance, label)
     StringBuilder sb = new StringBuilder();
     sb.append("(userId, ");
     for (int i = 0; i < info.size(); i++) {
@@ -169,6 +170,8 @@ public class QueryUsers {
     sb.append(")");
     String insertStr = sb.toString();
 
+    // build value string
+    // example: (7, 3.0, 1)
     StringBuilder val = new StringBuilder();
     val.append("('").append(userId).append("', ");
     for (int i = 0; i < info.size(); i++) {
@@ -182,7 +185,7 @@ public class QueryUsers {
     String valueStr = val.toString();
 
     StringBuilder qStr = new StringBuilder();
-    qStr.append("INSERT INTO user ").append(insertStr).append(" VALUES ").append(valueStr);
+    qStr.append("INSERT INTO training ").append(insertStr).append(" VALUES ").append(valueStr);
     String sql = qStr.toString();
 
     try {
@@ -190,9 +193,36 @@ public class QueryUsers {
       prep.executeUpdate();
       return true;
     } catch (SQLException e) {
-      System.out.println("ERROR: Can't insert info into table <user>");
+      System.out.println("ERROR: Can't insert info into table <training>");
       return false;
     }
+  }
+
+  // this will be for naive bayes, we should return a Person here
+  // for now putting in List<Map<String, String>> so things won't break
+  public List<Map<String, String>> getUserInfo(String userId) throws SQLException {
+    String sql = "SELECT * FROM training WHERE userId = ?;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, userId);
+    ResultSet rs = prep.executeQuery();
+    List<Map<String, String>> results = new ArrayList<>();
+    while (rs.next()) {
+      Map<String, String> rest = new HashMap<>();
+      String businessId = rs.getString(2);
+      String foodType = rs.getString(3);
+      String star = rs.getString(4);
+      String priceRange = rs.getString(5);
+      String numReview = rs.getString(6);
+      String distance = rs.getString(7);
+      String label = rs.getString(8);
+      String timestamp = rs.getString(9);
+      rest.put("businessId", businessId);
+      // more put statements here
+      results.add(rest);
+    }
+    prep.close();
+    rs.close();
+    return results;
   }
 
   /**
