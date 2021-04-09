@@ -10,9 +10,15 @@ import spark.Route;
 
 import java.util.Map;
 
+/**
+ * Deletes a user's information in the login table of users database.
+ */
 public class HandlerDeleteUser implements Route {
   private static final Gson GSON = new Gson();
 
+  /**
+   * Constructor.
+   */
   public HandlerDeleteUser() { }
 
   @Override

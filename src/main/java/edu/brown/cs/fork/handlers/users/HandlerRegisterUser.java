@@ -10,9 +10,15 @@ import spark.Route;
 
 import java.util.Map;
 
+/**
+ * Registers a user by adding their username and password into login table.
+ */
 public class HandlerRegisterUser implements Route {
   private static final Gson GSON = new Gson();
 
+  /**
+   * Constructor.
+   */
   public HandlerRegisterUser() { }
 
   @Override

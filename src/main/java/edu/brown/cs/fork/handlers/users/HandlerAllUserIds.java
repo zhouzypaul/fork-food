@@ -12,9 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class to query all user ids in the login table of users database.
+ */
 public class HandlerAllUserIds implements Route {
   private static final Gson GSON = new Gson();
 
+  /**
+   * Constructor.
+   */
   public HandlerAllUserIds() { }
 
   @Override

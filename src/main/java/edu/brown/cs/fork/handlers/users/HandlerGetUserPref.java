@@ -14,9 +14,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Queries user survey preferences.
+ */
 public class HandlerGetUserPref implements Route {
   private static final Gson GSON = new Gson();
 
+  /**
+   * Constructor.
+   */
   public HandlerGetUserPref() {  }
 
   @Override

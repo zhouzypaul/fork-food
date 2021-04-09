@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Handler for getting restaurants within a certain radius.
+ * Handler for getting restaurants within a given bounding box.
  */
 public class HandlerGetRestByRad implements Route {
   private static final Gson GSON = new Gson();

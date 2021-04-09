@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class to query all restaurants.
+ */
 public class HandlerAllRestaurants implements Route {
   private static final Gson GSON = new Gson();
 

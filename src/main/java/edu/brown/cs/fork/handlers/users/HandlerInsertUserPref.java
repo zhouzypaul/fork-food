@@ -13,9 +13,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Inserts a series of swiping decisions into training table of users database.
+ */
 public class HandlerInsertUserPref implements Route {
   private static final Gson GSON = new Gson();
 
+  /**
+   * Constructor.
+   */
   public HandlerInsertUserPref() {  }
 
   @Override
@@ -43,7 +49,8 @@ public class HandlerInsertUserPref implements Route {
     if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
-      success = Hub.getUserDB().insertUserPref(userId, userLat, userLon, restIds, likesOrDislikes);
+      success = Hub.getUserDB().insertUserSwipePref(userId,
+          userLat, userLon, restIds, likesOrDislikes);
     }
     Map<String, Object> variables = ImmutableMap.of("success", success, "err", err);
 

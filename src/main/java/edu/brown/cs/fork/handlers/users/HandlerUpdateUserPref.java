@@ -14,11 +14,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Updates users survey preferences.
+ */
 public class HandlerUpdateUserPref implements Route {
   private static final Gson GSON = new Gson();
 
+  /**
+   * Constructor.
+   */
   public HandlerUpdateUserPref() {  }
 
+  /**
+   * Matches frontend food types with backend food types.
+   * @param frontendType frontend food type
+   * @return backend food type
+   */
   public String matchFoodTypes(String frontendType) {
     switch (frontendType) {
       case "burgers":
@@ -46,6 +57,11 @@ public class HandlerUpdateUserPref implements Route {
     }
   }
 
+  /**
+   * Matches frontend price range with backend price range.
+   * @param frontendPriceRange frontend price range
+   * @return backend price range
+   */
   public String matchPriceRanges(String frontendPriceRange) {
     switch (frontendPriceRange) {
       case "$":

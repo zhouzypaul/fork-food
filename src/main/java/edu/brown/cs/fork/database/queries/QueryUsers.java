@@ -107,6 +107,10 @@ public class QueryUsers {
     return results;
   }
 
+  /**
+   * A string that would be used to insert a user into training table.
+   * @return a string to be set with PreparedStatement
+   */
   public String insertStr() {
     StringBuilder sb = new StringBuilder();
     sb.append("INSERT INTO training (userId, business_id, foodType, star, ");
@@ -115,6 +119,11 @@ public class QueryUsers {
     return sb.toString();
   }
 
+  /**
+   * Insert a blank row into training table where every field is empty.
+   * @param id id of user
+   * @return a boolean indicating if insertion is successful
+   */
   public boolean insertBlankRow(String id) {
     String sql = insertStr();
     try {
@@ -137,7 +146,12 @@ public class QueryUsers {
     }
   }
 
-  // for base preferences
+  /**
+   * Get user preferences from the training table where business_id is empty.
+   * @param id id of user
+   * @return a map representing user preferences from preference survey
+   * @throws SQLException SQLException
+   */
   public Map<String, List<String>> getUserPref(String id) throws SQLException {
     Map<String, List<String>> results = new HashMap<>();
     String sql = "SELECT * FROM training WHERE userId = ? AND business_id = '';";
@@ -145,8 +159,10 @@ public class QueryUsers {
     prep.setString(1, id);
     ResultSet rs = prep.executeQuery();
 
+    // all columns in the training table
     List<String> cols = Arrays.asList("userId", "business_id", "foodType", "star",
         "priceRange", "numReviews", "distance", "label", "timestamp");
+    // first make an empty Arraylist for every column
     for (String col : cols) {
       List<String> empty = new ArrayList<>();
       results.put(col, empty);
@@ -162,8 +178,11 @@ public class QueryUsers {
       String distance = rs.getString(EIGHT);
       String label = rs.getString(NINE);
       String timestamp = rs.getString(TEN);
+      // make a list out of the queried column info
       List<String> vals = Arrays.asList(userId, businessId, foodType, star,
           priceRange, numReviews, distance, label, timestamp);
+      // for each <column_name, info> pair, add info in the ArrayList
+      // associated with the column name
       for (int i = 0; i < cols.size(); i++) {
         List<String> thisColList = results.get(cols.get(i));
         thisColList.add(vals.get(i));
@@ -175,6 +194,13 @@ public class QueryUsers {
     return results;
   }
 
+  /**
+   * Insert rows representing user preferences from preferences survey.
+   * @param userId user id
+   * @param colsToSet columns to insert
+   * @param info information for each column
+   * @return a boolean indicating whether insertion is successful
+   */
   public boolean insertUserPref(String userId, List<String> colsToSet, List<String> info) {
     if (colsToSet.size() != info.size()) {
       return false;
@@ -222,7 +248,11 @@ public class QueryUsers {
     }
   }
 
-  // deleting user base survey preferences for updating
+  /**
+   * Delete all user preferences from preferences survey.
+   * @param id id of user
+   * @return a boolean indicating whether deletion is successful
+   */
   public boolean deleteUserPref(String id) {
     String sql = "DELETE FROM training WHERE userId = ? AND business_id = '';";
     try {
@@ -236,8 +266,16 @@ public class QueryUsers {
     }
   }
 
-  // for swiping
-  public boolean insertUserPref(String userId, Double userLat, Double userLon,
+  /**
+   * Insert user swiping preferences.
+   * @param userId user id
+   * @param userLat latitude of user
+   * @param userLon longitude of user
+   * @param restIDs a list of recommended restaurant ids
+   * @param likeOrDislike a list indicating if user likes a restaurant
+   * @return a boolean indicating whether insertion is successful
+   */
+  public boolean insertUserSwipePref(String userId, Double userLat, Double userLon,
                                 List<String> restIDs, List<String> likeOrDislike) {
     String sql = insertStr();
     if (restIDs.size() != likeOrDislike.size()) {
@@ -254,7 +292,7 @@ public class QueryUsers {
         prep.setString(5, rest.get("priceRange"));
         prep.setString(6, rest.get("numReviews"));
 
-        // calculate distance here
+        // calculate distance from user to restaurant
         Double restLat = Double.parseDouble(rest.get("latitude"));
         Double restLon = Double.parseDouble(rest.get("longitude"));
         DistanceCalculator calc = new DistanceCalculator();
@@ -267,14 +305,17 @@ public class QueryUsers {
         prep.setString(NINE, "");
         prep.setString(TEN, rest.get("name"));
 
+        // parse long categories string into individual categories of interest
         String categories = rest.get("categories");
         String pattern = "[^,\\s][^,]*[^,\\s]*";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(categories);
         ForkUtils utils = new ForkUtils();
         while (m.find()) {
+          // get an individual category
           String restCategory = Collections.singletonList(m.group()).get(0);
           if (utils.isInCategories(restCategory)) {
+            // see if this is a category that a user can select in survey
             prep.setString(3, restCategory);
             prep.executeUpdate();
           }
@@ -287,6 +328,15 @@ public class QueryUsers {
     }
   }
 
+  /**
+   * Queries all preferences of a user and make them into a list of
+   * LabeledRestaurant objects for naive bayes training.
+   * @param userId user id
+   * @return a list of LabeledRestaurants
+   * @throws SQLException SQLException
+   * @throws NumberFormatException NumberFormatException
+   * @throws OutOfRangeException OutOfRangeException
+   */
   public List<LabeledRestaurant> trainRowsToLabeledRests(String userId)
       throws SQLException, NumberFormatException, OutOfRangeException {
     List<LabeledRestaurant> results = new ArrayList<>();
@@ -301,6 +351,7 @@ public class QueryUsers {
       double star = Double.parseDouble(rs.getString(5));
       String priceRange = rs.getString(6);
 
+      // default priceRange is 1 if database field is empty
       int intPriceRange = 1;
       if (!priceRange.isEmpty()) {
         intPriceRange = Integer.parseInt(priceRange);
@@ -321,6 +372,13 @@ public class QueryUsers {
     return results;
   }
 
+  /**
+   * Queries all preferences of a user and make rows into a Person object.
+   * @param userId user id
+   * @return a Person object
+   * @throws OutOfRangeException OutOfRangeException
+   * @throws SQLException SQLException
+   */
   public Person trainRowsToPerson(String userId) throws OutOfRangeException, SQLException {
     List<LabeledRestaurant> rests = trainRowsToLabeledRests(userId);
     return new Person(userId, rests, 1.0);
