@@ -58,6 +58,7 @@ public class LoginHandler implements Route {
 
   // TODO: all of the following we will need Sean to do for us
   private Person getUserByName(String username) {
-    return new Person();
+//    return new Person();
+    return null;
   }
 }
