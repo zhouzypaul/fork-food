@@ -15,5 +15,5 @@ public interface TriggerAction {
    * @param args String List representing user arguments
    * @return a string, either an error message or empty string
    */
-  String run(String[] args);
+  void run(String[] args);
 }

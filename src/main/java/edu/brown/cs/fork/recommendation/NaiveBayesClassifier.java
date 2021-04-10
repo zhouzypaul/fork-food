@@ -1,5 +1,4 @@
 package edu.brown.cs.fork.recommendation;
-
 import edu.brown.cs.fork.exceptions.NoTrainDataException;
 
 import java.util.Arrays;

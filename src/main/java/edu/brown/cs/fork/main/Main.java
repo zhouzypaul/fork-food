@@ -5,6 +5,14 @@ import java.io.StringWriter;
 
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
+import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
+import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
+import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
+import edu.brown.cs.fork.handlers.users.HandlerDeleteUser;
+import edu.brown.cs.fork.handlers.users.HandlerGetUserPref;
+import edu.brown.cs.fork.handlers.users.HandlerInsertUserPref;
+import edu.brown.cs.fork.handlers.users.HandlerRegisterUser;
+import edu.brown.cs.fork.handlers.users.HandlerUpdateUserPref;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import com.google.gson.Gson;
@@ -74,9 +82,15 @@ public final class Main {
     Spark.exception(Exception.class, new ExceptionPrinter());
 
     Spark.post("/test", new HandlerAllRestaurants());
+    Spark.post("/getRestByID", new HandlerGetRestByID());
+    Spark.post("/getRestByRad", new HandlerGetRestByRad());
+    Spark.post("/registerUser", new HandlerRegisterUser());
+    Spark.post("/deleteUser", new HandlerDeleteUser());
+    Spark.post("/getAllUserIds", new HandlerAllUserIds());
+    Spark.post("/getUserPref", new HandlerGetUserPref());
+    Spark.post("/insertUserPref", new HandlerInsertUserPref());
+    Spark.post("/updateUserPref", new HandlerUpdateUserPref());
   }
-
-
 
   /**
    * Display an error page when an exception occurs in the server.
