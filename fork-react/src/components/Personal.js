@@ -1,6 +1,6 @@
-import TextBox from "./TextBox";
 import {useDispatch, useSelector} from "react-redux";
 import {logout} from "../actions";
+import {Link} from "react-router-dom";
 
 function Personal(props) {
   const user = useSelector(state => state.user);
@@ -14,7 +14,9 @@ function Personal(props) {
       <div className="title-text">profile</div>
       @{user}
       <br/>
-      <button className="primary-button">update preferences</button>
+      <Link to="/survey">
+        <button className="primary-button">update preferences</button>
+      </Link>
       <button className="secondary-button" onClick={exit}>log out</button>
     </div>
   );

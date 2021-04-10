@@ -4,6 +4,12 @@ import { Link } from "react-router-dom";
 function Home() {
 
   const roomCode = Math.floor(1000 + Math.random() * 9000);
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = null;
+    }
+  });
 
   return (
     <>

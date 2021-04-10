@@ -18,11 +18,11 @@ function NewUser(props) {
     if (password === confirm) {
       // register user in backend
       registerUser(username, password);
-
     } else {
       setError("Passwords do not match");
     }
   }
+
 
   const registerUser = (username, hash) => {
     const toSend = {
@@ -56,7 +56,14 @@ function NewUser(props) {
       });
   }
 
-  return (
+  const submit = (e) => {
+    const key = e.key;
+    if (key === "Enter") {
+      createUser();
+    }
+  }
+
+  return(
     <>
       <TopBar to="/" showOptions={false} />
       <div className="login">
@@ -64,9 +71,9 @@ function NewUser(props) {
         <div className="login-error">
           {error}
         </div>
-        <TextBox initial="username" change={setUsername} type="text" />
-        <TextBox initial="password" change={setPassword} type="password" />
-        <TextBox initial="confirm password" change={setConfirm} type="password" />
+        <TextBox initial="username" change={setUsername} onKeyDown={submit} type="text"/>
+        <TextBox initial="password" change={setPassword} onKeyDown={submit} type="password"/>
+        <TextBox initial="confirm password" change={setConfirm} onKeyDown={submit} type="password"/>
         <button className="primary-button" onClick={createUser}>
           join
         </button>

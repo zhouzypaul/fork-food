@@ -12,6 +12,8 @@ import { useSelector } from "react-redux";
 import Host from "./components/Host";
 import Join from "./components/Join";
 import NewUser from './components/NewUser';
+import Survey from './components/Survey';
+import Swipe from "./components/Swipe";
 
 function App() {
   const user = useSelector(state => state.user);
@@ -27,6 +29,8 @@ function App() {
         <Route path="/profile" component={user !== "" ? Profile : Start} />
         <Route path="/settings" component={user !== "" ? Settings : Start} />
         <Route path="/join" component={user !== "" ? Join : Start} />
+        <Route path="/survey" component={user !== "" ? Survey : Start}/>
+        <Route path="/swipe" component={user !== "" ? Swipe : Start}/>
         <Route path="/room:roomId" component={user !== "" ? Host : Start} />
       </Router>
     </div>

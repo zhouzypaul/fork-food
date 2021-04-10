@@ -1,4 +1,4 @@
-package edu.brown.cs.fork.handlers.restaurants;
+package edu.brown.cs.fork.handlers.users;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -13,28 +13,31 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class to query all restaurants.
+ * Class to query all user ids in the login table of users database.
  */
-public class HandlerAllRestaurants implements Route {
+public class HandlerAllUserIds implements Route {
   private static final Gson GSON = new Gson();
 
-  public HandlerAllRestaurants() {  }
+  /**
+   * Constructor.
+   */
+  public HandlerAllUserIds() { }
 
   @Override
-  public Object handle(Request req, Response res) {
+  public Object handle(Request req, Response res) throws Exception {
     String err = "";
-    List<Map<String, String>> ret = new ArrayList<>();
-    if (!Hub.getRestDB().isConnected()) {
+    List<String> ret = new ArrayList<>();
+    if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
       try {
-        ret = Hub.getRestDB().getAllRestaurants();
+        ret = Hub.getUserDB().queryAllUserIds();
       } catch (SQLException e) {
         err = e.getMessage();
         System.out.println(e.getMessage());
       }
     }
-    Map<String, Object> variables = ImmutableMap.of("restaurants", ret, "err", err);
+    Map<String, Object> variables = ImmutableMap.of("userIds", ret, "err", err);
 
     return GSON.toJson(variables);
   }

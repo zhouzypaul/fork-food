@@ -26,7 +26,6 @@ public class Database {
   /**
    * Initialize database connection, only wipes cache if new database is connected.
    * @param filename name of the database
-   * @return whether it's new connection
    * @throws SQLException sql exception
    * @throws ClassNotFoundException class not found
    */

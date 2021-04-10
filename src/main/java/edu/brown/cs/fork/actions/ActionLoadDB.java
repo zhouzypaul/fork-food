@@ -22,10 +22,10 @@ public class ActionLoadDB implements TriggerAction {
   }
 
   @Override
-  public String run(String[] args) {
+  public void run(String[] args) {
     if (args.length != 3) {
       System.out.println("ERROR: Wrong number of arguments");
-      return "ERROR: Wrong number of arguments";
+//      return "ERROR: Wrong number of arguments";
     }
 
     String whichDB = args[1];
@@ -33,19 +33,20 @@ public class ActionLoadDB implements TriggerAction {
 
     if (!Files.exists(Path.of(path))) {
       System.out.println("ERROR: Database doesn't exist");
-      return "ERROR: Database doesn't exist";
+//      return "ERROR: Database doesn't exist";
     }
 
     if (whichDB.equals("rest")) {
       this.restDB.initRestaurants(path);
       System.out.println("Loaded Restaurants Database");
-      return "Loaded Restaurants Database";
+//      return "Loaded Restaurants Database";
     } else if (whichDB.equals("user")) {
       this.userDB.initUsers(path);
       System.out.println("Loaded Users Database");
-      return "Loaded Users Database";
+//      return "Loaded Users Database";
     } else {
-      return "ERROR: The second argument must be either rest or user";
+      System.out.println("ERROR: The second argument must be either rest or user");
+//      return "ERROR: The second argument must be either rest or user";
     }
   }
 }

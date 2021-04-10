@@ -3,6 +3,7 @@ import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
 import useUpdateUsers from "./useUpdateUsers"
 import { useEffect } from "react";
+import {Link} from "react-router-dom";
 
 function Host(props) {
 
@@ -19,6 +20,7 @@ function Host(props) {
   const user = useSelector(state => state.user);
   const userList = useUpdateUsers(roomCode, user);
 
+  // TODO: ternary operator
   if (host.current) {
     return (
       <>

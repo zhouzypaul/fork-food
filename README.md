@@ -20,6 +20,31 @@ csv file to sqlite file:
 
 https://pypi.org/project/csv-to-sqlite/
 
+#### SQL Commands to Preprocess Data
+
+```
+// keep only restaurants data
+DELETE FROM yelp_academic_dataset_business AS bus WHERE
+bus.categories NOT LIKE '%Food%' OR
+bus.categories NOT LIKE '%Restaurants%'
+
+// in DB Browser, attach reviews.sqlite3 to yelp_academic_dataset_business.sqlite3
+// then create a table in yelp_academic_dataset called reviews containing all business reviews
+INSERT INTO reviews SELECT * FROM review.yelp_academic_dataset_review
+
+// detach reviews.sqlite3, then
+// create another table that has another column numReviews representing
+// the number of reviews for each restaurant
+CREATE TABLE restaurants AS SELECT * FROM (
+SELECT COUNT(reviews.stars) as numReviews, rest.business_id as rev_id
+FROM reviews, yelp_academic_dataset_business AS rest
+WHERE reviews.business_id = rest.business_id GROUP BY rest.business_id 
+) AS new INNER JOIN yelp_academic_dataset_business
+ON rev_id = yelp_academic_dataset_business.business_id
+```
+
+These SQL commands are much faster than the naive, deprecated ```ActionPreprocess.java``` in ```actions/```.
+
 ### How To Run
 
 - Get all ```sqlite``` data from: [here](https://drive.google.com/drive/folders/1GUGTRPzdTwJg88stwNtSrPvzzjVUiwq4?usp=sharing)
@@ -30,7 +55,7 @@ https://pypi.org/project/csv-to-sqlite/
 term-project-...
     |
     |- data
-    |    |- business.sqlite
+    |    |- restaurants.sqlite
     |    |- users.sqlite
     |    |- ...
     |- src
@@ -39,18 +64,43 @@ term-project-...
     .
 ```
 
-- Execute ```mvn package```
-
-- Then, use the following commands to load in database
-
+- Execute 
+  
 ```
-// start the gui
+// compiles project
+mvn package
+
+// stars the backend, databases will be automatically loaded
 ./run --gui
 
-// load databases
-load rest data/business.sqlite
-load user data/users.sqlite
+// load custom databases
+load rest path_to_custom_restaurants_db
+load user path_to_custom_user_db
 ```
+
+### API Documentation
+
+#### restaurants
+
+- ```/test``` no required body, returns all restaurants. This endpoint was for initial dataflow testing.
+
+- ```/getRestByID``` body format: ```{"id": rest_id}```, returns restaurant with ```rest_id``` in format ```{"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}``` For the specific format, please refer to ```database/queries/QueryRestaurants/getRestaurantsWithPrep```.
+
+- ```/getRestByRad``` body format: ```{“radius": rad, "lat": center_lat, "lon": center_lon}```, returns restaurants within the square bounding box with side length ```2*rad``` around the center coordinate.
+
+#### user
+
+- ```/getAllUserIds``` no required body, returns all ```userId```s.
+
+- ```/registerUser``` body format: ```{"id": user_id, "pwd": user_pwd}```, returns whether the action is successful
+
+- ```/deleteUser``` body format: ```{"id": user_id}```, returns whether the action is successful
+
+- ```/getUserPref``` gets user's survey response from /user/training table. body format: ```{"id": user_id}```, returns user with ```user_id``` in format ```{"userID": "", "radius": "", "prefHighReview": "", "prefNumReviews": "", "categories": ""}```
+
+- ```/updateUserPref``` updates user's survey response in /user/training table. body format: ```{"username": user_id, "types": arr_of_food_types, "price": arr_of_preferred_price_ranges, "radius": preferred_radius}```
+
+- ```/insertUserPref``` inserts user's swiping responses into /user/training table. body format: ```{"username": user_id, "latitude": lat, "longitude": lon, "business_id_arr", arr_of_recommended_restaurants, "swipe_decision_arr", arr_of_1s_and_0s}``` 
 
 ### Team Strengths and Weaknesses:
 

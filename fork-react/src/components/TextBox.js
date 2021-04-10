@@ -10,7 +10,7 @@ function TextBox(props) {
     <>
       <label>
         {props.label}
-        <input className="text-box" type={props.type} placeholder={props.initial} onChange={mutate}/>
+        <input className="text-box" type={props.type} placeholder={props.initial} onChange={mutate} onKeyDown={props.onKeyDown}/>
       </label>
     </>
   )
