@@ -13,6 +13,7 @@ import Host from "./components/Host";
 import Join from "./components/Join";
 import NewUser from './components/NewUser';
 import Survey from './components/Survey';
+import Swipe from "./components/Swipe";
 
 function App() {
   const user = useSelector(state => state.user);
@@ -28,6 +29,7 @@ function App() {
         <Route path="/host" component={user !== "" ? Host : Start}/>
         <Route path="/join" component={user !== "" ? Join : Start}/>
         <Route path="/survey" component={user !== "" ? Survey : Start}/>
+        <Route path="/swipe" component={user !== "" ? Swipe : Start}/>
       </Router>
     </div>
   );

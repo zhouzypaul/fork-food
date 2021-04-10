@@ -1,4 +1,5 @@
 import TopBar from "./TopBar";
+import {Link} from "react-router-dom";
 
 function Host() {
   const code = Math.floor(1000 + Math.random() * 9000);
@@ -10,7 +11,9 @@ function Host() {
           share the code
         </div>
         <div className="code">{code}</div>
-        <button className="primary-button">start</button>
+        <Link to="/swipe">
+          <button className="primary-button">start</button>
+        </Link>
       </div>
     </>
   );
