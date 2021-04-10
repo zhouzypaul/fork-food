@@ -43,8 +43,8 @@ public class Restaurant implements Recommendable {
   private final int dimNumReviews = 3;
   private final int dimPriceRange = 3;
   // mapping of attributes
-  private final double closeDistance = 0.2;  // in kilometers
-  private final double walkDistance = 1;
+  private final double closeDistance = 0.5;  // in miles
+  private final double walkDistance = 1.5;
   private final double driveDistance = 10;
   private final int lowNumReview = 10;
   private final int highNumReview = 100;
@@ -65,7 +65,7 @@ public class Restaurant implements Recommendable {
   public Restaurant(String id, String name, String foodType, double star, int numReviews,
                     double distance, int priceRange) throws OutOfRangeException {
     if (star < 0 || star > 5 || numReviews < 0 || distance < 0 || priceRange > 3
-        || priceRange < 0) {
+            || priceRange < 0) {
       throw new OutOfRangeException("all of stars, numReviews, distance have to be non-negative");
     }
     this.id = id;

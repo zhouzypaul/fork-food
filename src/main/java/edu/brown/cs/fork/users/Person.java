@@ -24,7 +24,7 @@ public class Person {
    * @throws OutOfRangeException if gotten way if not between 0 and 1.
    */
   public Person(String userId, List<LabeledRestaurant> preference, double gottenWay)
-    throws OutOfRangeException {
+          throws OutOfRangeException {
     if (gottenWay < 0 || gottenWay > 1) {
       throw new OutOfRangeException("gottenWay should be between 0 and 1");
     }
