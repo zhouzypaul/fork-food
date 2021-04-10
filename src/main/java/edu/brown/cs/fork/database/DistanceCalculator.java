@@ -1,5 +1,7 @@
 package edu.brown.cs.fork.database;
 
+import edu.brown.cs.fork.exceptions.ErrorException;
+
 import java.util.List;
 
 /**
@@ -18,9 +20,9 @@ public class DistanceCalculator {
    * @param c2 coordinate 2
    * @return distance between input coordinates
    */
-  public double getEucDistance(List<Double> c1, List<Double> c2) {
+  public double getEucDistance(List<Double> c1, List<Double> c2) throws ErrorException {
     if (c1.size() != c2.size()) {
-      throw new RuntimeException("ERROR: Can't calculate distance");
+      throw new ErrorException("ERROR: Can't calculate distance");
     }
 
     double dist = 0;

@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 public class QueryRestaurants {
   private final Database db = new Database();
   private Connection conn;
-  private static final double RAD = 6371.0;
+  private static final double RAD = 3958.8;
   private static final int SEVEN = 7;
   private static final int EIGHT = 8;
   private static final int NINE = 9;

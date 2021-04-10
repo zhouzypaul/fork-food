@@ -1,7 +1,6 @@
 package edu.brown.cs.fork;
 
 import edu.brown.cs.fork.actions.ActionLoadDB;
-import edu.brown.cs.fork.actions.ActionPreprocess;
 import edu.brown.cs.fork.database.queries.QueryRestaurants;
 import edu.brown.cs.fork.database.queries.QueryUsers;
 
@@ -14,7 +13,6 @@ public class Hub {
   private static final QueryRestaurants REST_DB = new QueryRestaurants();
 
   private final ActionLoadDB loadDB = new ActionLoadDB();
-  private final ActionPreprocess preprocess = new ActionPreprocess();
 
   /**
    * Constructor.
@@ -52,6 +50,5 @@ public class Hub {
     REST_DB.initRestaurants("data/restaurants.sqlite3");
     USER_DB.initUsers("data/users.sqlite3");
     this.repl.registerAction(loadDB);
-    this.repl.registerAction(preprocess);
   }
 }
