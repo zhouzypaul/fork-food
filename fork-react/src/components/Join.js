@@ -1,17 +1,29 @@
 import TopBar from "./TopBar";
-import {useState} from "react";
+import { useRef, useState } from "react";
 import Code from "./Code";
+import { Link } from "react-router-dom";
 
 function Join() {
+  // values same as room code
   const [values, setValues] = useState("");
   console.log(values);
+
   return (
     <>
-      <TopBar showOptions={true} to="/home"/>
+      <TopBar showOptions={true} to="/home" />
       <div className="content">
-        <Code change={setValues}/>
-        <br/>
-        <button className="primary-button">join</button>
+        <Code change={setValues} />
+        <br />
+        <Link to={{
+          pathname: `/room${values}`,
+          roomProps: {
+            roomCode: values,
+            isHost: false
+          }
+        }}>
+          <button className="primary-button">join</button>
+        </Link>
+
       </div>
     </>
   );

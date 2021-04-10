@@ -4,7 +4,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.handlers.login.LoginHandler;
+import edu.brown.cs.fork.handlers.login.RegistrationHandler;
 import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
+import edu.brown.cs.fork.sockets.GroupSocket;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
 import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
@@ -16,6 +19,7 @@ import edu.brown.cs.fork.handlers.users.HandlerUpdateUserPref;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import com.google.gson.Gson;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
@@ -63,6 +67,10 @@ public final class Main {
   private void runSparkServer(int port) {
     Spark.port(port);
     Spark.externalStaticFileLocation("fork-react/build/");
+
+    // websocket
+    Spark.webSocket("/socket", GroupSocket.class);
+
     Spark.options("/*", (request, response) -> {
       String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
       if (accessControlRequestHeaders != null) {
@@ -77,11 +85,17 @@ public final class Main {
 
       return "OK";
     });
+
     // Setup Spark Routes
     Spark.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
     Spark.exception(Exception.class, new ExceptionPrinter());
 
     Spark.post("/test", new HandlerAllRestaurants());
+    // handles registering new users
+    Spark.post("/register", new RegistrationHandler());
+    // handles user login
+    Spark.post("/login", new LoginHandler());
+
     Spark.post("/getRestByID", new HandlerGetRestByID());
     Spark.post("/getRestByRad", new HandlerGetRestByRad());
     Spark.post("/registerUser", new HandlerRegisterUser());

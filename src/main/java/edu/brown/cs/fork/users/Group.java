@@ -1,6 +1,7 @@
 package edu.brown.cs.fork.users;
 
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
+import edu.brown.cs.fork.sockets.GroupSocket;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * A Group data structure. This holds a list of Person data structures.
  */
 public class Group {
+  private GroupSocket gs;
   private final List<Person> people;
 
   /**

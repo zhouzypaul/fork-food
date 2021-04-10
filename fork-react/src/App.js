@@ -8,7 +8,7 @@ import Login from "./components/Login";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import Host from "./components/Host";
 import Join from "./components/Join";
 import NewUser from './components/NewUser';
@@ -20,16 +20,18 @@ function App() {
   return (
     <div className="App">
       <Router>
-        <Route exact path="/" component={Start}/>
-        <Route path="/login" component={Login}/>
-        <Route path="/newuser" component={NewUser}/>
-        <Route path="/home" component={user !== "" ? Home : Start}/>
-        <Route path="/profile" component={user !== "" ? Profile : Start}/>
-        <Route path="/settings" component={user !== "" ? Settings : Start}/>
-        <Route path="/host" component={user !== "" ? Host : Start}/>
-        <Route path="/join" component={user !== "" ? Join : Start}/>
+        <Route exact path="/" component={Start} />
+        <Route path="/login" component={Login} />
+        <Route path="/newuser" component={NewUser} />
+
+        {/* checking if user is logged in, should we consider using JWT or something else more secure? */}
+        <Route path="/home" component={user !== "" ? Home : Start} />
+        <Route path="/profile" component={user !== "" ? Profile : Start} />
+        <Route path="/settings" component={user !== "" ? Settings : Start} />
+        <Route path="/join" component={user !== "" ? Join : Start} />
         <Route path="/survey" component={user !== "" ? Survey : Start}/>
         <Route path="/swipe" component={user !== "" ? Swipe : Start}/>
+        <Route path="/room:roomId" component={user !== "" ? Host : Start} />
       </Router>
     </div>
   );
