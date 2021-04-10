@@ -1,23 +1,36 @@
-import logo from './logo.svg';
 import './App.css';
+import {
+  BrowserRouter as Router,
+  Route
+} from "react-router-dom";
+import Start from './components/Start.js'
+import Login from "./components/Login";
+import Home from "./components/Home";
+import Profile from "./components/Profile";
+import Settings from "./components/Settings";
+import {useSelector} from "react-redux";
+import Host from "./components/Host";
+import Join from "./components/Join";
+import NewUser from './components/NewUser';
+import Survey from './components/Survey';
+import Swipe from "./components/Swipe";
 
 function App() {
+  const user = useSelector(state => state.user);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Route exact path="/" component={Start}/>
+        <Route path="/login" component={Login}/>
+        <Route path="/newuser" component={NewUser}/>
+        <Route path="/home" component={user !== "" ? Home : Start}/>
+        <Route path="/profile" component={user !== "" ? Profile : Start}/>
+        <Route path="/settings" component={user !== "" ? Settings : Start}/>
+        <Route path="/host" component={user !== "" ? Host : Start}/>
+        <Route path="/join" component={user !== "" ? Join : Start}/>
+        <Route path="/survey" component={user !== "" ? Survey : Start}/>
+        <Route path="/swipe" component={user !== "" ? Swipe : Start}/>
+      </Router>
     </div>
   );
 }

@@ -1,38 +1,334 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin&display=swap');
+
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-around;
+  font-size: x-large;
+  font-style: normal;
+  font-family: 'Cabin', sans-serif;
+  font-weight: lighter;
+}
+
+.login-button {
+  align-self: flex-end;
+  padding: 16px 32px;
+  margin: 8px;
+}
+
+.top-bar {
+  position: sticky;
+  top: 16px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 95vw;
+}
+
+.title-text {
+  font-size: xxx-large;
+}
+
+.fork-main {
+  font-size: 140px;
+}
+
+#slogan {
+  font-size: 46px;
+}
+
+.text-box {
+  font-size: large;
+  background-color: #dcdcdc80;
+  padding: 6px;
+  margin: 8px 4px;
+  border-style: solid;
+  border-color: transparent;
+  border-radius: 6px;
+  outline: none;
+}
+
+.text-box:focus {
+  background-color: transparent;
+  border-style: solid;
+  border-color: #dcdcdc80;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
 }
 
-.App-link {
-  color: #61dafb;
+.profile {
+  min-width: 80vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.links {
+  text-decoration: none;
+  color: black;
 }
+
+.links:hover {
+  color: #DDAFF9;
+}
+
+.primary-button {
+  margin: 8px;
+  padding: 6px 18px;
+  background-color: #DDAFF995;
+  border-radius: 6px;
+  border-style: none;
+  outline: none;
+  animation: ease-in 1s;
+  cursor: pointer;
+  font: inherit;
+}
+
+.primary-button:active {
+  background-color: #DDAFF980;
+  transform: translateY(3px);
+}
+
+.secondary-button {
+  margin: 8px;
+  padding: 6px 18px;
+  background-color: #dcdcdc90;
+  border-radius: 6px;
+  border-style: none;
+  outline: none;
+  animation: ease-in 1s;
+  cursor: pointer;
+  font: inherit;
+}
+
+.secondary-button:active {
+  background-color: #DDAFF980;
+  transform: translateY(3px);
+}
+
+.options {
+  display: flex;
+  flex-direction: row;
+  min-width: 200px;
+  justify-content: space-between;
+}
+
+.scroll-box {
+  height: 20vh;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.fork-home {
+  font-size: 88px;
+}
+
+.login {
+  margin: 60px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
+}
+
+.login-error {
+  margin: 4px;
+  color: darkred;
+  font-size: medium;
+  min-height: 20px;
+}
+
+.survey {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: space-around;
+  justify-content: center;
+  max-width: 60vw;
+  margin: 18px;
+}
+
+.survey-box {
+  font: inherit;
+  margin: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  background-color: gainsboro;
+  outline: none;
+  cursor: pointer;
+}
+
+#radius {
+  margin: 0 16px;
+  width: 60%;
+}
+
+#radius-display {
+  width: 100px;
+}
+
+.slider-container {
+  margin: 18px;
+  display: flex;
+  flex-direction: row;
+  width: 30vw;
+  justify-content: space-around;
+}
+
+.exit-home {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 16px;
+}
+
+.divider {
+  margin: 16px;
+  color: gainsboro;
+  background-color: gainsboro;
+  height: 2px;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.code {
+  font-size: 124px;
+  color: #DDAFF9;
+}
+
+.circle-1 {
+  position: absolute;
+  right: 33%;
+  top: 15%;
+
+  animation: wobble-1 ease-in-out 6s infinite;
+}
+
+.stars {
+  color: #DDAFF9;
+}
+
+.restaurant {
+  padding: 32px;
+  border-radius: 8px;
+  border-color: gainsboro;
+  border-style: solid;
+}
+
+@keyframes wobble-1 {
+  0% {transform: translateY(0)}
+  50% {transform: translate(-6px,-12px) scale(1.1)}
+  100% {transform: translateY(0)}
+}
+
+.circle-2 {
+  position: absolute;
+  right: 30%;
+  top: 13%;
+
+  animation: wobble-2 ease-in-out 5s infinite;
+}
+
+@keyframes wobble-2 {
+  0% {transform: translateY(0)}
+  50% {transform: translate(8px,-16px) scale(1.2)}
+  100% {transform: translateY(0)}
+}
+
+.circle-3 {
+  position: absolute;
+  right: 27%;
+  top: 16%;
+  animation: wobble-3 ease-in-out 4s infinite;
+}
+
+@keyframes wobble-3 {
+  0% {transform: translateY(0)}
+  50% {transform: translate(6px,-12px) scale(0.9)}
+  100% {transform: translateY(0)}
+}
+
+.bg-blob {
+  position: relative;
+  animation: pulse ease-in-out 4.5s infinite;
+}
+
+@keyframes pulse {
+  0% {transform: translate(0, 0)}
+  50% {transform: translate(0, -10px)}
+  100% {transform: translate(0, 0)}
+}
+
+.blob {
+  position: absolute;
+  top: 0;
+  left: 0;
+  fill: #DDAFF950;
+  width: 50vmax;
+  z-index: -1;
+  animation: move 10s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+#host-button {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  animation: pulse ease-in-out 2s infinite;
+}
+
+#join-button {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  animation: pulse ease-in-out 1.6s infinite;
+}
+
+@keyframes move {
+  0%   { transform: scale(1)   translate(10px, -30px); }
+  38%  { transform: scale(0.8, 1) translate(80vw, 30vh) rotate(160deg); }
+  40%  { transform: scale(0.8, 1) translate(80vw, 30vh) rotate(160deg); }
+  78%  { transform: scale(1.3) translate(0vw, 50vh) rotate(-20deg); }
+  80%  { transform: scale(1.3) translate(0vw, 50vh) rotate(-20deg); }
+  100% { transform: scale(1)   translate(10px, -30px); }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.code-cont {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.code-input {
+  margin: 6px;
+  font-family: inherit;
+  font-size: 64px;
+  outline: none;
+  border-color: gainsboro;
+  border-style: none none solid none;
+  border-width: 6px;
+  width: 52px;
+  text-align: center;
+}
+
