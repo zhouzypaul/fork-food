@@ -43,8 +43,8 @@ public class Restaurant implements Recommendable {
   private final int dimNumReviews = 3;
   private final int dimPriceRange = 3;
   // mapping of attributes
-  private final double closeDistance = 0.2;  // in kilometers
-  private final double walkDistance = 1;
+  private final double closeDistance = 0.5;  // in miles
+  private final double walkDistance = 1.5;
   private final double driveDistance = 10;
   private final int lowNumReview = 10;
   private final int highNumReview = 100;
