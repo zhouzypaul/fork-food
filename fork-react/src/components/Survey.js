@@ -6,8 +6,7 @@ import axios from 'axios';
 
 const TYPES = ["coffee & tea", "chinese", "pizza", "italian", "japanese", "indian", "greek",
   "middle eastern", "pizza", "vegan", "mexican", "thai", "american", "salad", "barbeque", "seafood",
-  "steak", "vietnamese", "steak", "breakfast", "dessert"];
-TYPES.sort();
+  "steak", "vietnamese", "breakfast", "dessert"];
 const PRICES = ["$", "$$", "$$$"];
 
 function Option(props) {
