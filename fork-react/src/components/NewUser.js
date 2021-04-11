@@ -41,13 +41,12 @@ function NewUser(props) {
       .post(`${SERVER_URL}/register`, toSend, config)
       .then((response) => {
         // if response is true, do this otherwise, say username already exists setError
-        if (response.data["okay"]) {
-
+        if (response.data["success"]) {
           dispatch(login(username));
           props.history.push('/home');
           console.log("registered");
         } else {
-          setError("Username already taken");
+          setError(response.data["err"]);
         }
 
       })
@@ -63,7 +62,7 @@ function NewUser(props) {
     }
   }
 
-  return(
+  return (
     <>
       <TopBar to="/" showOptions={false} />
       <div className="login">
@@ -71,9 +70,9 @@ function NewUser(props) {
         <div className="login-error">
           {error}
         </div>
-        <TextBox initial="username" change={setUsername} onKeyDown={submit} type="text"/>
-        <TextBox initial="password" change={setPassword} onKeyDown={submit} type="password"/>
-        <TextBox initial="confirm password" change={setConfirm} onKeyDown={submit} type="password"/>
+        <TextBox initial="username" change={setUsername} onKeyDown={submit} type="text" />
+        <TextBox initial="password" change={setPassword} onKeyDown={submit} type="password" />
+        <TextBox initial="confirm password" change={setConfirm} onKeyDown={submit} type="password" />
         <button className="primary-button" onClick={createUser}>
           join
         </button>
