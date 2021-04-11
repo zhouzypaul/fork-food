@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
-import useUpdateUsers from "./useUpdateUsers"
+import useUpdateUsers from "../hooks/useUpdateUsers"
 import { useEffect } from "react";
 import {Link} from "react-router-dom";
 
