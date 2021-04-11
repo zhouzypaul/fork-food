@@ -8,10 +8,8 @@ const MESSAGE_TYPE = {
 
 const useUpdateUsers = (roomId, user) => {
     const [users, setUsers] = useState([user]);
-    const socket = useRef();
+    const socket = useRef(new WebSocket("ws://localhost:4567/socket"));
     const id = useRef();
-
-    socket.current = new WebSocket("ws://localhost:4567/socket"); // create spcket connection
 
     useEffect(() => {
         socket.current.onmessage = (msg) => {
