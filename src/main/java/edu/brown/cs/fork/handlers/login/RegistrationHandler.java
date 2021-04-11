@@ -64,12 +64,4 @@ public class RegistrationHandler implements Route {
     }
     return null;
   }
-
-  private boolean tempFunc(String username, byte[] password, byte[] salt) {
-    if (username.startsWith("E")) { // check if username already exists
-      return false;
-    }
-    System.out.println(username + ": " + Arrays.toString(password) + ": " + Arrays.toString(salt)); //put in database
-    return true;
-  }
 }

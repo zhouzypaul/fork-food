@@ -98,12 +98,14 @@ public final class Main {
 
     Spark.post("/getRestByID", new HandlerGetRestByID());
     Spark.post("/getRestByRad", new HandlerGetRestByRad());
-    Spark.post("/registerUser", new HandlerRegisterUser());
     Spark.post("/deleteUser", new HandlerDeleteUser());
     Spark.post("/getAllUserIds", new HandlerAllUserIds());
     Spark.post("/getUserPref", new HandlerGetUserPref());
     Spark.post("/insertUserPref", new HandlerInsertUserPref());
     Spark.post("/updateUserPref", new HandlerUpdateUserPref());
+
+    // using other registration endpoint
+    // Spark.post("/registerUser", new HandlerRegisterUser());
   }
 
   /**

@@ -24,7 +24,7 @@ function NewUser(props) {
   }
 
 
-  const registerUser = (username, hash) => {
+  const registerUser = (username, password) => {
     const toSend = {
       // username and password
       username: username,
@@ -50,7 +50,7 @@ function NewUser(props) {
         }
 
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
   }
