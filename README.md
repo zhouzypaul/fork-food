@@ -96,6 +96,8 @@ load user path_to_custom_user_db
 
 - ```/deleteUser``` body format: ```{"id": user_id}```, returns whether the action is successful
 
+- ```/getUserPwd``` body format: ```{"id": user_id}```, returns user's password in format ```{"pwd": user_pwd}```
+
 - ```/getUserPref``` gets user's survey response from /user/training table. body format: ```{"id": user_id}```, returns user with ```user_id``` in format ```{"userID": "", "radius": "", "prefHighReview": "", "prefNumReviews": "", "categories": ""}```
 
 - ```/updateUserPref``` updates user's survey response in /user/training table. body format: ```{"username": user_id, "types": arr_of_food_types, "price": arr_of_preferred_price_ranges, "radius": preferred_radius}```
