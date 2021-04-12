@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
-import useUpdateUsers from "../hooks/useUpdateUsers";
-import Bubble from "./Bubble";
+
+// import Bubble from "./Bubble";
 
 const MESSAGE_TYPE = {
   CONNECT: 0,
@@ -101,19 +101,19 @@ function Host(props) {
     socket.current.send(JSON.stringify(message));
   }
 
-  const populate = () => {
-    if (userList === undefined) {
-      return;
-    }
-    const bubbles = [];
-    let i = 0;
-    for (let user of users) {
-      bubbles.push(<Bubble user={user} key={i++}/>);
-    }
-    setActive(bubbles);
-  }
+  // const populate = () => {
+  //   if (users === undefined) {
+  //     return;
+  //   }
+  //   const bubbles = [];
+  //   let i = 0;
+  //   for (let user of users) {
+  //     bubbles.push(<Bubble user={user} key={i++} />);
+  //   }
+  //   setActive(bubbles);
+  // }
 
-  useEffect(populate, [users]);
+  // useEffect(populate, [users]);
 
   return (
     <>
@@ -123,9 +123,10 @@ function Host(props) {
           share the code
         </div>
         <div className="code">{roomCode.current}</div>
-        {host.current ? <button className="primary-button">start</button>: <></>}
+        {host.current ? <button className="primary-button" onClick={startSwiping}>start</button> : <></>}
         <div className="joined">
-          {active}
+          {/* {active} */}
+          {users}
         </div>
       </div>
     </>

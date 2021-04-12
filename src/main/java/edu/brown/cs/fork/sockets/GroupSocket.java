@@ -106,7 +106,6 @@ public class GroupSocket {
 
           List<Restaurant> recommendedRestaurants = new ArrayList<>();
 //          Set<String> resIds = new HashSet<>();
-
           try {
             recommendedRestaurants = Hub.recommendRestaurants(usernames, new double[]{lat, lon});
           } catch (Exception e) {
@@ -124,6 +123,7 @@ public class GroupSocket {
 
 //          userRestaurants.put(roomId, toBeSwiped);
 
+          System.out.println(Arrays.toString(recommendedRestaurants.toArray()));
           JsonObject restaurants = new JsonObject();
           restaurants.add("restaurants", GSON.toJsonTree(recommendedRestaurants));
 

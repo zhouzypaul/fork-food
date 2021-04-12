@@ -3,7 +3,6 @@ import Option from "./Option";
 import Waiting from "./Waiting";
 import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import useSwipeResults from "../hooks/useSwipeResults";
 
 const MESSAGE_TYPE = {
   CONNECT: 0,
