@@ -14,6 +14,7 @@ import edu.brown.cs.fork.users.Person;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A singleton class containing REPL and databases.
@@ -55,7 +56,7 @@ public class Hub {
    * @param hostCoordinate the coordinate of the host, in the form of (latitude, longitude)
    * @return a list of recommended restaurants.
    */
-  public static List<Restaurant> recommendRestaurants(String[] userIds, double[] hostCoordinate)
+  public static List<Restaurant> recommendRestaurants(Set<String> userIds, double[] hostCoordinate)
           throws OutOfRangeException, SQLException, NoTrainDataException {
     // getting the list of users
     List<Person> userList = new LinkedList<>();

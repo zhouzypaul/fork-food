@@ -29,8 +29,8 @@ function App() {
         <Route path="/profile" component={user !== "" ? Profile : Start} />
         <Route path="/settings" component={user !== "" ? Settings : Start} />
         <Route path="/join" component={user !== "" ? Join : Start} />
-        <Route path="/survey" component={user !== "" ? Survey : Start}/>
-        <Route path="/swipe" component={user !== "" ? Swipe : Start}/>
+        <Route path="/survey" component={user !== "" ? Survey : Start} />
+        <Route path="/swipe" component={user !== "" ? Swipe : Start} />
         <Route path="/room:roomId" component={user !== "" ? Host : Start} />
       </Router>
     </div>

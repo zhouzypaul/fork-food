@@ -2,8 +2,6 @@ import { useRef, useState } from "react";
 import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
 import useUpdateUsers from "../hooks/useUpdateUsers"
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
 
 function Host(props) {
 
@@ -18,7 +16,18 @@ function Host(props) {
   }
 
   const user = useSelector(state => state.user);
-  const { users, restaurants, startSwiping } = useUpdateUsers(roomCode, user);
+  // naming convention little iffy here
+  const { users, restaurants, sock, startSwiping } = useUpdateUsers(roomCode, user);
+  console.log(restaurants.length)
+  if (restaurants.length !== 0) {
+    props.history.push({
+      pathname: `/swipe`,
+      swipeProps: {
+        restaurants: restaurants,
+        socket: sock
+      }
+    })
+  }
 
   // TODO: ternary operator
   if (host.current) {

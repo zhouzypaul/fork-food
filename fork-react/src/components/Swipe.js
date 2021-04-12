@@ -1,4 +1,4 @@
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import Option from "./Option";
 
 function Swipe() {
@@ -7,7 +7,7 @@ function Swipe() {
       <div className="content">
         <div className="choices">
           <button className="ex">&#x2715;</button>
-          <Option name="The Capital Grille" star={3} review={100} price="$$" distance="100 miles"/>
+          <Option name="The Capital Grille" star={3} review={100} price="$$" distance="100 miles" />
           <button className="check">&#x2713;</button>
         </div>
       </div>

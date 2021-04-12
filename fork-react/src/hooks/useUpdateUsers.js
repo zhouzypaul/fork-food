@@ -40,11 +40,11 @@ const useUpdateUsers = (roomId, user) => {
                 case MESSAGE_TYPE.UPDATE:
                     // check if we're updating users or doing something else
                     if (data.payload.type === "update_user") {
-                        setUsers(data.payload.senderMessage);
-                        console.log("users set")
+                        setUsers(data.payload.senderMessage.users);
+                        console.log("users set");
                     } else if (data.payload.type === "start") {
-                        setRestaurants(data.payload.senderMessage);
-                        console.log("start swiping")
+                        console.log(data.payload.senderMessage.restaurants);
+                        console.log("start swiping");
                     }
                     break;
                 default:
@@ -71,13 +71,16 @@ const useUpdateUsers = (roomId, user) => {
             id: id.current,
             message: {
                 type: "start",
-                roomId: roomId
+                roomId: roomId,
+                lat: 40.723091,
+                lon: -73.989201
             }
         };
         socket.current.send(JSON.stringify(message));
     }
+    const sock = socket.current;
 
-    return { users, restaurants, startSwiping };
+    return { users, restaurants, sock, startSwiping };
 }
 
 export default useUpdateUsers;

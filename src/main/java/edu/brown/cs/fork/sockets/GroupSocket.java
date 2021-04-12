@@ -1,8 +1,8 @@
 package edu.brown.cs.fork.sockets;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.restaurants.Restaurant;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -20,6 +20,7 @@ public class GroupSocket {
   private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
   private static final Hashtable<Integer, Queue<Session>> rooms = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> userRooms = new Hashtable<>();
+  private static final Hashtable<Integer, Hashtable<String, Set<String>>> userRestaurants = new Hashtable<>();
   private static int nextId = 0;
 
   private static enum MESSAGE_TYPE {
@@ -83,20 +84,50 @@ public class GroupSocket {
           userRooms.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
           rooms.get(roomId).add(session);
 
-          JSONObject users = new JSONObject();
-          users.put("users", userRooms.get(roomId));
+          JsonObject users = new JsonObject();
+          users.add("users", GSON.toJsonTree(userRooms.get(roomId)));
 
           payload.addProperty("type", "update_user");
-          payload.addProperty("senderMessage", users.toString());
+          payload.add("senderMessage", users);
           break;
 
         case "start":
-          // TODO: some paul shit right here
-          JSONObject restaurants = new JSONObject();
-          restaurants.put("restaurants", userRooms.get(roomId));
+          double lat = messageObj.getJSONObject("message").getDouble("lat");
+          double lon = messageObj.getJSONObject("message").getDouble("lon");
+
+          Set<String> usernames = userRooms.get(roomId);
+
+          List<Restaurant> recommendedRestaurants = new ArrayList<>();
+          Set<String> resIds = new HashSet<>();
+
+          try {
+            recommendedRestaurants = Hub.recommendRestaurants(usernames, new double[]{lat, lon});
+          } catch (Exception e) {
+            System.out.println("ERROR: " + e);
+          }
+
+          for (Restaurant res : recommendedRestaurants) {
+            resIds.add(res.getId());
+          }
+
+          Hashtable<String, Set<String>> toBeSwiped = new Hashtable<>();
+          for (String user : usernames) {
+            toBeSwiped.put(user, resIds);
+          }
+
+          userRestaurants.put(roomId, toBeSwiped);
+          userRooms.remove(roomId);
+
+          JsonObject restaurants = new JsonObject();
+          restaurants.add("restaurants", GSON.toJsonTree(recommendedRestaurants));
 
           payload.addProperty("type", "start");
-          payload.addProperty("senderMessage", restaurants.toString());
+          payload.add("senderMessage", restaurants);
+          break;
+
+        case "swipe":
+          // check if user is done with swiping
+          // if so, remove all rooms and such
           break;
 
         default:
