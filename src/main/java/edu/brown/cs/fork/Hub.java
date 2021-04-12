@@ -3,7 +3,7 @@ package edu.brown.cs.fork;
 import edu.brown.cs.fork.actions.ActionLoadDB;
 import edu.brown.cs.fork.database.queries.QueryRestaurants;
 import edu.brown.cs.fork.database.queries.QueryUsers;
-import edu.brown.cs.fork.exceptions.NoTestDataException;
+import edu.brown.cs.fork.exceptions.NoTrainDataException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.recommendation.NaiveBayesClassifier;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
@@ -56,7 +56,7 @@ public class Hub {
    * @return a list of recommended restaurants.
    */
   public static List<Restaurant> recommendRestaurants(String[] userIds, double[] hostCoordinate)
-          throws OutOfRangeException, SQLException, NoTestDataException {
+          throws OutOfRangeException, SQLException, NoTrainDataException {
     // getting the list of users
     List<Person> userList = new LinkedList<>();
     for (String id : userIds) {
