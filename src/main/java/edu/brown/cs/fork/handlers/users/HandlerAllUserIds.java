@@ -8,9 +8,7 @@ import spark.Response;
 import spark.Route;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class to query all user ids in the login table of users database.
@@ -26,7 +24,7 @@ public class HandlerAllUserIds implements Route {
   @Override
   public Object handle(Request req, Response res) throws Exception {
     String err = "";
-    List<String> ret = new ArrayList<>();
+    Set<String> ret = new HashSet<>();
     if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {

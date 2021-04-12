@@ -22,7 +22,7 @@ function App() {
       <Router>
         <Route exact path="/" component={Start} />
         <Route path="/login" component={Login} />
-        <Route path="/newuser" component={NewUser} />
+        <Route path="/newUser" component={NewUser} />
 
         {/* checking if user is logged in, should we consider using JWT or something else more secure? */}
         <Route path="/home" component={user !== "" ? Home : Start} />

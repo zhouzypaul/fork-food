@@ -7,14 +7,17 @@ const MESSAGE_TYPE = {
 };
 
 const useUpdateUsers = (roomId, user) => {
-    const [users, setUsers] = useState([user]);
-    const socket = useRef(new WebSocket("ws://localhost:4567/socket"));
+    const [users, setUsers] = useState();
+    const socket = useRef(null);
     const id = useRef();
+
+    socket.current = new WebSocket("ws://localhost:4567/socket");
 
     useEffect(() => {
         socket.current.onmessage = (msg) => {
             //
             const data = JSON.parse(msg.data);
+            console.log(data);
             switch (data.type) {
                 case MESSAGE_TYPE.CONNECT:
                     id.current = data.payload.id
