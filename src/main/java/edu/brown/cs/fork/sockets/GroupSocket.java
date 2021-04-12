@@ -81,7 +81,7 @@ public class GroupSocket {
       payload.addProperty("senderId", messageObj.getInt("id"));
 
       JsonObject users = new JsonObject();
-      users.add("users", new GsonBuilder().create().toJsonTree(userRooms.get(roomId)));
+      users.add("users", GSON.toJsonTree(userRooms.get(roomId)));
 
       payload.add("senderMessage", users);
       json.add("payload", payload);
