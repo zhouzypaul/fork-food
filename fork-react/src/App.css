@@ -310,6 +310,11 @@
   animation: pulse ease-out 4s infinite;
 }
 
+#delete {
+  color: white;
+  background-color: #FF4747;
+}
+
 @keyframes wobble-1 {
   0% {transform: translateY(0)}
   50% {transform: translate(-6px,-12px) scale(1.1)}

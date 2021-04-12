@@ -52,8 +52,28 @@ public class HandlerUpdateUserPref implements Route {
         return "Breakfast & Brunch";
       case "dessert":
         return "Desserts";
+      case "coffee & tea":
+        return "Coffee & Tea";
+      case "greek":
+        return "Greek";
+      case "middle eastern":
+        return "Middle Eastern";
+      case "vegan":
+        return "Vegan";
+      case "mexican":
+        return "Mexican";
+      case "thai":
+        return "Thai";
+      case "american":
+        return "American";
+      case "salad":
+        return "Salad";
+      case "barbeque":
+        return "Barbeque";
+      case "seafood":
+        return "Seafood";
       default:
-        return "NONE";
+        return "";
     }
   }
 
@@ -71,7 +91,7 @@ public class HandlerUpdateUserPref implements Route {
       case "$$$":
         return "3";
       default:
-        return "NONE";
+        return "";
     }
   }
 
@@ -98,15 +118,22 @@ public class HandlerUpdateUserPref implements Route {
         "priceRange", "distance", "label", "timestamp", "numReviews", "name");
 
     String err = "";
-    boolean success = false;
+    boolean success = true;
     if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
+      if (priceRanges.size() == 0) {
+        priceRanges.add("");
+      }
+      if (foodTypes.size() == 0) {
+        foodTypes.add("");
+      }
       if (!Hub.getUserDB().deleteUserPref(userId)) {
         err = "ERROR: Can't update user preference";
       } else {
-        for (int i = 0; i < priceRanges.size(); i++) {
-          for (int j = 0; j < foodTypes.size(); j++) {
+        System.out.println("after deleting row");
+        for (int i = 0; i < foodTypes.size(); i++) {
+          for (int j = 0; j < priceRanges.size(); j++) {
             List<String> info = Arrays.asList(userId, "", matchFoodTypes(foodTypes.get(i)), "3.0",
                 matchPriceRanges(priceRanges.get(j)), distance, "1", "", "60", "");
             success = Hub.getUserDB().insertUserPref(userId, colsToSet, info);

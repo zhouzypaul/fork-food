@@ -103,6 +103,6 @@ public class GroupSocket {
   }
 
   public static boolean roomExists(int code) {
-    return rooms.containsKey(code);
+    return userRooms.containsKey(code);
   }
 }
