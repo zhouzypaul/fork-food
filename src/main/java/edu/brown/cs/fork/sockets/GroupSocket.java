@@ -20,8 +20,8 @@ public class GroupSocket {
   private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
   private static final Hashtable<Integer, Queue<Session>> rooms = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> userRooms = new Hashtable<>();
-  private static final Hashtable<Integer, Hashtable<String, Set<String>>> userRestaurants = new Hashtable<>();
-  private static final Hashtable<Integer, Hashtable<String, Set<String>>> userDecisions = new Hashtable<>();
+//  private static final Hashtable<Integer, Hashtable<String, Set<String>>> userRestaurants = new Hashtable<>();
+  private static final Hashtable<Integer, List<String>> userDecisions = new Hashtable<>();
   private static int nextId = 0;
 
   private static enum MESSAGE_TYPE {
@@ -64,7 +64,7 @@ public class GroupSocket {
     try {
       JSONObject messageObj = new JSONObject(message);
       String type = messageObj.getJSONObject("message").getString("type");
-      int roomId = messageObj.getJSONObject("message").getJSONObject("roomId").getInt("current");
+      int roomId = messageObj.getJSONObject("message").getInt("roomId");
 
       // prepare update message
       JsonObject update_message = new JsonObject();
@@ -98,8 +98,11 @@ public class GroupSocket {
 
           Set<String> usernames = userRooms.get(roomId);
 
+
+          userDecisions.put(roomId, new LinkedList<>());
+
           List<Restaurant> recommendedRestaurants = new ArrayList<>();
-          Set<String> resIds = new HashSet<>();
+//          Set<String> resIds = new HashSet<>();
 
           try {
             recommendedRestaurants = Hub.recommendRestaurants(usernames, new double[]{lat, lon});
@@ -107,17 +110,16 @@ public class GroupSocket {
             System.out.println("ERROR: " + e);
           }
 
-          for (Restaurant res : recommendedRestaurants) {
-            resIds.add(res.getId());
-          }
+//          for (Restaurant res : recommendedRestaurants) {
+//            resIds.add(res.getId());
+//          }
+//
+//          Hashtable<String, Set<String>> toBeSwiped = new Hashtable<>();
+//          for (String user : usernames) {
+//            toBeSwiped.put(user, resIds);
+//          }
 
-          Hashtable<String, Set<String>> toBeSwiped = new Hashtable<>();
-          for (String user : usernames) {
-            toBeSwiped.put(user, resIds);
-          }
-
-          userRestaurants.put(roomId, toBeSwiped);
-          userRooms.remove(roomId);
+//          userRestaurants.put(roomId, toBeSwiped);
 
           JsonObject restaurants = new JsonObject();
           restaurants.add("restaurants", GSON.toJsonTree(recommendedRestaurants));
@@ -129,8 +131,29 @@ public class GroupSocket {
         case "swipe":
           String user = messageObj.getJSONObject("message").getString("username");
           String resId = messageObj.getJSONObject("message").getString("resId");
-          // check if user is done with swiping
-          // if so, remove all rooms and such
+          // add to the userDecisions table
+          if (messageObj.getJSONObject("message").getInt("like") == 1) {
+            userDecisions.get(roomId).add(resId);
+          }
+          return;
+
+        case "done":
+          String username = messageObj.getJSONObject("message").getString("username");
+          userRooms.get(roomId).remove(username);
+          if (userRooms.get(roomId).isEmpty()) {
+            // return a decision
+            JsonObject result = new JsonObject();
+            String commonRes = mostCommon(userDecisions.get(roomId));
+            System.out.println("decision " + commonRes);
+
+            result.addProperty("result", commonRes);
+
+            payload.addProperty("type", "done");
+            payload.add("senderMessage", result);
+            // TODO: will have to remove room at some point too
+          } else {
+            return;
+          }
           break;
 
         default:
@@ -140,7 +163,9 @@ public class GroupSocket {
 
       // send usernames of everyone in room
       String update = GSON.toJson(update_message);
+      session.getRemote().sendString(update);
 
+      System.out.println(update);
       for (Session sesh : rooms.get(roomId)) {
         sesh.getRemote().sendString(update); // sending to each session in room
       }
@@ -152,6 +177,24 @@ public class GroupSocket {
   @OnWebSocketError
   public void throwError(Throwable error) {
     error.printStackTrace();
+  }
+
+  public static <T> T mostCommon(List<T> list) {
+    Map<T, Integer> map = new HashMap<>();
+
+    for (T t : list) {
+      Integer val = map.get(t);
+      map.put(t, val == null ? 1 : val + 1);
+    }
+
+    Map.Entry<T, Integer> max = null;
+
+    for (Map.Entry<T, Integer> e : map.entrySet()) {
+      if (max == null || e.getValue() > max.getValue())
+        max = e;
+    }
+
+    return max.getKey();
   }
 
 }

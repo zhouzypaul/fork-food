@@ -12,6 +12,7 @@ import edu.brown.cs.fork.users.Group;
 import edu.brown.cs.fork.users.Person;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +57,7 @@ public class Hub {
    * @param hostCoordinate the coordinate of the host, in the form of (latitude, longitude)
    * @return a list of recommended restaurants.
    */
-  public static List<Restaurant> recommendRestaurants(String[] userIds, double[] hostCoordinate)
+  public static List<Restaurant> recommendRestaurants(Set<String> userIds, double[] hostCoordinate)
           throws OutOfRangeException, SQLException, NoTestDataException {
     // getting the list of users
     List<Person> userList = new LinkedList<>();
@@ -73,6 +74,7 @@ public class Hub {
       radius = radius + r.getDistance();
     }
     radius = radius / groupPreference.size();
+    radius = 100;
     // getting training and testing restaurants
     List<Restaurant> restaurantsWithinRadius =
             REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);

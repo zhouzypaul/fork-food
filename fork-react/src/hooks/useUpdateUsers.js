@@ -43,7 +43,7 @@ const useUpdateUsers = (roomId, user) => {
                         setUsers(data.payload.senderMessage.users);
                         console.log("users set");
                     } else if (data.payload.type === "start") {
-                        console.log(data.payload.senderMessage.restaurants);
+                        setRestaurants(data.payload.senderMessage.restaurants);
                         console.log("start swiping");
                     }
                     break;
@@ -59,9 +59,6 @@ const useUpdateUsers = (roomId, user) => {
             console.log("socket closed");
         }
 
-        return () => {
-            socket.current.close();
-        };
     }, [roomId, user])
 
 
@@ -80,7 +77,7 @@ const useUpdateUsers = (roomId, user) => {
     }
     const sock = socket.current;
 
-    return { users, restaurants, sock, startSwiping };
+    return { users, restaurants, sock, id, startSwiping };
 }
 
 export default useUpdateUsers;

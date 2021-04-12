@@ -14,6 +14,7 @@ import Join from "./components/Join";
 import NewUser from './components/NewUser';
 import Survey from './components/Survey';
 import Swipe from "./components/Swipe";
+import Result from "./components/Result";
 
 function App() {
   const user = useSelector(state => state.user);
@@ -31,6 +32,7 @@ function App() {
         <Route path="/join" component={user !== "" ? Join : Start} />
         <Route path="/survey" component={user !== "" ? Survey : Start} />
         <Route path="/swipe" component={user !== "" ? Swipe : Start} />
+        <Route path="/result" component={user !== "" ? Result : Start} />
         <Route path="/room:roomId" component={user !== "" ? Host : Start} />
       </Router>
     </div>

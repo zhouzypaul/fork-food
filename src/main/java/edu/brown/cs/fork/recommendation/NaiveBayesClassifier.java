@@ -37,7 +37,7 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
    * @throws NoTestDataException when the testData is an empty list.
    */
   public NaiveBayesClassifier(List<L> trainingData, List<R> testData) throws NoTestDataException {
-    if (trainingData.isEmpty()) {
+    if (testData.isEmpty()) {
       throw new NoTestDataException("no testing data for naive bayes classifier");
     }
     this.trainingData = trainingData;
