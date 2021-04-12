@@ -206,7 +206,7 @@ public class QueryUsers {
     // build insert string
     // example: (userId, distance, label)
     StringBuilder sb = new StringBuilder();
-    sb.append("(userId, ");
+    sb.append("(");
     for (int i = 0; i < info.size(); i++) {
       if (i == info.size() - 1) {
         sb.append(colsToSet.get(i));
@@ -220,7 +220,7 @@ public class QueryUsers {
     // build value string
     // example: (7, 3.0, 1)
     StringBuilder val = new StringBuilder();
-    val.append("('").append(userId).append("', ");
+    val.append("(");
     for (int i = 0; i < info.size(); i++) {
       if (i == info.size() - 1) {
         val.append("'").append(info.get(i)).append("'");

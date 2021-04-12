@@ -103,7 +103,6 @@ public class HandlerUpdateUserPref implements Route {
     JSONArray price = data.getJSONArray("price");
     String distance = data.getString("radius");
 
-    System.out.println(data);
     List<String> foodTypes = new ArrayList<>();
     List<String> priceRanges = new ArrayList<>();
 
@@ -126,8 +125,8 @@ public class HandlerUpdateUserPref implements Route {
       if (!Hub.getUserDB().deleteUserPref(userId)) {
         err = "ERROR: Can't update user preference";
       } else {
-        for (int i = 0; i < priceRanges.size(); i++) {
-          for (int j = 0; j < foodTypes.size(); j++) {
+        for (int i = 0; i < foodTypes.size(); i++) {
+          for (int j = 0; j < priceRanges.size(); j++) {
             List<String> info = Arrays.asList(userId, "", matchFoodTypes(foodTypes.get(i)), "3.0",
                 matchPriceRanges(priceRanges.get(j)), distance, "1", "", "60", "");
             success = Hub.getUserDB().insertUserPref(userId, colsToSet, info);
