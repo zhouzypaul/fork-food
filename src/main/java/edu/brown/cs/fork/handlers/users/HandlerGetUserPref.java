@@ -35,7 +35,7 @@ public class HandlerGetUserPref implements Route {
     Map<String, List<String>> user = new HashMap<>();
     List<String> foodTypes = new ArrayList<>();
     List<String> priceRanges = new ArrayList<>();
-    double radius = 0.0;
+    double radius = 10.0;
     if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
@@ -45,6 +45,12 @@ public class HandlerGetUserPref implements Route {
         priceRanges = user.get("priceRange");
         foodTypes = new ArrayList<>(new HashSet<>(foodTypes));
         priceRanges = new ArrayList<>(new HashSet<>(priceRanges));
+        if (foodTypes.size() == 1 && foodTypes.get(0).equals("")) {
+          foodTypes = new ArrayList<>();
+        }
+        if (priceRanges.size() == 1 && priceRanges.get(0).equals("")) {
+          priceRanges = new ArrayList<>();
+        }
         if (!user.get("distance").get(0).equals("")) {
           radius = Double.parseDouble(user.get("distance").get(0));
         }
