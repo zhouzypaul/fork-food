@@ -7,6 +7,12 @@ import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.handlers.login.LoginHandler;
 import edu.brown.cs.fork.handlers.login.RegistrationHandler;
 import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
+
+import edu.brown.cs.fork.handlers.room.RoomCheckHandler;
+import edu.brown.cs.fork.sockets.GroupSocket;
+import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
+import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
+
 import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
 import edu.brown.cs.fork.handlers.users.HandlerDeleteUser;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPref;
@@ -105,8 +111,12 @@ public final class Main {
     Spark.post("/insertUserPref", new HandlerInsertUserPref());
     Spark.post("/updateUserPref", new HandlerUpdateUserPref());
 
+
     // using other registration endpoint
     // Spark.post("/registerUser", new HandlerRegisterUser());
+
+    Spark.post("/verifyCode", new RoomCheckHandler());
+
   }
 
   /**
