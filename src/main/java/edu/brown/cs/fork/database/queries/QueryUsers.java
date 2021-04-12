@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
 import edu.brown.cs.fork.database.DistanceCalculator;
-import edu.brown.cs.fork.database.ForkUtils;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 import edu.brown.cs.fork.restaurants.Restaurant;
@@ -308,11 +307,10 @@ public class QueryUsers {
         String pattern = "[^,\\s][^,]*[^,\\s]*";
         Pattern r = Pattern.compile(pattern);
         Matcher m = r.matcher(categories);
-        ForkUtils utils = new ForkUtils();
         while (m.find()) {
           // get an individual category
           String restCategory = Collections.singletonList(m.group()).get(0);
-          if (utils.isInCategories(restCategory)) {
+          if (Hub.isInCategories(restCategory)) {
             // see if this is a category that a user can select in survey
             prep.setString(3, restCategory);
             prep.executeUpdate();
@@ -402,7 +400,25 @@ public class QueryUsers {
     }
   }
 
-  // do we need an update action for login table? -- feature: changing password
+  /**
+   * Get user password.
+   * @param userId user id
+   * @return password of user with userId
+   * @throws SQLException SQLException
+   */
+  public String getPwd(String userId) throws SQLException {
+    String result = "";
+    String sql = "SELECT password FROM login WHERE userId = ?;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, userId);
+    ResultSet rs = prep.executeQuery();
+    while (rs.next()) {
+      result = rs.getString(1);
+    }
+    prep.close();
+    rs.close();
+    return result;
+  }
 
   /**
    * Deletes user with userID from database.

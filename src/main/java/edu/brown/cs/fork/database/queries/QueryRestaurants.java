@@ -1,8 +1,8 @@
 package edu.brown.cs.fork.database.queries;
 
+import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
 import edu.brown.cs.fork.database.DistanceCalculator;
-import edu.brown.cs.fork.database.ForkUtils;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.restaurants.Restaurant;
 
@@ -196,12 +196,11 @@ public class QueryRestaurants {
       String pattern = "[^,\\s][^,]*[^,\\s]*";
       Pattern r = Pattern.compile(pattern);
       Matcher m = r.matcher(categories);
-      ForkUtils utils = new ForkUtils();
       while (m.find()) {
         // get an individual category
         String restCategory = Collections.singletonList(m.group()).get(0);
         // see if this is a category that a user can select in survey
-        if (utils.isInCategories(restCategory)) {
+        if (Hub.isInCategories(restCategory)) {
           results.add(
               new Restaurant(businessId, name, restCategory,
                 star, numReviews, dist, intPriceRange));

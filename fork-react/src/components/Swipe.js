@@ -5,7 +5,11 @@ function Swipe() {
   return (
     <>
       <div className="content">
-        <Option name="The Capital Grille" star={3} review={100} price="$$" distance="100 miles"/>
+        <div className="choices">
+          <button className="ex">&#x2715;</button>
+          <Option name="The Capital Grille" star={3} review={100} price="$$" distance="100 miles"/>
+          <button className="check">&#x2713;</button>
+        </div>
       </div>
       <div className="exit-home">
         <Link to="/home">
