@@ -3,7 +3,7 @@ import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
 import useUpdateUsers from "../hooks/useUpdateUsers"
 import { useEffect } from "react";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Host(props) {
 
@@ -18,7 +18,7 @@ function Host(props) {
   }
 
   const user = useSelector(state => state.user);
-  const userList = useUpdateUsers(roomCode, user);
+  const { users, restaurants, startSwiping } = useUpdateUsers(roomCode, user);
 
   // TODO: ternary operator
   if (host.current) {
@@ -30,9 +30,10 @@ function Host(props) {
             share the code
           </div>
           <div className="code">{roomCode.current}</div>
-          <button className="primary-button">start</button>
+          <button className="primary-button" onClick={startSwiping}>start</button>
         </div>
-        <div>{userList}</div>
+        <div>{users}</div>
+        <div>{restaurants}</div>
       </>
     );
   } else {
@@ -45,7 +46,7 @@ function Host(props) {
           </div>
           <div className="code">{roomCode.current}</div>
         </div>
-        <div>{userList}</div>
+        <div>{users}</div>
       </>
     )
   }

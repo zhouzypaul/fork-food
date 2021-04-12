@@ -7,11 +7,26 @@ const MESSAGE_TYPE = {
 };
 
 const useUpdateUsers = (roomId, user) => {
-    const [users, setUsers] = useState([user]);
-    const socket = useRef(new WebSocket("ws://localhost:4567/socket"));
+    const [users, setUsers] = useState([]);
+    const [restaurants, setRestaurants] = useState([]);
+    const socket = useRef();
     const id = useRef();
 
+    socket.current = new WebSocket("ws://localhost:4567/socket")
+
     useEffect(() => {
+
+        const sendInfo = () => {
+            const message = {
+                id: id.current,
+                message: {
+                    type: "update_user",
+                    roomId: roomId,
+                    username: user
+                }
+            };
+            socket.current.send(JSON.stringify(message));
+        }
         socket.current.onmessage = (msg) => {
             //
             const data = JSON.parse(msg.data);
@@ -23,10 +38,14 @@ const useUpdateUsers = (roomId, user) => {
                     sendInfo()
                     break;
                 case MESSAGE_TYPE.UPDATE:
-                    // We get this message when some client broadcast a message to all clients
-                    // TODO append to the message board unordered list (in chat.ftl) the received message
-                    console.log(data.payload.senderMessage)
-                    setUsers(data.payload.senderMessage)
+                    // check if we're updating users or doing something else
+                    if (data.payload.type === "update_user") {
+                        setUsers(data.payload.senderMessage);
+                        console.log("users set")
+                    } else if (data.payload.type === "start") {
+                        setRestaurants(data.payload.senderMessage);
+                        console.log("start swiping")
+                    }
                     break;
                 default:
                     console.log('Unknown message type!', data.type);
@@ -43,20 +62,22 @@ const useUpdateUsers = (roomId, user) => {
         return () => {
             socket.current.close();
         };
-    })
+    }, [roomId, user])
 
-    const sendInfo = () => {
+
+
+    const startSwiping = () => {
         const message = {
             id: id.current,
             message: {
-                roomId: roomId,
-                username: user
+                type: "start",
+                roomId: roomId
             }
         };
         socket.current.send(JSON.stringify(message));
     }
 
-    return users;
+    return { users, restaurants, startSwiping };
 }
 
 export default useUpdateUsers;
