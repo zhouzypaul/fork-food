@@ -14,17 +14,35 @@ function NewUser(props) {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
+  const hasWhiteSpace = (s) => {
+    return /\s/g.test(s);
+  }
+
   const createUser = () => {
-    if (password === confirm) {
-      // register user in backend
+    let valid = true;
+    if (password !== confirm) {
+      valid = false;
+      setError("passwords do not match");
+    } else if (password.length < 8) {
+      valid = false;
+      setError("password must be at least 8 characters long");
+    } else if (hasWhiteSpace(password)) {
+      valid = false;
+      setError("password can not contain white spaces");
+    } else if (hasWhiteSpace(username)) {
+      valid = false;
+      setError("username can not contain white spaces");
+    } else if (username.length === 0) {
+      valid = false;
+      setError("username can not be blank");
+    }
+    if (valid) {
       registerUser(username, password);
-    } else {
-      setError("Passwords do not match");
     }
   }
 
 
-  const registerUser = (username, hash) => {
+  const registerUser = (username, password) => {
     const toSend = {
       // username and password
       username: username,
@@ -41,17 +59,16 @@ function NewUser(props) {
       .post(`${SERVER_URL}/register`, toSend, config)
       .then((response) => {
         // if response is true, do this otherwise, say username already exists setError
-        if (response.data["okay"]) {
-
+        if (response.data["success"]) {
           dispatch(login(username));
-          props.history.push('/home');
+          props.history.push('/survey');
           console.log("registered");
         } else {
-          setError("Username already taken");
+          setError(response.data["err"]);
         }
 
       })
-      .catch(function (error) {
+      .catch((error) => {
         console.log(error);
       });
   }
@@ -63,7 +80,7 @@ function NewUser(props) {
     }
   }
 
-  return(
+  return (
     <>
       <TopBar to="/" showOptions={false} />
       <div className="login">
@@ -71,9 +88,9 @@ function NewUser(props) {
         <div className="login-error">
           {error}
         </div>
-        <TextBox initial="username" change={setUsername} onKeyDown={submit} type="text"/>
-        <TextBox initial="password" change={setPassword} onKeyDown={submit} type="password"/>
-        <TextBox initial="confirm password" change={setConfirm} onKeyDown={submit} type="password"/>
+        <TextBox initial="username" change={setUsername} onKeyDown={submit} type="text" />
+        <TextBox initial="password" change={setPassword} onKeyDown={submit} type="password" />
+        <TextBox initial="confirm password" change={setConfirm} onKeyDown={submit} type="password" />
         <button className="primary-button" onClick={createUser}>
           join
         </button>

@@ -3,16 +3,7 @@ import { useEffect, useRef, useState } from "react";
 const MESSAGE_TYPE = {
     CONNECT: 0,
     UPDATE: 1,
-    SEND: 2
-};
 
-const useUpdateUsers = (roomId, user) => {
-    const [users, setUsers] = useState([]);
-    const [restaurants, setRestaurants] = useState([]);
-    const socket = useRef();
-    const id = useRef();
-
-    socket.current = new WebSocket("ws://localhost:4567/socket")
 
     useEffect(() => {
 
@@ -30,6 +21,7 @@ const useUpdateUsers = (roomId, user) => {
         socket.current.onmessage = (msg) => {
             //
             const data = JSON.parse(msg.data);
+            console.log(data);
             switch (data.type) {
                 case MESSAGE_TYPE.CONNECT:
                     id.current = data.payload.id

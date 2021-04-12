@@ -1,6 +1,9 @@
 package edu.brown.cs.fork.sockets;
 
 import com.google.gson.Gson;
+
+import com.google.gson.GsonBuilder;
+
 import com.google.gson.JsonObject;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.restaurants.Restaurant;
@@ -179,6 +182,7 @@ public class GroupSocket {
     error.printStackTrace();
   }
 
+
   public static <T> T mostCommon(List<T> list) {
     Map<T, Integer> map = new HashMap<>();
 
@@ -195,6 +199,11 @@ public class GroupSocket {
     }
 
     return max.getKey();
+  }
+
+
+  public static boolean roomExists(int code) {
+    return userRooms.containsKey(code);
   }
 
 }

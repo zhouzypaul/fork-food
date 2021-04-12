@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
-import useUpdateUsers from "../hooks/useUpdateUsers"
+import useUpdateUsers from "../hooks/useUpdateUsers";
+import Bubble from "./Bubble";
 
 const MESSAGE_TYPE = {
   CONNECT: 0,
@@ -9,19 +10,19 @@ const MESSAGE_TYPE = {
   SEND: 2
 };
 
-function Host(props) {
 
+function Host(props) {
+  const [active, setActive] = useState([]);
   const roomCode = useRef(9999);
   const host = useRef(false);
+  const user = useSelector(state => state.user);
+
 
   const roomProps = props.location.roomProps
-  console.log(roomProps)
   if (roomProps) {
     roomCode.current = roomProps.roomCode
     host.current = roomProps.isHost
   }
-
-  const user = useSelector(state => state.user);
 
   const [users, setUsers] = useState([]);
 
@@ -100,38 +101,35 @@ function Host(props) {
     socket.current.send(JSON.stringify(message));
   }
 
-
-
-  // TODO: ternary operator
-  if (host.current) {
-    return (
-      <>
-        <TopBar to="/home" showOptions={true} />
-        <div className="content">
-          <div className="title-text">
-            share the code
-          </div>
-          <div className="code">{roomCode.current}</div>
-          <button className="primary-button" onClick={startSwiping}>start</button>
-        </div>
-        <div>{users}</div>
-      </>
-    );
-  } else {
-    return (
-      <>
-        <TopBar to="/home" showOptions={true} />
-        <div className="content">
-          <div className="title-text">
-            share the code
-          </div>
-          <div className="code">{roomCode.current}</div>
-        </div>
-        <div>{users}</div>
-      </>
-    )
+  const populate = () => {
+    if (userList === undefined) {
+      return;
+    }
+    const bubbles = [];
+    let i = 0;
+    for (let user of users) {
+      bubbles.push(<Bubble user={user} key={i++}/>);
+    }
+    setActive(bubbles);
   }
 
+  useEffect(populate, [users]);
+
+  return (
+    <>
+      <TopBar to="/home" showOptions={true} />
+      <div className="content">
+        <div className="title-text">
+          share the code
+        </div>
+        <div className="code">{roomCode.current}</div>
+        {host.current ? <button className="primary-button">start</button>: <></>}
+        <div className="joined">
+          {active}
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default Host;

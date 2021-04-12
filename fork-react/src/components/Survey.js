@@ -9,9 +9,17 @@ const TYPES = ["coffee & tea", "chinese", "pizza", "italian", "japanese", "india
   "steak", "vietnamese", "breakfast", "dessert"];
 TYPES.sort();
 const PRICES = ["$", "$$", "$$$"];
+const CONFIG = {
+  headers: {
+    "Content-Type": "application/json",
+    'Access-Control-Allow-Origin': '*',
+  }
+};
+
+const SERVER_URL = 'http://localhost:4567';
 
 function Option(props) {
-  const selected = useRef(false);
+  const selected = useRef(props.selected);
   const toggle = (e) => {
     props.pick(e.target.innerText);
     selected.current = !selected.current;
@@ -23,13 +31,13 @@ function Option(props) {
   }
 
   return(
-    <button className="survey-box" onClick={toggle} style={{backgroundColor: props.color}}>
+    <button className="survey-box" onClick={toggle} style={{backgroundColor: props.selected ? "#DDAFF980" : "gainsboro"}}>
       {props.value}
     </button>
   );
 }
 
-function Survey() {
+function Survey(props) {
   const [types, setTypes] = useState([]);
   const [prices, setPrices] = useState([]);
   const [radius, setRadius] = useState(2);
@@ -49,7 +57,7 @@ function Survey() {
     let i = 1;
     for (let op in options) {
       if (options.hasOwnProperty(op)) {
-        boxes.push(<Option value={op} color={options[op] ? "#DDAFF980" : "gainsboro"} pick={handler} key={i}/>);
+        boxes.push(<Option value={op} selected={options[op]} color={options[op] ? "#DDAFF980" : "gainsboro"} pick={handler} key={i}/>);
         i++;
       }
     }
@@ -58,26 +66,23 @@ function Survey() {
 
   const getPreferences = () => {
     const toSend = {
-      username: user
+      id: user
     }
 
-    let config = {
-      headers: {
-        "Content-Type": "application/json",
-        'Access-Control-Allow-Origin': '*',
-      }
-    }
-
-    axios.post("http://localhost:4567/getUserPref", toSend, config)
+    axios.post(`${SERVER_URL}/getUserPref`, toSend, CONFIG)
       .then(response => {
         const data = response.data;
+        if (data['err'].length !== 0) {
+          alert(data['err']);
+          return;
+        }
         const types = data['types'];
         const prices = data['prices'];
         setRadius(data['radius']);
         types.forEach(t => selectType(t));
         prices.forEach(p => selectPrice(p));
-        // generateBoxes(selectedTypes.current, selectType, setTypes);
-        // generateBoxes(priceRange.current, selectPrice, setPrices);
+        generateBoxes(selectedTypes.current, selectType, setTypes);
+        generateBoxes(priceRange.current, selectPrice, setPrices);
       })
 
       .catch(function (e) {
@@ -86,19 +91,23 @@ function Survey() {
   }
 
   const selectType = (name) => {
-    selectedTypes.current[name] = !selectedTypes.current[name];
+    if (selectedTypes.current.hasOwnProperty(name)) {
+      selectedTypes.current[name] = !selectedTypes.current[name];
+    }
   }
 
   const selectPrice = (name) => {
-    priceRange.current[name] = !priceRange.current[name];
+    if (priceRange.current.hasOwnProperty(name)) {
+      priceRange.current[name] = !priceRange.current[name];
+    }
   }
 
   useEffect(() => {
     generateObjects(TYPES, selectedTypes);
     generateObjects(PRICES, priceRange);
-    generateBoxes(selectedTypes.current, selectType, setTypes);
-    generateBoxes(priceRange.current, selectPrice, setPrices);
-    // getPreferences();
+    // generateBoxes(selectedTypes.current, selectType, setTypes);
+    // generateBoxes(priceRange.current, selectPrice, setPrices);
+    getPreferences();
   }, []);
 
   const changeRange = (e) => {
@@ -132,7 +141,23 @@ function Survey() {
       price: pricePref,
       radius: radius
     }
-    console.log(toSend);
+
+    console.log(toSend)
+
+    axios.post(`${SERVER_URL}/updateUserPref`, toSend, CONFIG)
+      .then(response => {
+        const data = response.data;
+        if (!data['success']) {
+          alert(data['err']);
+        } else {
+          props.history.push('/home');
+        }
+      })
+
+      .catch(function (e) {
+        console.log(e);
+      })
+
   }
 
   return (
