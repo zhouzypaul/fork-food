@@ -25,9 +25,7 @@ function Join(props) {
 
     axios.post(`${SERVER_URL}/verifyCode`, toSend, config)
       .then((response) => {
-        console.log(response.data['exists'])
-        if (response.data['exists'] === true) {
-          console.log("yay we good")
+        if (response.data['exists']) {
           props.history.push({
             pathname: `room${values}`,
             roomProps: {

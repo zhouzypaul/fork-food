@@ -9,6 +9,9 @@ function Settings() {
           settings
         </div>
       </div>
+      <button className="secondary-button" id="delete">
+        delete account
+      </button>
     </>
   );
 }

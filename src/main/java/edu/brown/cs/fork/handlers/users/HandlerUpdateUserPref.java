@@ -103,6 +103,7 @@ public class HandlerUpdateUserPref implements Route {
     JSONArray price = data.getJSONArray("price");
     String distance = data.getString("radius");
 
+    System.out.println(data);
     List<String> foodTypes = new ArrayList<>();
     List<String> priceRanges = new ArrayList<>();
 

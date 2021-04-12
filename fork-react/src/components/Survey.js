@@ -9,6 +9,14 @@ const TYPES = ["coffee & tea", "chinese", "pizza", "italian", "japanese", "india
   "steak", "vietnamese", "breakfast", "dessert"];
 TYPES.sort();
 const PRICES = ["$", "$$", "$$$"];
+const CONFIG = {
+  headers: {
+    "Content-Type": "application/json",
+    'Access-Control-Allow-Origin': '*',
+  }
+};
+
+const SERVER_URL = 'http://localhost:4567';
 
 function Option(props) {
   const selected = useRef(false);
@@ -29,7 +37,7 @@ function Option(props) {
   );
 }
 
-function Survey() {
+function Survey(props) {
   const [types, setTypes] = useState([]);
   const [prices, setPrices] = useState([]);
   const [radius, setRadius] = useState(2);
@@ -61,18 +69,11 @@ function Survey() {
       id: user
     }
 
-    let config = {
-      headers: {
-        "Content-Type": "application/json",
-        'Access-Control-Allow-Origin': '*',
-      }
-    }
-
-    axios.post("http://localhost:4567/getUserPref", toSend, config)
+    axios.post(`${SERVER_URL}/getUserPref`, toSend, CONFIG)
       .then(response => {
         const data = response.data;
-        if (data['error'].length !== 0) {
-          alert(data['error']);
+        if (data['err'].length !== 0) {
+          alert(data['err']);
           return;
         }
         const types = data['types'];
@@ -90,11 +91,15 @@ function Survey() {
   }
 
   const selectType = (name) => {
-    selectedTypes.current[name] = !selectedTypes.current[name];
+    if (selectedTypes.current.hasOwnProperty(name)) {
+      selectedTypes.current[name] = !selectedTypes.current[name];
+    }
   }
 
   const selectPrice = (name) => {
-    priceRange.current[name] = !priceRange.current[name];
+    if (priceRange.current.hasOwnProperty(name)) {
+      priceRange.current[name] = !priceRange.current[name];
+    }
   }
 
   useEffect(() => {
@@ -136,7 +141,23 @@ function Survey() {
       price: pricePref,
       radius: radius
     }
-    console.log(toSend);
+
+    console.log(toSend)
+
+    axios.post(`${SERVER_URL}/updateUserPref`, toSend, CONFIG)
+      .then(response => {
+        const data = response.data;
+        if (!data['success']) {
+          alert(data['err']);
+        } else {
+          props.history.push('/home');
+        }
+      })
+
+      .catch(function (e) {
+        console.log(e);
+      })
+
   }
 
   return (

@@ -37,7 +37,6 @@ function NewUser(props) {
       setError("username can not be blank");
     }
     if (valid) {
-      console.log("hiiii")
       registerUser(username, password);
     }
   }
@@ -62,7 +61,7 @@ function NewUser(props) {
         // if response is true, do this otherwise, say username already exists setError
         if (response.data["success"]) {
           dispatch(login(username));
-          props.history.push('/home');
+          props.history.push('/survey');
           console.log("registered");
         } else {
           setError(response.data["err"]);

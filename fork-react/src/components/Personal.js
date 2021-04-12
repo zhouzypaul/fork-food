@@ -14,6 +14,7 @@ function Personal(props) {
       <div className="title-text">profile</div>
       @{user}
       <br/>
+      <br/>
       <Link to="/survey">
         <button className="primary-button">update preferences</button>
       </Link>

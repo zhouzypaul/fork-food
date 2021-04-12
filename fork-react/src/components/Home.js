@@ -65,13 +65,13 @@ function Home() {
           }
         }}>
           <button className="primary-button" id="host-button">
-            <div className="title-text">Host</div>
+            <div className="title-text">host</div>
           </button>
         </Link>
         <br />
         <Link to="/join">
           <button className="secondary-button" id="join-button">
-            <div className="title-text">Join</div>
+            <div className="title-text">join</div>
           </button>
         </Link>
       </div>
