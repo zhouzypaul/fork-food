@@ -11,6 +11,7 @@ import spark.Route;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,11 @@ public class HandlerGetUserPref implements Route {
         user = Hub.getUserDB().getUserPref(id);
         foodTypes = user.get("foodType");
         priceRanges = user.get("priceRange");
-        radius = Double.parseDouble(user.get("distance").get(0));
+        foodTypes = new ArrayList<>(new HashSet<>(foodTypes));
+        priceRanges = new ArrayList<>(new HashSet<>(priceRanges));
+        if (!user.get("distance").get(0).equals("")) {
+          radius = Double.parseDouble(user.get("distance").get(0));
+        }
       } catch (SQLException | NumberFormatException e) {
         err = "ERROR: " + e.getMessage();
         System.out.println("ERROR: " + e.getMessage());
