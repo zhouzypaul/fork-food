@@ -52,6 +52,26 @@ public class HandlerUpdateUserPref implements Route {
         return "Breakfast & Brunch";
       case "dessert":
         return "Desserts";
+      case "coffee & tea":
+        return "Coffee & Tea";
+      case "greek":
+        return "Greek";
+      case "middle eastern":
+        return "Middle Eastern";
+      case "vegan":
+        return "Vegan";
+      case "mexican":
+        return "Mexican";
+      case "thai":
+        return "Thai";
+      case "american":
+        return "American";
+      case "salad":
+        return "Salad";
+      case "barbeque":
+        return "Barbeque";
+      case "seafood":
+        return "Seafood";
       default:
         return "NONE";
     }
