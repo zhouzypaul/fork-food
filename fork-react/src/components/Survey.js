@@ -19,7 +19,7 @@ const CONFIG = {
 const SERVER_URL = 'http://localhost:4567';
 
 function Option(props) {
-  const selected = useRef(false);
+  const selected = useRef(props.selected);
   const toggle = (e) => {
     props.pick(e.target.innerText);
     selected.current = !selected.current;
@@ -31,7 +31,7 @@ function Option(props) {
   }
 
   return(
-    <button className="survey-box" onClick={toggle} style={{backgroundColor: props.color}}>
+    <button className="survey-box" onClick={toggle} style={{backgroundColor: props.selected ? "#DDAFF980" : "gainsboro"}}>
       {props.value}
     </button>
   );
@@ -57,7 +57,7 @@ function Survey(props) {
     let i = 1;
     for (let op in options) {
       if (options.hasOwnProperty(op)) {
-        boxes.push(<Option value={op} color={options[op] ? "#DDAFF980" : "gainsboro"} pick={handler} key={i}/>);
+        boxes.push(<Option value={op} selected={options[op]} color={options[op] ? "#DDAFF980" : "gainsboro"} pick={handler} key={i}/>);
         i++;
       }
     }

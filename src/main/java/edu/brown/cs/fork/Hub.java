@@ -44,6 +44,10 @@ public class Hub {
     return REST_DB;
   }
 
+  public static List<String> getCategories() {
+    return CATEGORIES;
+  }
+
   /**
    * Return a list of categories which is the union of allRestCategories and CATEGORIES.
    * @param allRestCategories a restaurant's list of food categories

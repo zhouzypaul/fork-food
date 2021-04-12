@@ -73,7 +73,7 @@ public class HandlerUpdateUserPref implements Route {
       case "seafood":
         return "Seafood";
       default:
-        return "NONE";
+        return "";
     }
   }
 
@@ -91,7 +91,7 @@ public class HandlerUpdateUserPref implements Route {
       case "$$$":
         return "3";
       default:
-        return "NONE";
+        return "";
     }
   }
 
@@ -118,13 +118,20 @@ public class HandlerUpdateUserPref implements Route {
         "priceRange", "distance", "label", "timestamp", "numReviews", "name");
 
     String err = "";
-    boolean success = false;
+    boolean success = true;
     if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
+      if (priceRanges.size() == 0) {
+        priceRanges.add("");
+      }
+      if (foodTypes.size() == 0) {
+        foodTypes.add("");
+      }
       if (!Hub.getUserDB().deleteUserPref(userId)) {
         err = "ERROR: Can't update user preference";
       } else {
+        System.out.println("after deleting row");
         for (int i = 0; i < foodTypes.size(); i++) {
           for (int j = 0; j < priceRanges.size(); j++) {
             List<String> info = Arrays.asList(userId, "", matchFoodTypes(foodTypes.get(i)), "3.0",
