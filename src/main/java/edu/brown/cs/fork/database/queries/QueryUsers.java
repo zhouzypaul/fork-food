@@ -13,12 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,10 +61,10 @@ public class QueryUsers {
    * @return a list of string representing all user ids
    * @throws SQLException SQLException
    */
-  public List<String> queryAllUserIds() throws SQLException {
+  public Set<String> queryAllUserIds() throws SQLException {
     String sql = "SELECT login.userId FROM login;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
-    List<String> results = new ArrayList<>();
+    Set<String> results = new HashSet<>();
     ResultSet rs = prep.executeQuery();
     while (rs.next()) {
       String userId = rs.getString(1);
