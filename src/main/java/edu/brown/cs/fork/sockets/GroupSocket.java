@@ -1,17 +1,19 @@
 package edu.brown.cs.fork.sockets;
 
 import com.google.gson.Gson;
+
 import com.google.gson.GsonBuilder;
+
 import com.google.gson.JsonObject;
+import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.restaurants.Restaurant;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @WebSocket
@@ -19,15 +21,16 @@ public class GroupSocket {
   private static final Gson GSON = new Gson();
   // TODO: use hashmap of session queues, can we even do this, i.e. send a message to the server on conncet?
   private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
-  private static final HashMap<Integer, Queue<Session>> rooms = new HashMap<>();
-  private static final HashMap<Integer, HashSet<String>> userRooms = new HashMap<>();
+  private static final Hashtable<Integer, Queue<Session>> rooms = new Hashtable<>();
+  private static final Hashtable<Integer, HashSet<String>> userRooms = new Hashtable<>();
+//  private static final Hashtable<Integer, Hashtable<String, Set<String>>> userRestaurants = new Hashtable<>();
+  private static final Hashtable<Integer, List<String>> userDecisions = new Hashtable<>();
   private static int nextId = 0;
 
   private static enum MESSAGE_TYPE {
     CONNECT,
     UPDATE,
-    SEND,
-
+    SEND
   }
 
   @OnWebSocketConnect
@@ -63,34 +66,111 @@ public class GroupSocket {
     System.out.println(message);
     try {
       JSONObject messageObj = new JSONObject(message);
-      int roomId = messageObj.getJSONObject("message").getJSONObject("roomId").getInt("current");
+      String type = messageObj.getJSONObject("message").getString("type");
+      int roomId = messageObj.getJSONObject("message").getInt("roomId");
 
-      // add current session to correct room
-      if (rooms.get(roomId) == null) {
-        rooms.put(roomId, new ConcurrentLinkedQueue<>());
-        userRooms.put(roomId, new HashSet<>());
-      }
-      userRooms.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
-      rooms.get(roomId).add(session);
-
-      // create update message
-      JsonObject json = new JsonObject();
-      json.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
+      // prepare update message
+      JsonObject update_message = new JsonObject();
+      update_message.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
 
       JsonObject payload = new JsonObject();
       payload.addProperty("senderId", messageObj.getInt("id"));
 
-      JsonObject users = new JsonObject();
-      users.add("users", GSON.toJsonTree(userRooms.get(roomId)));
+      System.out.println(type);
 
-      payload.add("senderMessage", users);
-      json.add("payload", payload);
+      switch (type) {
+        case "update_user":
+          // add current session to correct room
+          if (rooms.get(roomId) == null) {
+            rooms.put(roomId, new ConcurrentLinkedQueue<>());
+            userRooms.put(roomId, new HashSet<>());
+          }
+          userRooms.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
+          rooms.get(roomId).add(session);
+
+          JsonObject users = new JsonObject();
+          users.add("users", GSON.toJsonTree(userRooms.get(roomId)));
+
+          payload.addProperty("type", "update_user");
+          payload.add("senderMessage", users);
+          break;
+
+        case "start":
+          double lat = messageObj.getJSONObject("message").getDouble("lat");
+          double lon = messageObj.getJSONObject("message").getDouble("lon");
+
+          Set<String> usernames = userRooms.get(roomId);
+
+
+          userDecisions.put(roomId, new LinkedList<>());
+
+          List<Restaurant> recommendedRestaurants = new ArrayList<>();
+//          Set<String> resIds = new HashSet<>();
+
+          try {
+            recommendedRestaurants = Hub.recommendRestaurants(usernames, new double[]{lat, lon});
+          } catch (Exception e) {
+            System.out.println("ERROR: " + e);
+          }
+
+//          for (Restaurant res : recommendedRestaurants) {
+//            resIds.add(res.getId());
+//          }
+//
+//          Hashtable<String, Set<String>> toBeSwiped = new Hashtable<>();
+//          for (String user : usernames) {
+//            toBeSwiped.put(user, resIds);
+//          }
+
+//          userRestaurants.put(roomId, toBeSwiped);
+
+          JsonObject restaurants = new JsonObject();
+          restaurants.add("restaurants", GSON.toJsonTree(recommendedRestaurants));
+
+          payload.addProperty("type", "start");
+          payload.add("senderMessage", restaurants);
+          break;
+
+        case "swipe":
+          String user = messageObj.getJSONObject("message").getString("username");
+          String resId = messageObj.getJSONObject("message").getString("resId");
+          // add to the userDecisions table
+          if (messageObj.getJSONObject("message").getInt("like") == 1) {
+            userDecisions.get(roomId).add(resId);
+          }
+          return;
+
+        case "done":
+          String username = messageObj.getJSONObject("message").getString("username");
+          userRooms.get(roomId).remove(username);
+          if (userRooms.get(roomId).isEmpty()) {
+            // return a decision
+            JsonObject result = new JsonObject();
+            String commonRes = mostCommon(userDecisions.get(roomId));
+            System.out.println("decision " + commonRes);
+
+            result.addProperty("result", commonRes);
+
+            payload.addProperty("type", "done");
+            payload.add("senderMessage", result);
+            // TODO: will have to remove room at some point too
+          } else {
+            return;
+          }
+          break;
+
+        default:
+          System.out.println("Unrecognized message type");
+      }
+      update_message.add("payload", payload);
 
       // send usernames of everyone in room
-      String update = json.toString();
+      String update = GSON.toJson(update_message);
+      session.getRemote().sendString(update);
 
-      for (Session s : rooms.get(roomId)) {
-        s.getRemote().sendString(update); // sending to each session in room
+      System.out.println(update);
+      for (Session sesh : rooms.get(roomId)) {
+        sesh.getRemote().sendString(update); // sending to each session in room
       }
     } catch (JSONException e) {
       System.out.println("ERROR: invalid json" + e);
@@ -102,7 +182,28 @@ public class GroupSocket {
     error.printStackTrace();
   }
 
+
+  public static <T> T mostCommon(List<T> list) {
+    Map<T, Integer> map = new HashMap<>();
+
+    for (T t : list) {
+      Integer val = map.get(t);
+      map.put(t, val == null ? 1 : val + 1);
+    }
+
+    Map.Entry<T, Integer> max = null;
+
+    for (Map.Entry<T, Integer> e : map.entrySet()) {
+      if (max == null || e.getValue() > max.getValue())
+        max = e;
+    }
+
+    return max.getKey();
+  }
+
+
   public static boolean roomExists(int code) {
     return userRooms.containsKey(code);
   }
+
 }

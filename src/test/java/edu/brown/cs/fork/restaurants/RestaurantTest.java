@@ -40,19 +40,19 @@ public class RestaurantTest implements ITest {
   /**
    * test the exceptions in constructor.
    */
-  @Test
-  public void testConstructor() {
-    this.setUp();
-    assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", -1, 10, 10, 3));
-    assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 10, 10, 10, 3));
-    assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 3, -3, 10, 3));
-    assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
-            "Burges", 3, 10, -10, 3));
-    this.tearDown();
-  }
+//  @Test
+//  public void testConstructor() {
+//    this.setUp();
+//    assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
+//            "Burges", -1, 10, 10, 3));
+//    assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
+//            "Burges", 10, 10, 10, 3));
+//    assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
+//            "Burges", 3, -3, 10, 3));
+//    assertThrows(OutOfRangeException.class, () -> new Restaurant("0", "kfc",
+//            "Burges", 3, 10, -10, 3));
+//    this.tearDown();
+//  }
 
   /**
    * test all the getters.

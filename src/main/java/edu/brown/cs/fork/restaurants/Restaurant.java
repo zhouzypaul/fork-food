@@ -64,10 +64,11 @@ public class Restaurant implements Recommendable {
    */
   public Restaurant(String id, String name, String foodType, double star, int numReviews,
                     double distance, int priceRange) throws OutOfRangeException {
-    if (star < 0 || star > 5 || numReviews < 0 || distance < 0 || priceRange > 3
-            || priceRange < 0) {
-      throw new OutOfRangeException("all of stars, numReviews, distance have to be non-negative");
-    }
+//    if (star < 0 || star > 5 || numReviews < 0 || distance < 0 || priceRange > 3
+//            || priceRange < 0) {
+//
+//      throw new OutOfRangeException("all of stars, numReviews, distance have to be non-negative");
+//    }
     this.id = id;
     this.name = name;
     this.foodType = foodType;

@@ -4,7 +4,6 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import {login} from "../actions";
 
-
 const SERVER_URL = 'http://localhost:4567';
 
 function Home() {

@@ -1,5 +1,5 @@
 package edu.brown.cs.fork.recommendation;
-import edu.brown.cs.fork.exceptions.NoTrainDataException;
+import edu.brown.cs.fork.exceptions.NoTestDataException;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,17 +34,17 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
    *                     train the naive bayes classifier.
    * @param testData - a testing dataset, which is the data that the classifier will try to
    *                 predict on.
-   * @throws NoTrainDataException when the trainingData is an empty list.
+   * @throws NoTestDataException when the testData is an empty list.
    */
-  public NaiveBayesClassifier(List<L> trainingData, List<R> testData) throws NoTrainDataException {
-    if (trainingData.isEmpty()) {
-      throw new NoTrainDataException("no training data for naive bayes classifier");
+  public NaiveBayesClassifier(List<L> trainingData, List<R> testData) throws NoTestDataException {
+    if (testData.isEmpty()) {
+      throw new NoTestDataException("no testing data for naive bayes classifier");
     }
     this.trainingData = trainingData;
     this.testData = testData;
-    this.numAttr = this.trainingData.get(0).getData().getNumAttr();
-    this.attrDim = this.trainingData.get(0).getData().getAttrDim();
-    this.numClasses = this.trainingData.get(0).getData().getNumAttr();
+    this.numAttr = this.testData.get(0).getNumAttr();
+    this.attrDim = this.testData.get(0).getAttrDim();
+    this.numClasses = this.testData.get(0).getNumAttr();
   }
 
   @Override
