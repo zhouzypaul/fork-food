@@ -58,7 +58,7 @@ function Survey() {
 
   const getPreferences = () => {
     const toSend = {
-      username: user
+      id: user
     }
 
     let config = {
@@ -71,13 +71,17 @@ function Survey() {
     axios.post("http://localhost:4567/getUserPref", toSend, config)
       .then(response => {
         const data = response.data;
+        if (data['error'].length !== 0) {
+          alert(data['error']);
+          return;
+        }
         const types = data['types'];
         const prices = data['prices'];
         setRadius(data['radius']);
         types.forEach(t => selectType(t));
         prices.forEach(p => selectPrice(p));
-        // generateBoxes(selectedTypes.current, selectType, setTypes);
-        // generateBoxes(priceRange.current, selectPrice, setPrices);
+        generateBoxes(selectedTypes.current, selectType, setTypes);
+        generateBoxes(priceRange.current, selectPrice, setPrices);
       })
 
       .catch(function (e) {
@@ -96,9 +100,9 @@ function Survey() {
   useEffect(() => {
     generateObjects(TYPES, selectedTypes);
     generateObjects(PRICES, priceRange);
-    generateBoxes(selectedTypes.current, selectType, setTypes);
-    generateBoxes(priceRange.current, selectPrice, setPrices);
-    // getPreferences();
+    // generateBoxes(selectedTypes.current, selectType, setTypes);
+    // generateBoxes(priceRange.current, selectPrice, setPrices);
+    getPreferences();
   }, []);
 
   const changeRange = (e) => {
