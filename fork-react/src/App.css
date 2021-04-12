@@ -311,6 +311,7 @@
 }
 
 #delete {
+  margin: 12px;
   color: white;
   background-color: #FF4747;
 }
