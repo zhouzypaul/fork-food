@@ -1,7 +1,7 @@
 package edu.brown.cs.fork.recommendation;
 
 import edu.brown.cs.fork.ITest;
-import edu.brown.cs.fork.exceptions.NoTestDataException;
+import edu.brown.cs.fork.exceptions.NoTrainDataException;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -133,7 +133,7 @@ public class NaiveBayesClassifierTest implements ITest {
     // init recommender
     try {
       this.classifier = new NaiveBayesClassifier<>(train, test);
-    } catch (NoTestDataException e) {
+    } catch (NoTrainDataException e) {
       this.tearDown();
       fail();
     }
@@ -154,7 +154,7 @@ public class NaiveBayesClassifierTest implements ITest {
   public void testRecommend() {
     this.setUp();
     // illegal set up
-    assertThrows(NoTestDataException.class,
+    assertThrows(NoTrainDataException.class,
             () -> new NaiveBayesClassifier<>(new LinkedList<>(), new LinkedList<>()));
     // recommend negative
     List<Coor> neg = this.classifier.recommend(-1, 1);
