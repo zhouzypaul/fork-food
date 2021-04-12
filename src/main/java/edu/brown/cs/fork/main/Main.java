@@ -6,21 +6,19 @@ import java.io.StringWriter;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.handlers.login.LoginHandler;
 import edu.brown.cs.fork.handlers.login.RegistrationHandler;
-import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
 
-import edu.brown.cs.fork.handlers.room.RoomCheckHandler;
-import edu.brown.cs.fork.sockets.GroupSocket;
+import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
+import edu.brown.cs.fork.handlers.room.RoomCheckHandler;
+import edu.brown.cs.fork.sockets.GroupSocket;
 
 import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
 import edu.brown.cs.fork.handlers.users.HandlerDeleteUser;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPwd;
 import edu.brown.cs.fork.handlers.users.HandlerInsertUserPref;
-import edu.brown.cs.fork.handlers.users.HandlerRegisterUser;
 import edu.brown.cs.fork.handlers.users.HandlerUpdateUserPref;
-import edu.brown.cs.fork.sockets.GroupSocket;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
 import joptsimple.OptionParser;
@@ -110,7 +108,6 @@ public final class Main {
     Spark.post("/getUserPref", new HandlerGetUserPref());
     Spark.post("/insertUserPref", new HandlerInsertUserPref());
     Spark.post("/updateUserPref", new HandlerUpdateUserPref());
-
 
     // using other registration endpoint
     // Spark.post("/registerUser", new HandlerRegisterUser());
