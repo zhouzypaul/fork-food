@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
 
-// import Bubble from "./Bubble";
+import Bubble from "./Bubble";
 
 const MESSAGE_TYPE = {
   CONNECT: 0,
@@ -102,19 +102,17 @@ function Host(props) {
   }
 
   // const populate = () => {
-  //   if (users === undefined) {
-  //     return;
-  //   }
   //   const bubbles = [];
   //   let i = 0;
   //   for (let user of users) {
+  //     console.log(user)
   //     bubbles.push(<Bubble user={user} key={i++} />);
   //   }
   //   setActive(bubbles);
   // }
 
   // useEffect(populate, [users]);
-
+  let i = 0;
   return (
     <>
       <TopBar to="/home" showOptions={true} />
@@ -125,8 +123,9 @@ function Host(props) {
         <div className="code">{roomCode.current}</div>
         {host.current ? <button className="primary-button" onClick={startSwiping}>start</button> : <></>}
         <div className="joined">
-          {/* {active} */}
-          {users}
+          {users.map((user) => {
+            return (<Bubble user={user} key={i++} />)
+          })}
         </div>
       </div>
     </>
