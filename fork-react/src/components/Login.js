@@ -43,7 +43,13 @@ function Login(props) {
       });
   }
 
-  // TODO: add keydown handler 
+  const submit = (e) => {
+    const key = e.key;
+    if (key === "Enter") {
+      verify();
+    }
+  }
+
   return (
     <>
       <TopBar to="/" showOptions={false} />
@@ -52,13 +58,13 @@ function Login(props) {
         <div className="login-error">
           {error}
         </div>
-        <TextBox initial="username" change={setUsername} type="text" />
-        <TextBox initial="password" change={setPassword} type="password" />
-        <button className="primary-button" onClick={verify} onKeyPress={verify}>
+        <TextBox initial="username" change={setUsername} onKeyDown={submit} type="text" />
+        <TextBox initial="password" change={setPassword} onKeyDown={submit} type="password" />
+        <button className="primary-button" onClick={verify}>
           sign in
         </button>
         <div className="divider" />
-        <Link to="/newuser">
+        <Link to="/newUser">
           <button className="secondary-button">
             join
           </button>

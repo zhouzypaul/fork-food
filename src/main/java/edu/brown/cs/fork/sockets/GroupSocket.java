@@ -1,7 +1,7 @@
 package edu.brown.cs.fork.sockets;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
@@ -80,23 +80,18 @@ public class GroupSocket {
       JsonObject payload = new JsonObject();
       payload.addProperty("senderId", messageObj.getInt("id"));
 
-      JSONObject users = new JSONObject();
-      users.put("users", userRooms.get(roomId));
+      JsonObject users = new JsonObject();
+      users.add("users", new GsonBuilder().create().toJsonTree(userRooms.get(roomId)));
 
-      payload.addProperty("senderMessage", users.toString());
+      payload.add("senderMessage", users);
       json.add("payload", payload);
 
       // send usernames of everyone in room
-      String update = GSON.toJson(json);
+      String update = json.toString();
 
-      for (Session sesh : rooms.get(roomId)) {
-        sesh.getRemote().sendString(update); // sending to each session in room
+      for (Session s : rooms.get(roomId)) {
+        s.getRemote().sendString(update); // sending to each session in room
       }
-
-
-
-
-
     } catch (JSONException e) {
       System.out.println("ERROR: invalid json" + e);
     }
@@ -107,4 +102,7 @@ public class GroupSocket {
     error.printStackTrace();
   }
 
+  public static boolean roomExists(int code) {
+    return rooms.containsKey(code);
+  }
 }

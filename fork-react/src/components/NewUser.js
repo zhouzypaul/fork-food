@@ -14,12 +14,31 @@ function NewUser(props) {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
+  const hasWhiteSpace = (s) => {
+    return /\s/g.test(s);
+  }
+
   const createUser = () => {
-    if (password === confirm) {
-      // register user in backend
+    let valid = true;
+    if (password !== confirm) {
+      valid = false;
+      setError("passwords do not match");
+    } else if (password.length < 8) {
+      valid = false;
+      setError("password must be at least 8 characters long");
+    } else if (hasWhiteSpace(password)) {
+      valid = false;
+      setError("password can not contain white spaces");
+    } else if (hasWhiteSpace(username)) {
+      valid = false;
+      setError("username can not contain white spaces");
+    } else if (username.length === 0) {
+      valid = false;
+      setError("username can not be blank");
+    }
+    if (valid) {
+      console.log("hiiii")
       registerUser(username, password);
-    } else {
-      setError("Passwords do not match");
     }
   }
 
@@ -47,7 +66,7 @@ function NewUser(props) {
           props.history.push('/home');
           console.log("registered");
         } else {
-          setError("Username already taken");
+          setError("username already taken");
         }
 
       })

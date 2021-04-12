@@ -1,15 +1,50 @@
 import TopBar from "./TopBar";
 import { Link } from "react-router-dom";
+import {useEffect, useState} from "react";
+import axios from "axios";
+import {login} from "../actions";
+
+const SERVER_URL = 'http://localhost:4567';
 
 function Home() {
-
-  const roomCode = Math.floor(1000 + Math.random() * 9000);
+  const [roomCode, setCode] = useState(0);
+  // const roomCode = Math.floor(1000 + Math.random() * 9000);
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = null;
     }
   });
+
+  useEffect(() => {
+    let code;
+    do {
+      code = Math.floor(1000 + Math.random() * 9000);
+    } while (exists(code));
+    setCode(code);
+  }, []);
+
+  const exists = (code) => {
+    const toSend = {
+      code: code,
+    };
+
+    let config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    };
+
+    axios.post(`${SERVER_URL}/verifyCode`, toSend, config)
+      .then((response) => {
+        return response.data['exists'];
+      })
+
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
 
   return (
     <>
