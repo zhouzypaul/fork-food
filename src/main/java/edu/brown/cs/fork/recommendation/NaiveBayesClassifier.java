@@ -3,9 +3,11 @@ import edu.brown.cs.fork.exceptions.NoTestDataException;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +53,7 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
   public List<R> recommend(int n, int classLabel) {
     // if not enough test data, just return all of them
     if (this.testData.size() <= n) {
-      return this.testData;
+      return this.getUnique(this.testData);
     }
     // if enough test data
     this.train();
@@ -69,12 +71,35 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
     }
     // sort dataToProb by descending order
     this.testData.sort((o1, o2) -> -Double.compare(dataToProb.get(o1), dataToProb.get(o2)));
+    List<R> uniqueTestData = this.getUnique(this.testData);
     // defensive copy the top results
     List<R> recommendation = new LinkedList<>();
     for (int i = 0; i < n; i++) {
-      recommendation.add(this.testData.get(i));
+      if (i >= uniqueTestData.size()) {
+        break;
+      }
+      recommendation.add(uniqueTestData.get(i));
     }
     return recommendation;
+  }
+
+  /**
+   * removes the duplicate R (determined by whether the id is the same) in the original list.
+   * @param duplicates a list of R, which might contain duplicates
+   *
+   * @return a list without any duplicates
+   */
+  private List<R> getUnique(List<R> duplicates) {
+    List<R> unique = new LinkedList<>();
+    Set<String> seenIds = new HashSet<>();
+    for (R r : duplicates) {
+      String id = r.getId();
+      if (!seenIds.contains(id)) {
+        seenIds.add(id);
+        unique.add(r);
+      }
+    }
+    return unique;
   }
 
   /**

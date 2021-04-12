@@ -6,6 +6,14 @@ package edu.brown.cs.fork.recommendation;
  */
 public interface Recommendable {
   /**
+   * return a unique identifier of the recommendable object. This is used to differentiate between
+   * different Recommendable so that unique Recommendables can be recommended.
+   *
+   * @return an ID.
+   */
+  String getId();
+
+  /**
    * return the number of attributes this type of object has.
    *
    * @return number of attributes (dimension of the input features).

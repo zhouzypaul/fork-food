@@ -82,6 +82,7 @@ public class Restaurant implements Recommendable {
    * getter for the id field.
    * @return the id.
    */
+  @Override
   public String getId() {
     return this.id;
   }

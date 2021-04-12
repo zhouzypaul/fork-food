@@ -29,6 +29,11 @@ public class NaiveBayesClassifierTest implements ITest {
     }
 
     @Override
+    public String getId() {
+      return Double.toString(x) + Double.toString(y);
+    }
+
+    @Override
     public int getNumAttr() {
       return 2;
     }
