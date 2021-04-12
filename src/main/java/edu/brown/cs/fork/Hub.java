@@ -56,7 +56,7 @@ public class Hub {
    * @param hostCoordinate the coordinate of the host, in the form of (latitude, longitude)
    * @return a list of recommended restaurants.
    */
-  public static List<Restaurant> recommendRestaurants(String[] userIds, double[] hostCoordinate)
+  public static List<Restaurant> recommendRestaurants(Set<String> userIds, double[] hostCoordinate)
           throws OutOfRangeException, SQLException, NoTrainDataException {
     // getting the list of users
     List<Person> userList = new LinkedList<>();

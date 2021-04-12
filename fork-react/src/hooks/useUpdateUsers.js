@@ -72,8 +72,8 @@ const useUpdateUsers = (roomId, user) => {
             message: {
                 type: "start",
                 roomId: roomId,
-                lat: 40.723091,
-                lon: -73.989201
+                lat: 42.359335,
+                lon: -71.059709
             }
         };
         socket.current.send(JSON.stringify(message));

@@ -21,6 +21,7 @@ public class GroupSocket {
   private static final Hashtable<Integer, Queue<Session>> rooms = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> userRooms = new Hashtable<>();
   private static final Hashtable<Integer, Hashtable<String, Set<String>>> userRestaurants = new Hashtable<>();
+  private static final Hashtable<Integer, Hashtable<String, Set<String>>> userDecisions = new Hashtable<>();
   private static int nextId = 0;
 
   private static enum MESSAGE_TYPE {
@@ -126,6 +127,8 @@ public class GroupSocket {
           break;
 
         case "swipe":
+          String user = messageObj.getJSONObject("message").getString("username");
+          String resId = messageObj.getJSONObject("message").getString("resId");
           // check if user is done with swiping
           // if so, remove all rooms and such
           break;
