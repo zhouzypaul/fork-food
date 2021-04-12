@@ -18,7 +18,7 @@ function Stars(props) {
       }
     }
     setStars(ret);
-  }, []);
+  }, [props.number]);
 
   return (
     <span className="stars">

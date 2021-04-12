@@ -12,7 +12,6 @@ const MESSAGE_TYPE = {
 
 
 function Host(props) {
-  const [active, setActive] = useState([]);
   const roomCode = useRef(9999);
   const host = useRef(false);
   const user = useSelector(state => state.user);
@@ -101,17 +100,6 @@ function Host(props) {
     socket.current.send(JSON.stringify(message));
   }
 
-  // const populate = () => {
-  //   const bubbles = [];
-  //   let i = 0;
-  //   for (let user of users) {
-  //     console.log(user)
-  //     bubbles.push(<Bubble user={user} key={i++} />);
-  //   }
-  //   setActive(bubbles);
-  // }
-
-  // useEffect(populate, [users]);
   let i = 0;
   return (
     <>
@@ -124,7 +112,7 @@ function Host(props) {
         {host.current ? <button className="primary-button" onClick={startSwiping}>start</button> : <></>}
         <div className="joined">
           {users.map((user) => {
-            return (<Bubble user={user} key={i++} />)
+            return (<Bubble user={user} key={i++}/>)
           })}
         </div>
       </div>
