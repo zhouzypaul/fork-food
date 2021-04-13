@@ -4,6 +4,7 @@ import edu.brown.cs.fork.actions.ActionLoadDB;
 import edu.brown.cs.fork.database.queries.QueryRestaurants;
 import edu.brown.cs.fork.database.queries.QueryUsers;
 import edu.brown.cs.fork.exceptions.NoTestDataException;
+import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.recommendation.NaiveBayesClassifier;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
@@ -93,9 +94,20 @@ public class Hub {
    * @param userIds an array of user IDs, one for each user in a group
    * @param hostCoordinate the coordinate of the host, in the form of (latitude, longitude)
    * @return a list of recommended restaurants.
+   * @throws OutOfRangeException when the Restaurant constructor takes in illegal args, or the
+   *                            coordinates passed in is illegal.
+   * @throws SQLException when SQL errors
+   * @throws NoTestDataException when there are no testing data available
+   * @throws NoUserException when no user ids are passed in
    */
   public static List<Restaurant> recommendRestaurants(Set<String> userIds, double[] hostCoordinate)
-          throws OutOfRangeException, SQLException, NoTestDataException {
+          throws OutOfRangeException, SQLException, NoTestDataException, NoUserException {
+    if (userIds.size() <= 0) {
+      throw new NoUserException("no users passed in");
+    }
+    if (hostCoordinate.length != 2) {
+      throw new OutOfRangeException("coordinate has to be an array of length 2");
+    }
     // getting the list of users
     List<Person> userList = new LinkedList<>();
     for (String id : userIds) {
@@ -106,15 +118,11 @@ public class Hub {
     List<LabeledRestaurant> groupPreference = group.getCollectivePreference();
     // get radius by averaging
     double radius = 0;
-    if (groupPreference.size() == 0) {
-      radius = DEFAULT_RADIUS; // set to default radius if no preference
-    } else {
-      for (LabeledRestaurant lr : groupPreference) {
-        Restaurant r = lr.getData();
-        radius = radius + r.getDistance();
-      }
-      radius = radius / groupPreference.size();
+    for (String id : userIds) {
+      String r = USER_DB.getUserPref(id).get("distance").get(0);
+      radius += Double.parseDouble(r);
     }
+    radius = radius / userIds.size();
     // getting training and testing restaurants
     List<Restaurant> restaurantsWithinRadius =
             REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);
