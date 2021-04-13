@@ -1,25 +1,36 @@
 import TopBar from "./TopBar";
 import {useEffect} from "react";
+import Stars from "./Stars";
+import Map from "./Map";
 
 function Result(props) {
+  const rest = props.location.resultProps.result;
+  console.log(rest)
 
-  const getData = () => {
-
+  const price = (p) => {
+    let ret = "";
+    for (let i = 0; i < p; i++) {
+      ret += "$";
+    }
+    return ret;
   }
 
-  // useEffect(() => {
-  //   const restaurant = props.location.resultProps.result;
-  // })
-
-  const restaurant = props.location.resultProps.result;
+  // const location = {
+  //   address: '',
+  //   lat: rest.latitude,
+  //   lng: rest.longitude
+  // }
 
   return (
     <>
       <TopBar to="/home" showOptions={true}/>
       <div className="content">
         <div className="title-text">head to</div>
-        <div>
-          This is your restaurant selection: {restaurant}. Yeah its just an id but you could look it up in the database i guess.
+        <div className="restaurant" id="final-choice">
+          <div className="title-text">{rest.name}</div>
+          <div><Stars number={rest.numStars}/> from {rest.numReviews} reviews</div>
+          <div>{price(rest.priceRange)} &#8226; {rest.city}, {rest.state}</div>
+          {/*<Map location={location} zoom={10}/>*/}
         </div>
       </div>
     </>

@@ -1,7 +1,6 @@
 import TopBar from "./TopBar";
-import {useEffect, useRef, useState} from "react";
+import {useState} from "react";
 import Code from "./Code";
-import { Link } from "react-router-dom";
 import axios from "axios";
 
 const SERVER_URL = 'http://localhost:4567';
@@ -27,7 +26,7 @@ function Join(props) {
       .then((response) => {
         if (response.data['exists']) {
           props.history.push({
-            pathname: `room${values}`,
+            pathname: `room/${values}`,
             roomProps: {
               roomCode: values,
               isHost: false

@@ -4,7 +4,7 @@ function Stars(props) {
   const [stars, setStars] = useState("");
 
   useEffect(() => {
-    const s = props.number;
+    const s = Math.ceil(props.number);
     let ret = "";
     for (let i = 0; i < 5; i++) {
       let type = "\u2606"

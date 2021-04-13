@@ -2,7 +2,6 @@ import TopBar from "./TopBar";
 import { Link } from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {login} from "../actions";
 
 const SERVER_URL = 'http://localhost:4567';
 
@@ -57,7 +56,7 @@ function Home() {
       </div>
       <div className="content">
         <Link to={{
-          pathname: `/room${roomCode}`,
+          pathname: `/room/${roomCode}`,
           roomProps: {
             roomCode: roomCode,
             isHost: true

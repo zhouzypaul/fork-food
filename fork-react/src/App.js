@@ -8,16 +8,27 @@ import Login from "./components/Login";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
-import { useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Host from "./components/Host";
 import Join from "./components/Join";
 import NewUser from './components/NewUser';
 import Survey from './components/Survey';
 import Swipe from "./components/Swipe";
 import Result from "./components/Result";
+import {useEffect} from "react";
+import {login} from "./actions";
 
 function App() {
   const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const loggedIn = localStorage.getItem("user");
+    if (loggedIn) {
+      dispatch(login(loggedIn));
+    }
+  }, []);
+
   return (
     <div className="App">
       <Router>
@@ -33,7 +44,7 @@ function App() {
         <Route path="/survey" component={user !== "" ? Survey : Start} />
         <Route path="/swipe" component={user !== "" ? Swipe : Start} />
         <Route path="/result" component={user !== "" ? Result : Start} />
-        <Route path="/room:roomId" component={user !== "" ? Host : Start} />
+        <Route path="/room/:roomId" component={user !== "" ? Host : Start} />
       </Router>
     </div>
   );

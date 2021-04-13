@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -148,8 +149,14 @@ public class GroupSocket {
             JsonObject result = new JsonObject();
             String commonRes = mostCommon(userDecisions.get(roomId));
             System.out.println("decision " + commonRes);
+            Map<String, String> rest = new HashMap<>();
+            try {
+               rest = Hub.getRestDB().queryRestByID(commonRes).get(0);
+            } catch (Exception e) {
+              System.out.println("ERROR: " + e);
+            }
 
-            result.addProperty("result", commonRes);
+            result.add("result", GSON.toJsonTree(rest));
 
             payload.addProperty("type", "done");
             payload.add("senderMessage", result);

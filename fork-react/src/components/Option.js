@@ -17,8 +17,8 @@ function Option(props) {
     <div className="restaurant">
       <div className="title-text">{restaurant.name}</div>
       <div className="rest-info">
-        <div><Stars number={Math.ceil(restaurant.star)}/> from {restaurant.numReviews} reviews</div>
-        <div>{price(restaurant.priceRange)} &#183; {restaurant.distance.toFixed(1)} mi</div>
+        <div><Stars number={restaurant.star}/> from {restaurant.numReviews} reviews</div>
+        <div>{price(restaurant.priceRange)} &#8226; {restaurant.distance.toFixed(1)} mi</div>
         <div>{restaurant.foodType}</div>
       </div>
     </div>

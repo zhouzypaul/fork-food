@@ -7,6 +7,7 @@ function Personal(props) {
   const dispatch = useDispatch();
   const exit = () => {
     dispatch(logout());
+    localStorage.clear();
     props.history.push('/');
   }
   return (

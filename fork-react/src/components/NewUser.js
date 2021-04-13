@@ -64,7 +64,7 @@ function NewUser(props) {
           props.history.push('/survey');
           console.log("registered");
         } else {
-          setError(response.data["err"]);
+          setError(response.data["err"].substr(7));
         }
 
       })
