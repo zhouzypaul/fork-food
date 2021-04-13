@@ -28,9 +28,9 @@ public class Hub {
   private static final QueryRestaurants REST_DB = new QueryRestaurants();
   private final ActionLoadDB loadDB = new ActionLoadDB();
 
-
   private static final int NUM_RECOMMEND = 10;
   private static final int POSITIVE_CLASS = 1;
+  private static final double DEFAULT_RADIUS = 10;
 
   // Food categories
   private static final List<String> CATEGORIES = Arrays.asList(
@@ -106,12 +106,15 @@ public class Hub {
     List<LabeledRestaurant> groupPreference = group.getCollectivePreference();
     // get radius by averaging
     double radius = 0;
-    for (LabeledRestaurant lr : groupPreference) {
-      Restaurant r = lr.getData();
-      radius = radius + r.getDistance();
+    if (groupPreference.size() == 0) {
+      radius = DEFAULT_RADIUS; // set to default radius if no preference
+    } else {
+      for (LabeledRestaurant lr : groupPreference) {
+        Restaurant r = lr.getData();
+        radius = radius + r.getDistance();
+      }
+      radius = radius / groupPreference.size();
     }
-    radius = radius / groupPreference.size();
-    radius = 100;
     // getting training and testing restaurants
     List<Restaurant> restaurantsWithinRadius =
             REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);
