@@ -126,6 +126,12 @@ public class Hub {
     // getting training and testing restaurants
     List<Restaurant> restaurantsWithinRadius =
             REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);
+    while (restaurantsWithinRadius.size() < 3 * NUM_RECOMMEND) {
+      radius += 5;
+      System.out.println("expanding search radius for restaurants");
+      restaurantsWithinRadius =
+              REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);
+    }
     // init recommendation algorithm
     NaiveBayesClassifier<Restaurant, LabeledRestaurant> recAlgo =
             new NaiveBayesClassifier<>(groupPreference, restaurantsWithinRadius);
