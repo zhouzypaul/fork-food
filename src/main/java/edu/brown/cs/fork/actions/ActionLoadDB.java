@@ -26,6 +26,7 @@ public class ActionLoadDB implements TriggerAction {
     if (args.length != 3) {
       System.out.println("ERROR: Wrong number of arguments");
 //      return "ERROR: Wrong number of arguments";
+      return;
     }
 
     String whichDB = args[1];
@@ -33,6 +34,7 @@ public class ActionLoadDB implements TriggerAction {
 
     if (!Files.exists(Path.of(path))) {
       System.out.println("ERROR: Database doesn't exist");
+      return;
 //      return "ERROR: Database doesn't exist";
     }
 

@@ -18,6 +18,9 @@ import java.util.Map;
 public class HandlerAllRestaurants implements Route {
   private static final Gson GSON = new Gson();
 
+  /**
+   * Constructor.
+   */
   public HandlerAllRestaurants() {  }
 
   @Override

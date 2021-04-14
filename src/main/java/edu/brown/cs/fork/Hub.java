@@ -61,6 +61,10 @@ public class Hub {
     return REST_DB;
   }
 
+  /**
+   * Getter for CATEGORIES.
+   * @return all categories the recommendation algorithm is interested in
+   */
   public static List<String> getCategories() {
     return CATEGORIES;
   }

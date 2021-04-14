@@ -19,8 +19,6 @@ import edu.brown.cs.fork.handlers.users.HandlerGetUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPwd;
 import edu.brown.cs.fork.handlers.users.HandlerInsertUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerUpdateUserPref;
-import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
-import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import com.google.gson.Gson;

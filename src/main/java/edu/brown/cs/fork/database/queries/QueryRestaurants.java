@@ -4,6 +4,7 @@ import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
 import edu.brown.cs.fork.database.DistanceCalculator;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
+import edu.brown.cs.fork.exceptions.SQLErrorException;
 import edu.brown.cs.fork.restaurants.Restaurant;
 
 import java.sql.Connection;
@@ -62,6 +63,17 @@ public class QueryRestaurants {
    */
   public boolean isConnected() {
     return db.isConnected();
+  }
+
+  /**
+   * Close connection to restaurants db.
+   */
+  public void close() {
+    try {
+      this.db.close();
+    } catch (SQLErrorException e) {
+      System.out.println(e.getMessage());
+    }
   }
 
   /**
@@ -249,11 +261,11 @@ public class QueryRestaurants {
         String restCategory = Collections.singletonList(m.group()).get(0);
         // see if this is a category that a user can select in survey
         if (Hub.isInCategories(restCategory)) {
-          System.out.println(star);
-          System.out.println(numReviews);
-          System.out.println(dist);
-          System.out.println(intPriceRange);
-          System.out.println();
+//          System.out.println(star);
+//          System.out.println(numReviews);
+//          System.out.println(dist);
+//          System.out.println(intPriceRange);
+//          System.out.println();
           results.add(
               new Restaurant(businessId, name, restCategory,
                 star, numReviews, dist, intPriceRange));
