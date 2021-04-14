@@ -40,12 +40,12 @@ public class LabeledRestaurantTest implements ITest {
   /**
    * tests the exceptions in the constructor.
    */
-//  @Test
-//  public void testConstructor() {
-//    this.setUp();
-//    assertThrows(OutOfRangeException.class, () -> new LabeledRestaurant(this.r, 2));
-//    this.tearDown();
-//  }
+  @Test
+  public void testConstructor() {
+    this.setUp();
+    assertThrows(OutOfRangeException.class, () -> new LabeledRestaurant(this.r, 2));
+    this.tearDown();
+  }
 
   /**
    * tests for getters.

@@ -4,6 +4,7 @@ import edu.brown.cs.fork.actions.ActionLoadDB;
 import edu.brown.cs.fork.database.queries.QueryRestaurants;
 import edu.brown.cs.fork.database.queries.QueryUsers;
 import edu.brown.cs.fork.exceptions.NoTestDataException;
+import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.recommendation.NaiveBayesClassifier;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
@@ -18,8 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A singleton class containing REPL and databases.
@@ -30,9 +29,9 @@ public class Hub {
   private static final QueryRestaurants REST_DB = new QueryRestaurants();
   private final ActionLoadDB loadDB = new ActionLoadDB();
 
-
   private static final int NUM_RECOMMEND = 10;
   private static final int POSITIVE_CLASS = 1;
+  private static final double DEFAULT_RADIUS = 10;
 
   // Food categories
   private static final List<String> CATEGORIES = Arrays.asList(
@@ -95,9 +94,20 @@ public class Hub {
    * @param userIds an array of user IDs, one for each user in a group
    * @param hostCoordinate the coordinate of the host, in the form of (latitude, longitude)
    * @return a list of recommended restaurants.
+   * @throws OutOfRangeException when the Restaurant constructor takes in illegal args, or the
+   *                            coordinates passed in is illegal.
+   * @throws SQLException when SQL errors
+   * @throws NoTestDataException when there are no testing data available
+   * @throws NoUserException when no user ids are passed in
    */
   public static List<Restaurant> recommendRestaurants(Set<String> userIds, double[] hostCoordinate)
-          throws OutOfRangeException, SQLException, NoTestDataException {
+          throws OutOfRangeException, SQLException, NoTestDataException, NoUserException {
+    if (userIds.size() <= 0) {
+      throw new NoUserException("no users passed in");
+    }
+    if (hostCoordinate.length != 2) {
+      throw new OutOfRangeException("coordinate has to be an array of length 2");
+    }
     // getting the list of users
     List<Person> userList = new LinkedList<>();
     for (String id : userIds) {
@@ -108,15 +118,20 @@ public class Hub {
     List<LabeledRestaurant> groupPreference = group.getCollectivePreference();
     // get radius by averaging
     double radius = 0;
-    for (LabeledRestaurant lr : groupPreference) {
-      Restaurant r = lr.getData();
-      radius = radius + r.getDistance();
+    for (String id : userIds) {
+      String r = USER_DB.getUserPref(id).get("distance").get(0);
+      radius += Double.parseDouble(r);
     }
-    radius = radius / groupPreference.size();
-    radius = 100;
+    radius = radius / userIds.size();
     // getting training and testing restaurants
     List<Restaurant> restaurantsWithinRadius =
             REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);
+    while (restaurantsWithinRadius.size() < 3 * NUM_RECOMMEND) {
+      radius += 5;
+      System.out.println("expanding search radius for restaurants");
+      restaurantsWithinRadius =
+              REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);
+    }
     // init recommendation algorithm
     NaiveBayesClassifier<Restaurant, LabeledRestaurant> recAlgo =
             new NaiveBayesClassifier<>(groupPreference, restaurantsWithinRadius);

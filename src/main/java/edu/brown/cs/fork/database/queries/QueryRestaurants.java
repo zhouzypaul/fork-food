@@ -225,6 +225,10 @@ public class QueryRestaurants {
       int intPriceRange = 1;
       if (!priceRange.isEmpty()) {
         intPriceRange = Integer.parseInt(priceRange);
+        // enforce price range to be only of 1, 2, or 3
+        if (intPriceRange >= 4) {
+          intPriceRange = 3;
+        }
       }
 
       // calculate the distance between the restaurant and current user location
@@ -245,6 +249,11 @@ public class QueryRestaurants {
         String restCategory = Collections.singletonList(m.group()).get(0);
         // see if this is a category that a user can select in survey
         if (Hub.isInCategories(restCategory)) {
+          System.out.println(star);
+          System.out.println(numReviews);
+          System.out.println(dist);
+          System.out.println(intPriceRange);
+          System.out.println();
           results.add(
               new Restaurant(businessId, name, restCategory,
                 star, numReviews, dist, intPriceRange));
