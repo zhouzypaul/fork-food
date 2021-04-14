@@ -453,16 +453,46 @@ public class QueryUsers {
   }
 
   /**
+   * Changes user's password.
+   * @param userId id of user to update
+   * @param newPwd new password
+   * @return a boolean indicating whether the update is successful
+   * @throws NoUserException if the user can't be found in the database
+   */
+  public boolean changePwd(String userId, String newPwd)
+      throws NoUserException {
+    String sql = "UPDATE login SET password = ? WHERE userId = ?;";
+    PreparedStatement prep = null;
+    try {
+      prep = this.conn.prepareStatement(sql);
+      prep.setString(1, newPwd);
+      prep.setString(2, userId);
+      int affectedRows = prep.executeUpdate();
+      if (affectedRows == 0) {
+        throw new NoUserException("User: " + userId + " does not exist.");
+      }
+      return true;
+    } catch (SQLException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /**
    * Deletes user with userID from database.
    * @param userID id of user to delete
    * @return true if deletion is successful, false if otherwise
    */
   public boolean deleteUser(String userID) {
     String sql = "DELETE FROM login WHERE userId = ?;";
+    String sql2 = "DELETE FROM training WHERE userId = ?;";
     try {
       PreparedStatement prep = conn.prepareStatement(sql);
+      PreparedStatement prep2 = conn.prepareStatement(sql2);
       prep.setString(1, userID);
+      prep2.setString(1, userID);
       prep.executeUpdate();
+      prep2.executeUpdate();
       return true;
     } catch (SQLException e) {
       System.out.println("ERROR: Could not delete user " + userID + " from the database");

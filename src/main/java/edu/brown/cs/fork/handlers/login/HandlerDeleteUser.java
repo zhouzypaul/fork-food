@@ -1,4 +1,4 @@
-package edu.brown.cs.fork.handlers.users;
+package edu.brown.cs.fork.handlers.login;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
@@ -24,7 +24,7 @@ public class HandlerDeleteUser implements Route {
   @Override
   public Object handle(Request req, Response res) throws Exception {
     JSONObject data = new JSONObject(req.body());
-    String id = data.getString("id");
+    String id = data.getString("username");
 
     String err = "";
     boolean success = false;

@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.handlers.login.HandlerUpdateUserPwd;
 import edu.brown.cs.fork.handlers.login.LoginHandler;
 import edu.brown.cs.fork.handlers.login.RegistrationHandler;
 
@@ -14,7 +15,7 @@ import edu.brown.cs.fork.handlers.room.RoomCheckHandler;
 import edu.brown.cs.fork.sockets.GroupSocket;
 
 import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
-import edu.brown.cs.fork.handlers.users.HandlerDeleteUser;
+import edu.brown.cs.fork.handlers.login.HandlerDeleteUser;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPwd;
 import edu.brown.cs.fork.handlers.users.HandlerInsertUserPref;
@@ -97,6 +98,7 @@ public final class Main {
     Spark.post("/register", new RegistrationHandler());
     // handles user login
     Spark.post("/login", new LoginHandler());
+    Spark.post("/updatePwd", new HandlerUpdateUserPwd());
 
     Spark.post("/getRestByID", new HandlerGetRestByID());
     Spark.post("/getRestByRad", new HandlerGetRestByRad());

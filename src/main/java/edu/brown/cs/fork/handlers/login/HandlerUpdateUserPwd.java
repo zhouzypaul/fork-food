@@ -3,6 +3,7 @@ package edu.brown.cs.fork.handlers.login;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.exceptions.NoUserException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import spark.Request;
@@ -14,15 +15,13 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 
-/**
- * Handles new user registration.
- */
-public class RegistrationHandler implements Route {
+public class HandlerUpdateUserPwd implements Route {
   private static final Gson GSON = new Gson();
+
+  public HandlerUpdateUserPwd() {  }
 
   @Override
   public String handle(Request req, Response res) {
@@ -47,19 +46,15 @@ public class RegistrationHandler implements Route {
       if (!Hub.getUserDB().isConnected()) {
         err = "ERROR: No database connected";
       } else {
-        // filter non-unique usernames and insert into DB
-        if (Hub.getUserDB().queryAllUserIds().contains(username)) {
-          err = "ERROR: user already exists";
-        } else {
-          success = Hub.getUserDB().registerUser(username, hash) && Hub.getUserDB().insertBlankRow(username);
-        }
+        success = Hub.getUserDB().changePwd(username, hash);
       }
       Map<String, Object> variables = ImmutableMap.of("success", success, "err", err);
 
       return GSON.toJson(variables);
 
-    } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException | SQLException e) {
-      System.out.println("ERROR: " + e); // replace with a good exception
+    } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException
+        | NoUserException e) {
+      System.out.println("ERROR: " + e);
     }
     return null;
   }
