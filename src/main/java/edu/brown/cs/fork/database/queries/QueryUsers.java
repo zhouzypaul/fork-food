@@ -225,12 +225,12 @@ public class QueryUsers {
 
   /**
    * Insert rows representing user preferences from preferences survey.
-   * @param userId user id
+   * Note that business_id must be "".
    * @param colsToSet columns to insert
    * @param info information for each column
    * @return a boolean indicating whether insertion is successful
    */
-  public boolean insertUserPref(String userId, List<String> colsToSet, List<String> info) {
+  public boolean insertUserPref(List<String> colsToSet, List<String> info) {
     if (colsToSet.size() != info.size()) {
       return false;
     }
@@ -438,14 +438,19 @@ public class QueryUsers {
    * @return password of user with userId
    * @throws SQLException SQLException
    */
-  public String getPwd(String userId) throws SQLException {
+  public synchronized String getPwd(String userId) throws SQLException, NoUserException {
     String result = "";
     String sql = "SELECT password FROM login WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
     prep.setString(1, userId);
     ResultSet rs = prep.executeQuery();
+    int count = 0;
     while (rs.next()) {
+      count += 1;
       result = rs.getString(1);
+    }
+    if (count == 0) {
+      throw new NoUserException("User: " + userId + " doesn't exist.");
     }
     prep.close();
     rs.close();
@@ -459,7 +464,7 @@ public class QueryUsers {
    * @return a boolean indicating whether the update is successful
    * @throws NoUserException if the user can't be found in the database
    */
-  public boolean changePwd(String userId, String newPwd)
+  public synchronized boolean changePwd(String userId, String newPwd)
       throws NoUserException {
     String sql = "UPDATE login SET password = ? WHERE userId = ?;";
     PreparedStatement prep = null;

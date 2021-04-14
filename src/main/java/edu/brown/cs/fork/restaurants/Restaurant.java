@@ -3,6 +3,8 @@ package edu.brown.cs.fork.restaurants;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.recommendation.Recommendable;
 
+import java.util.Objects;
+
 /**
  * A restaurant data structure. This implements the Recommendable interface.
  * This data structure holds all the data a restaurant has.
@@ -268,5 +270,31 @@ public class Restaurant implements Recommendable {
   public int[] getAttrDim() {
     return new int[]{this.dimDistance, this.dimFoodType, this.dimNumReviews, this.dimStar,
         this.dimPriceRange};
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder().append("Restaurant{").append("id='").append(id).append('\'')
+        .append(", name='").append(name).append('\'').append(", foodType='")
+        .append(foodType).append('\'').append(", star=").append(star).append(", numReviews=")
+        .append(numReviews).append(", distance=").append(distance).append(", priceRange=")
+        .append(priceRange).append('}').toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Restaurant that = (Restaurant) o;
+    return Double.compare(that.star, star) == 0 && numReviews == that.numReviews && Double.compare(that.distance, distance) == 0 && priceRange == that.priceRange && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(foodType, that.foodType);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, name, foodType, star, numReviews, distance, priceRange);
   }
 }
