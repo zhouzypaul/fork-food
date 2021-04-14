@@ -19,6 +19,7 @@ public class DistanceCalculator {
    * @param c1 coordinate 1
    * @param c2 coordinate 2
    * @return distance between input coordinates
+   * @throws ErrorException ErrorException
    */
   public double getEucDistance(List<Double> c1, List<Double> c2) throws ErrorException {
     if (c1.size() != c2.size()) {

@@ -13,7 +13,6 @@ public interface TriggerAction {
   /**
    * Performs action with user arguments.
    * @param args String List representing user arguments
-   * @return a string, either an error message or empty string
    */
   void run(String[] args);
 }

@@ -437,8 +437,9 @@ public class QueryUsers {
    * @param userId user id
    * @return password of user with userId
    * @throws SQLException SQLException
+   * @throws NoUserException NoUserException
    */
-  public synchronized String getPwd(String userId) throws SQLException, NoUserException {
+  public String getPwd(String userId) throws SQLException, NoUserException {
     String result = "";
     String sql = "SELECT password FROM login WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
@@ -464,7 +465,7 @@ public class QueryUsers {
    * @return a boolean indicating whether the update is successful
    * @throws NoUserException if the user can't be found in the database
    */
-  public synchronized boolean changePwd(String userId, String newPwd)
+  public boolean changePwd(String userId, String newPwd)
       throws NoUserException {
     String sql = "UPDATE login SET password = ? WHERE userId = ?;";
     PreparedStatement prep = null;
