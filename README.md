@@ -92,9 +92,13 @@ load user path_to_custom_user_db
 
 - ```/getAllUserIds``` no required body, returns all ```userId```s.
 
+- ```/login``` body format: ```{"username": user_id, "password": new_pwd}```, returns whether the password is correct
+
 - ```/register``` body format: ```{"username": user_id, "password": user_pwd}```, returns whether the action is successful
 
 - ```/deleteUser``` body format: ```{"username": user_id}```, returns whether the action is successful
+
+- ```/updatePwd``` body format: ```{"username": user_id, "password": new_pwd}```, returns whether the action is successful
 
 - ```/getUserPwd``` body format: ```{"id": user_id}```, returns user's password in format ```{"pwd": user_pwd}```
 
