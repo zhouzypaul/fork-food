@@ -8,7 +8,9 @@ import spark.Response;
 import spark.Route;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Class to query all user ids in the login table of users database.

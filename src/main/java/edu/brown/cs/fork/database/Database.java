@@ -1,14 +1,10 @@
 package edu.brown.cs.fork.database;
 
-import edu.brown.cs.fork.exceptions.NoSuchFileException;
 import edu.brown.cs.fork.exceptions.SQLErrorException;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Class representing a database. The database is able to make connection to a SQL database and
@@ -36,27 +32,20 @@ public class Database {
     conn = DriverManager.getConnection(urlToDB);
   }
 
+  /**
+   * Getter for the database connection.
+   * @return the database connection
+   */
   public Connection getConn() {
     return this.conn;
   }
 
+  /**
+   * Getter for if database is connected.
+   * @return whether the database is connected
+   */
   public boolean isConnected() {
     return this.connected;
-  }
-
-  /**
-   * Creates a PreparedStatement with the database connection.
-   *
-   * @param sql content of the statement
-   * @return the statement with the provided content
-   * @throws SQLErrorException when a statement cannot be created (e.g. cannot obtain database lock)
-   */
-  public PreparedStatement createStatement(String sql) throws SQLErrorException {
-    try {
-      return this.conn.prepareStatement(sql);
-    } catch (SQLException e) {
-      throw new SQLErrorException("could not prepare a new SQL statement");
-    }
   }
 
   /**

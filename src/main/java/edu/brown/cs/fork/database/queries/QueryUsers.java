@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
 import edu.brown.cs.fork.database.DistanceCalculator;
+import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
+import edu.brown.cs.fork.exceptions.SQLErrorException;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 import edu.brown.cs.fork.restaurants.Restaurant;
 import edu.brown.cs.fork.users.Person;
@@ -13,7 +15,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +66,17 @@ public class QueryUsers {
   }
 
   /**
+   * Close connection to users db.
+   */
+  public void close() {
+    try {
+      this.db.close();
+    } catch (SQLErrorException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  /**
    * Queries all userIds.
    * @return a list of string representing all user ids
    * @throws SQLException SQLException
@@ -76,32 +96,44 @@ public class QueryUsers {
   }
 
   /**
-   * Queries users info based on the prepared statement.
-   * @param prep statement to execute
-   * @return a list of hashmaps representing users
+   * Get user's gottenWay parameter.
+   * @param userId user id
+   * @return user's gottenWay parameter
    * @throws SQLException SQLException
+   * @throws NoUserException NoUserException
    */
-  private List<Map<String, String>> getUsers(PreparedStatement prep)
-      throws SQLException {
-    List<Map<String, String>> results = new ArrayList<>();
+  public float getUserGottenWay(String userId)
+      throws SQLException, NoUserException {
+    String sql = "SELECT gottenWay FROM login WHERE userId = ?;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, userId);
+    float gottenWay = -1.0f;
     ResultSet rs = prep.executeQuery();
     while (rs.next()) {
-      Map<String, String> person = new HashMap<>();
-      String userId = rs.getString(1);
-      String radius = rs.getString(2);
-      String prefHighReview = rs.getString(3);
-      String prefNumReviews = rs.getString(4);
-      String categories = rs.getString(5);
-      person.put("userId", userId);
-      person.put("radius", radius);
-      person.put("prefHighReview", prefHighReview);
-      person.put("prefNumReviews", prefNumReviews);
-      person.put("categories", categories);
-      results.add(person);
+      gottenWay = rs.getFloat(1);
     }
     prep.close();
     rs.close();
-    return results;
+    if (gottenWay == -1) {
+      throw new NoUserException("User " + userId + " not found.");
+    }
+    return gottenWay;
+  }
+
+  /**
+   * Updates user's gottenWay parameter.
+   * @param userId user id
+   * @param gottenWay user's gottenWay parameter
+   * @return whether the update is successful
+   * @throws SQLException SQLException
+   */
+  public boolean updateUserGottenWay(String userId, float gottenWay) throws SQLException {
+    String sql = "UPDATE login SET gottenWay = ? WHERE userId = ?;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setFloat(1, gottenWay);
+    prep.setString(2, userId);
+    int affectedRows = prep.executeUpdate();
+    return (affectedRows == 1);
   }
 
   /**
@@ -387,7 +419,7 @@ public class QueryUsers {
    * @return true if registered successfully, false if otherwise
    */
   public boolean registerUser(String userId, String pwd) {
-    String sql = "INSERT INTO login VALUES (?, ?);";
+    String sql = "INSERT INTO login VALUES (?, ?, 1);";
     try {
       PreparedStatement prep = this.conn.prepareStatement(sql);
       prep.setString(1, userId);
@@ -421,16 +453,46 @@ public class QueryUsers {
   }
 
   /**
+   * Changes user's password.
+   * @param userId id of user to update
+   * @param newPwd new password
+   * @return a boolean indicating whether the update is successful
+   * @throws NoUserException if the user can't be found in the database
+   */
+  public boolean changePwd(String userId, String newPwd)
+      throws NoUserException {
+    String sql = "UPDATE login SET password = ? WHERE userId = ?;";
+    PreparedStatement prep = null;
+    try {
+      prep = this.conn.prepareStatement(sql);
+      prep.setString(1, newPwd);
+      prep.setString(2, userId);
+      int affectedRows = prep.executeUpdate();
+      if (affectedRows == 0) {
+        throw new NoUserException("User: " + userId + " does not exist.");
+      }
+      return true;
+    } catch (SQLException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /**
    * Deletes user with userID from database.
    * @param userID id of user to delete
    * @return true if deletion is successful, false if otherwise
    */
   public boolean deleteUser(String userID) {
     String sql = "DELETE FROM login WHERE userId = ?;";
+    String sql2 = "DELETE FROM training WHERE userId = ?;";
     try {
       PreparedStatement prep = conn.prepareStatement(sql);
+      PreparedStatement prep2 = conn.prepareStatement(sql2);
       prep.setString(1, userID);
+      prep2.setString(1, userID);
       prep.executeUpdate();
+      prep2.executeUpdate();
       return true;
     } catch (SQLException e) {
       System.out.println("ERROR: Could not delete user " + userID + " from the database");
