@@ -71,7 +71,7 @@ term-project-...
 mvn package
 
 // stars the backend, databases will be automatically loaded
-./run --gui
+./run
 
 // load custom databases
 load rest path_to_custom_restaurants_db
