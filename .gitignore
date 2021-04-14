@@ -8,7 +8,7 @@ target/
 data/*.csv
 data/*.json
 data/orig_restaurants.sqlite3
-data/restaurants.sqlite3
+data/all_restaurants.sqlite3
 data/review.sqlite3
 data/users.sqlite3
 
