@@ -58,6 +58,11 @@ function Start() {
           </defs>
         </svg>
       </div>
+      <Link className="links" to="/about">
+        <div className="exit-home" id="about">
+          about
+        </div>
+      </Link>
     </>
   );
 }

@@ -196,6 +196,29 @@
   margin: 16px;
 }
 
+#about {
+  margin: 24px 40px;
+}
+
+.text {
+  border-radius: 16px;
+  background-color: #DDAFF940;;
+  color: black;
+  padding: 0 16px;
+  width: 70vw;
+  text-align: left;
+}
+
+h1 {
+  font-weight: normal;
+}
+
+.profile-pic {
+  margin: 8px;
+  width: 64px;
+  height: auto;
+}
+
 .divider {
   margin: 16px;
   color: gainsboro;

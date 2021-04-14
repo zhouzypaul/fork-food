@@ -1,15 +1,19 @@
 import TopBar from "./TopBar";
 import TextBox from "./TextBox";
 import {useState} from "react";
-import {useDispatch} from "react-redux";
-import {logout} from "../actions";
+import {useDispatch, useSelector} from "react-redux";
+import {login, logout} from "../actions";
+import axios from "axios";
 
-function Settings() {
+const SERVER_URL = 'http://localhost:4567';
+
+function Settings(props) {
   const [old, setOld] = useState("");
   const [newPassword, setNew] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const dispatch = useDispatch();
+  const user = useSelector(state => state.user);
 
   const hasWhiteSpace = (s) => {
     return /\s/g.test(s);
@@ -20,9 +24,6 @@ function Settings() {
     if (newPassword !== confirm) {
       valid = false;
       setError("passwords do not match");
-    } else if (!validPassword(old)) {
-      valid = false;
-      setError("incorrect password");
     } else if (newPassword.length < 8) {
       valid = false;
       setError("password must be at least 8 characters long");
@@ -31,13 +32,65 @@ function Settings() {
       setError("password can not contain white spaces");
     }
     if (valid) {
-      // change password
+      validPassword();
     }
   }
 
-  const validPassword = (old) => {
-    // check old
-    return true;
+  const validPassword = () => {
+    // verify user on backend
+    const toSend = {
+      // username and password
+      username: user,
+      password: old
+    };
+
+    let config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    };
+
+    axios
+      .post(`${SERVER_URL}/login`, toSend, config)
+      .then((response) => {
+        if (response.data["success"]) {
+          change();
+        } else {
+          setError("incorrect password");
+        }
+      })
+
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  const change = () => {
+    const toSend = {
+      // username and password
+      username: user,
+      password: newPassword
+    };
+    let config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    };
+
+    axios
+      .post(`${SERVER_URL}/updatePwd`, toSend, config)
+      .then((response) => {
+        if (response.data["success"]) {
+          props.history.push('/home');
+        } else {
+          setError("failed to update password");
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
   const submit = (e) => {
@@ -50,9 +103,36 @@ function Settings() {
   const deleteAccount = () => {
     const resp = prompt("Type 'DELETE' to delete account permanently.");
     if (resp === "DELETE") {
-      alert("Account deleted successfully.");
-      dispatch(logout());
+      dataDelete();
     }
+  }
+
+  const dataDelete = () => {
+    const toSend = {
+      id: user
+    };
+
+    let config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    };
+
+    axios
+      .post(`${SERVER_URL}/deleteUser`, toSend, config)
+      .then((response) => {
+        if (response.data["success"]) {
+          alert("Account deleted successfully.");
+          dispatch(logout());
+        } else {
+          alert(response.data["err"].substr(7));
+        }
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   return (
@@ -70,7 +150,7 @@ function Settings() {
         <TextBox initial="old password" change={setOld} onKeyDown={submit} type="password" />
         <TextBox initial="new password" change={setNew} onKeyDown={submit} type="password" />
         <TextBox initial="confirm password" change={setConfirm} onKeyDown={submit} type="password" />
-        <button className="primary-button">
+        <button className="primary-button" onClick={changePassword}>
           save
         </button>
       </div>

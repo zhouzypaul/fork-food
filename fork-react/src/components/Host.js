@@ -1,6 +1,6 @@
-import { useRef, useState, useEffect } from "react";
+import {useEffect, useRef, useState} from "react";
 import TopBar from "./TopBar";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 
 import Bubble from "./Bubble";
 
@@ -9,7 +9,6 @@ const MESSAGE_TYPE = {
   UPDATE: 1,
   SEND: 2
 };
-
 
 function Host(props) {
   const roomCode = useRef(9999);
@@ -22,6 +21,19 @@ function Host(props) {
     roomCode.current = roomProps.roomCode
     host.current = roomProps.isHost
   }
+
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      return true;
+    };
+    window.onunload = () => {
+      window.location.href = "/home";
+    };
+    return () => {
+      window.onbeforeunload = null;
+      window.onunload = null;
+    }
+  })
 
   const [users, setUsers] = useState([]);
 
