@@ -376,21 +376,44 @@ public class QueryUsers {
       String businessId = rs.getString(2);
       String name = rs.getString(3);
       String foodType = rs.getString(4);
-      double star = Double.parseDouble(rs.getString(5));
-      String priceRange = rs.getString(6);
 
-      // default priceRange is 1 if database field is empty
-      int intPriceRange = 1;
-      if (!priceRange.isEmpty()) {
-        intPriceRange = Integer.parseInt(priceRange);
+      // default star is 2.5 if database field is empty
+      String starString = rs.getString(5);
+      double star = Hub.DEFAULT_STAR;
+      if (!starString.isEmpty()) {
+        star = Double.parseDouble(starString);
       }
 
-      int numReviews = Integer.parseInt(rs.getString(SEVEN));
-      double distance = Double.parseDouble(rs.getString(EIGHT));
-      int label = Integer.parseInt(rs.getString(NINE));
+      // default priceRange is 1 if database field is empty
+      String priceRangeString = rs.getString(6);
+      int priceRange = Hub.DEFAULT_PRICE_RANGE;
+      if (!priceRangeString.isEmpty()) {
+        priceRange = Integer.parseInt(priceRangeString);
+      }
+
+      // default num reviews is 0 if the database field is empty
+      String numReviewsString = rs.getString(SEVEN);
+      int numReviews = Hub.DEFAULT_NUM_REVIEWS;
+      if (!numReviewsString.isEmpty()) {
+        numReviews = Integer.parseInt(numReviewsString);
+      }
+
+      // default distance is 10 if the database field is empty
+      String distanceString = rs.getString(EIGHT);
+      double distance = Hub.DEFAULT_DISTANCE;
+      if (!distanceString.isEmpty()) {
+        distance = Double.parseDouble(distanceString);
+      }
+
+      // default label is 1 if the database field is empty.
+      String labelString = rs.getString(NINE);
+      int label = Hub.DEFAULT_LABEL;
+      if (!labelString.isEmpty()) {
+        label = Integer.parseInt(labelString);
+      }
 
       Restaurant rest =
-          new Restaurant(businessId, name, foodType, star, numReviews, distance, intPriceRange);
+          new Restaurant(businessId, name, foodType, star, numReviews, distance, priceRange);
 
       LabeledRestaurant labeledRest = new LabeledRestaurant(rest, label);
       results.add(labeledRest);

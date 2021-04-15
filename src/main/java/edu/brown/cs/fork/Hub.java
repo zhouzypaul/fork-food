@@ -29,8 +29,15 @@ public class Hub {
 
   private static final int NUM_RECOMMEND = 10;
   private static final int POSITIVE_CLASS = 1;
-  private static final double DEFAULT_RADIUS = 10;
   private static final double GOTTEN_WAY_PRESERVE_RATIO = 0.7;
+  private static final int MAX_NUM_RADIUS_EXPANSION = 5;
+
+  private static final double DEFAULT_RADIUS = 10;
+  public static final int DEFAULT_PRICE_RANGE = 1;
+  public static final double DEFAULT_STAR = 2.5;
+  public static final double DEFAULT_DISTANCE = 10;
+  public static final int DEFAULT_NUM_REVIEWS = 0;
+  public static final int DEFAULT_LABEL = 1;
 
   // Food categories
   private static final List<String> CATEGORIES = Arrays.asList(
@@ -121,19 +128,28 @@ public class Hub {
     List<LabeledRestaurant> groupPreference = group.getCollectivePreference();
     // get radius by averaging
     double radius = 0;
-    for (String id : userIds) {
-      String r = USER_DB.getUserPref(id).get("distance").get(0);
-      radius += Double.parseDouble(r);
+    try {
+      for (String id : userIds) {
+        String r = USER_DB.getUserPref(id).get("distance").get(0);
+        radius += Double.parseDouble(r);
+      }
+      radius = radius / userIds.size();
+    } catch (NumberFormatException e) {
+      radius = DEFAULT_RADIUS;
     }
-    radius = radius / userIds.size();
     // getting training and testing restaurants
     List<Restaurant> restaurantsWithinRadius =
             REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);
+    int expansionCounter = 0;
     while (restaurantsWithinRadius.size() < 3 * NUM_RECOMMEND) {
+      expansionCounter++;
       radius += 5;
       System.out.println("expanding search radius for restaurants");
       restaurantsWithinRadius =
               REST_DB.getTestingRests(radius, hostCoordinate[0], hostCoordinate[1]);
+      if (expansionCounter > MAX_NUM_RADIUS_EXPANSION) {
+        break;
+      }
     }
     // init recommendation algorithm
     NaiveBayesClassifier<Restaurant, LabeledRestaurant> recAlgo =
