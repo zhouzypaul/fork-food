@@ -12,13 +12,11 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class HubTest implements ITest {
-  private Hub hub;
   /**
    * set up a hub
    */
   @Override
   public void setUp() {
-    this.hub = new Hub();
     Hub.getRestDB().initRestaurants("data/restaurants.sqlite3");
     Hub.getUserDB().initUsers("data/test_users.sqlite3");
   }
@@ -29,16 +27,15 @@ public class HubTest implements ITest {
   @Override
   public void tearDown() {
     try {
-      Hub.getUserDB().updateUserGottenWay("paul", (float) 0.9);
-      Hub.getUserDB().updateUserGottenWay("sean", (float) 0.8);
-      Hub.getUserDB().updateUserGottenWay("ed", (float) 0.3);
-      Hub.getUserDB().updateUserGottenWay("alan", (float) 0.2);
+      Hub.getUserDB().updateUserGottenWay("paul", 0.9f);
+      Hub.getUserDB().updateUserGottenWay("sean", 0.8f);
+      Hub.getUserDB().updateUserGottenWay("ed", 0.3f);
+      Hub.getUserDB().updateUserGottenWay("alan", 0.11f);
     } catch (Exception e) {
       fail();
     }
     Hub.getRestDB().close();
     Hub.getUserDB().close();
-    this.hub = null;
   }
 
   /**
