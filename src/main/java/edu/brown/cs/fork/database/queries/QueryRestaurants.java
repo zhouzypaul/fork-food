@@ -125,49 +125,49 @@ public class QueryRestaurants {
     return getRestaurantsWithPrep(prep);
   }
 
-  public Restaurant getRestObjByID(String id, Double lat, Double lon)
-      throws SQLException, OutOfRangeException {
-    List<Map<String, String>> restsInBBox = queryRestByID(id);
-    List<Restaurant> results = new ArrayList<>();
-    for (Map<String, String> rest : restsInBBox) {
-      String businessId = rest.get("business_id");
-      String name = rest.get("name");
-      double star = Double.parseDouble(rest.get("numStars"));
-      int numReviews = Integer.parseInt(rest.get("numReviews"));
-
-      // default priceRange is 1 if database field is empty
-      String priceRange = rest.get("priceRange");
-      int intPriceRange = 1;
-      if (!priceRange.isEmpty()) {
-        intPriceRange = Integer.parseInt(priceRange);
-      }
-
-      // calculate the distance between the restaurant and current user location
-      double restLat = Double.parseDouble(rest.get("latitude"));
-      double restLon = Double.parseDouble(rest.get("longitude"));
-      List<Double> restCoor = Arrays.asList(restLat, restLon);
-      List<Double> userCoor = Arrays.asList(lat, lon);
-      DistanceCalculator calc = new DistanceCalculator();
-      double dist = calc.getHaversineDistance(userCoor, restCoor, RAD);
-
-      // parse long categories string into individual categories of interest
-      String categories = rest.get("categories");
-      String pattern = "[^,\\s][^,]*[^,\\s]*";
-      Pattern r = Pattern.compile(pattern);
-      Matcher m = r.matcher(categories);
-      while (m.find()) {
-        // get an individual category
-        String restCategory = Collections.singletonList(m.group()).get(0);
-        // see if this is a category that a user can select in survey
-        if (Hub.isInCategories(restCategory)) {
-          results.add(
-              new Restaurant(businessId, name, restCategory,
-                star, numReviews, dist, intPriceRange));
-        }
-      }
-    }
-    return results.get(0);
-  }
+//  public Restaurant getRestObjByID(String id, Double lat, Double lon)
+//      throws SQLException, OutOfRangeException {
+//    List<Map<String, String>> restsInBBox = queryRestByID(id);
+//    List<Restaurant> results = new ArrayList<>();
+//    for (Map<String, String> rest : restsInBBox) {
+//      String businessId = rest.get("business_id");
+//      String name = rest.get("name");
+//      double star = Double.parseDouble(rest.get("numStars"));
+//      int numReviews = Integer.parseInt(rest.get("numReviews"));
+//
+//      // default priceRange is 1 if database field is empty
+//      String priceRange = rest.get("priceRange");
+//      int intPriceRange = 1;
+//      if (!priceRange.isEmpty()) {
+//        intPriceRange = Integer.parseInt(priceRange);
+//      }
+//
+//      // calculate the distance between the restaurant and current user location
+//      double restLat = Double.parseDouble(rest.get("latitude"));
+//      double restLon = Double.parseDouble(rest.get("longitude"));
+//      List<Double> restCoor = Arrays.asList(restLat, restLon);
+//      List<Double> userCoor = Arrays.asList(lat, lon);
+//      DistanceCalculator calc = new DistanceCalculator();
+//      double dist = calc.getHaversineDistance(userCoor, restCoor, RAD);
+//
+//      // parse long categories string into individual categories of interest
+//      String categories = rest.get("categories");
+//      String pattern = "[^,\\s][^,]*[^,\\s]*";
+//      Pattern r = Pattern.compile(pattern);
+//      Matcher m = r.matcher(categories);
+//      while (m.find()) {
+//        // get an individual category
+//        String restCategory = Collections.singletonList(m.group()).get(0);
+//        // see if this is a category that a user can select in survey
+//        if (Hub.isInCategories(restCategory)) {
+//          results.add(
+//              new Restaurant(businessId, name, restCategory,
+//                star, numReviews, dist, intPriceRange));
+//        }
+//      }
+//    }
+//    return results.get(0);
+//  }
 
   /**
    * Converts miles to latitude, longitude degrees.
@@ -193,6 +193,7 @@ public class QueryRestaurants {
    * @param lat latitude of the center of the square bounding box
    * @param lon longitude of the center of the square bounding box
    * @return a PreparedStatement
+   * @throws SQLException SQLException
    */
   public List<Map<String, String>> queryRestByRad(Double half, Double lat, Double lon)
       throws SQLException {
