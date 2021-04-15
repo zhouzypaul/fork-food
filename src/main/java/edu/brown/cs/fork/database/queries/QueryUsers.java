@@ -102,15 +102,15 @@ public class QueryUsers {
    * @throws SQLException SQLException
    * @throws NoUserException NoUserException
    */
-  public float getUserGottenWay(String userId)
+  public double getUserGottenWay(String userId)
       throws SQLException, NoUserException {
     String sql = "SELECT gottenWay FROM login WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
     prep.setString(1, userId);
-    float gottenWay = -1.0f;
+    double gottenWay = -1.0;
     ResultSet rs = prep.executeQuery();
     while (rs.next()) {
-      gottenWay = rs.getFloat(1);
+      gottenWay = rs.getDouble(1);
     }
     prep.close();
     rs.close();
@@ -127,10 +127,10 @@ public class QueryUsers {
    * @return whether the update is successful
    * @throws SQLException SQLException
    */
-  public boolean updateUserGottenWay(String userId, float gottenWay) throws SQLException {
+  public boolean updateUserGottenWay(String userId, double gottenWay) throws SQLException {
     String sql = "UPDATE login SET gottenWay = ? WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
-    prep.setFloat(1, gottenWay);
+    prep.setDouble(1, gottenWay);
     prep.setString(2, userId);
     int affectedRows = prep.executeUpdate();
     return (affectedRows == 1);

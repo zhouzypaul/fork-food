@@ -27,10 +27,10 @@ public class HubTest implements ITest {
   @Override
   public void tearDown() {
     try {
-      Hub.getUserDB().updateUserGottenWay("paul", 0.9f);
-      Hub.getUserDB().updateUserGottenWay("sean", 0.8f);
-      Hub.getUserDB().updateUserGottenWay("ed", 0.3f);
-      Hub.getUserDB().updateUserGottenWay("alan", 0.11f);
+      Hub.getUserDB().updateUserGottenWay("paul", 0.9);
+      Hub.getUserDB().updateUserGottenWay("sean", 0.8);
+      Hub.getUserDB().updateUserGottenWay("ed", 0.3);
+      Hub.getUserDB().updateUserGottenWay("alan", 0.11);
     } catch (Exception e) {
       fail();
     }

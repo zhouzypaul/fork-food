@@ -182,14 +182,14 @@ public class Hub {
       throw new NoUserException("no users/votes passed in to the ranking algorithm");
     }
     // get the user's gottenWay from DB
-    Map<String, Float> userGottenWays = new HashMap<>();
+    Map<String, Double> userGottenWays = new HashMap<>();
     for (String id : userIds) {
       userGottenWays.put(id, USER_DB.getUserGottenWay(id));
     }
     // rank the restaurants
-    Map<String, Float> votesCount = new HashMap<>();
+    Map<String, Double> votesCount = new HashMap<>();
     for (String restaurantId : votes.keySet()) {
-      float currentVote = 0;
+      double currentVote = 0;
       Map<String, Integer> swipeResults = votes.get(restaurantId);
       for (String userId : swipeResults.keySet()) {
         currentVote = currentVote + swipeResults.get(userId) * userGottenWays.get(userId);
@@ -197,8 +197,8 @@ public class Hub {
       votesCount.put(restaurantId, currentVote);
     }
     // get the highest value in votesCount
-    Map.Entry<String, Float> maxEntry = null;
-    for (Map.Entry<String, Float> entry : votesCount.entrySet()) {
+    Map.Entry<String, Double> maxEntry = null;
+    for (Map.Entry<String, Double> entry : votesCount.entrySet()) {
       if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
         maxEntry = entry;
       }
@@ -207,9 +207,9 @@ public class Hub {
     String highestRankingRestaurant = maxEntry.getKey();
     // update user's gottenWay in DB
     for (String userId : userIds) {
-      float newGottenWay = (float) (userGottenWays.get(userId) * GOTTEN_WAY_PRESERVE_RATIO
+      double newGottenWay = userGottenWays.get(userId) * GOTTEN_WAY_PRESERVE_RATIO
               + (1 - votes.get(highestRankingRestaurant).get(userId))
-              * (1 - GOTTEN_WAY_PRESERVE_RATIO));
+              * (1 - GOTTEN_WAY_PRESERVE_RATIO);
       USER_DB.updateUserGottenWay(userId, newGottenWay);
     }
     // return top restaurant
