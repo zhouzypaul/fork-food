@@ -11,12 +11,16 @@ const MESSAGE_TYPE = {
 };
 
 function Swipe(props) {
+  const d1 = useRef(null);
+  const d2 = useRef(null);
+  const d3 = useRef(null);
 
   const counter = useRef(0);
   const restaurants = props.location.swipeProps.restaurants;
   const socket = useRef(props.location.swipeProps.socket);
   const id = useRef(99);
   const roomId = useRef(9999);
+  const [waiting, setWaiting] = useState(false);
 
   const swipeProps = props.location.swipeProps;
   if (swipeProps) {
@@ -28,21 +32,28 @@ function Swipe(props) {
 
   const [currentRestaurant, setCurrent] = useState(restaurants[counter.current]);
 
-  // const { result } = useSwipeResults(roomId.current, user, socket.current);
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      return true;
+    };
+    return () => {
+      window.onbeforeunload = null;
+    }
+  })
+
+  const sendInfo = () => {
+    const message = {
+      id: id.current,
+      message: {
+        type: "update_user",
+        roomId: roomId.current,
+        username: user
+      }
+    };
+    socket.current.send(JSON.stringify(message));
+  }
 
   useEffect(() => {
-
-    const sendInfo = () => {
-      const message = {
-        id: id.current,
-        message: {
-          type: "update_user",
-          roomId: roomId.current,
-          username: user
-        }
-      };
-      socket.current.send(JSON.stringify(message));
-    }
     socket.current.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       console.log(data);
@@ -57,7 +68,6 @@ function Swipe(props) {
           break;
         case MESSAGE_TYPE.UPDATE:
           // check if we get a finished message then move to next page
-          console.log("herehhhhh")
           if (data.payload.type === "done") {
             props.history.push({
               pathname: `/result`,
@@ -81,7 +91,6 @@ function Swipe(props) {
   console.log(counter.current)
   if (counter.current >= restaurants.length - 1) {
     // send done message
-    console.log("dsfjsldjfkldsajfkskldj")
     const message = {
       id: id.current,
       message: {
@@ -91,7 +100,6 @@ function Swipe(props) {
       }
     };
     socket.current.send(JSON.stringify(message));
-
   }
 
 
@@ -111,17 +119,41 @@ function Swipe(props) {
 
     if (++counter.current < restaurants.length) {
       setCurrent(restaurants[counter.current]);
+    } else {
+      setWaiting(true);
     }
   }
+
+  const toggleDot = (dot) => {
+    if (dot.current.style.visibility === "hidden") {
+      dot.current.style.visibility = "visible";
+    } else {
+      dot.current.style.visibility = "hidden";
+    }
+  }
+
+  // useEffect(() => {
+  //   while (waiting) {
+  //     setTimeout(() => {
+  //       toggleDot(d1);
+  //       toggleDot(d2);
+  //       toggleDot(d3);
+  //     }, 400);
+  //   }
+  // }, [waiting])
 
   return (
     <>
       <div className="content">
-        <div className="choices">
-          <button className="ex" onClick={() => sendDecision(0)}>&#x2715;</button>
-          <Option restaurant={currentRestaurant} />
-          <button className="check" onClick={() => sendDecision(1)}>&#x2713;</button>
-        </div>
+        {waiting ? <div className="title-text">
+            waiting for others<span ref={d1}>.</span><span ref={d2}>.</span><span ref={d3}>.</span>
+        </div> :
+          <div className="choices">
+            <button className="ex" onClick={() => sendDecision(0)}>&#x2715;</button>
+            <Option restaurant={currentRestaurant} />
+            <button className="check" onClick={() => sendDecision(1)}>&#x2713;</button>
+          </div>
+        }
       </div>
       <div className="exit-home">
         <Link to="/home">

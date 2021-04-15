@@ -26,12 +26,8 @@ function Host(props) {
     window.onbeforeunload = () => {
       return true;
     };
-    window.onunload = () => {
-      window.location.href = "/home";
-    };
     return () => {
       window.onbeforeunload = null;
-      window.onunload = null;
     }
   })
 
@@ -40,23 +36,22 @@ function Host(props) {
   const socket = useRef();
   const id = useRef();
 
-  socket.current = new WebSocket("ws://localhost:4567/socket")
+  socket.current = new WebSocket("ws://localhost:4567/socket");
+
+  const sendInfo = () => {
+    const message = {
+      id: id.current,
+      message: {
+        type: "update_user",
+        roomId: roomCode.current,
+        username: user
+      }
+    };
+    socket.current.send(JSON.stringify(message));
+  }
 
   useEffect(() => {
-
-    const sendInfo = () => {
-      const message = {
-        id: id.current,
-        message: {
-          type: "update_user",
-          roomId: roomCode.current,
-          username: user
-        }
-      };
-      socket.current.send(JSON.stringify(message));
-    }
     socket.current.onmessage = (msg) => {
-      //
       const data = JSON.parse(msg.data);
       switch (data.type) {
         case MESSAGE_TYPE.CONNECT:

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cabin&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Outlined');
 
 .App {
   text-align: center;
@@ -264,7 +265,7 @@ h1 {
 .check {
   width: 64px;
   height: 64px;
-  margin: 8px;
+  margin: 16px 32px;
   padding: 12px;
   background-color: #63D06195;
   border-radius: 50%;
@@ -285,7 +286,7 @@ h1 {
 .ex {
   width: 64px;
   height: 64px;
-  margin: 8px;
+  margin: 16px 32px;
   padding: 12px;
   background-color: #EB2D2D95;
   border-radius: 50%;
@@ -341,6 +342,7 @@ h1 {
 
 #final-choice {
   margin-top: 32px;
+  cursor: pointer;
 }
 
 @keyframes wobble-1 {

@@ -7,6 +7,7 @@ const SERVER_URL = 'http://localhost:4567';
 
 function Home() {
   const [roomCode, setCode] = useState(0);
+
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -16,10 +17,8 @@ function Home() {
 
   useEffect(() => {
     let code;
-    do {
-      code = Math.floor(1000 + Math.random() * 9000);
-    } while (exists(code));
-    setCode(code);
+    code = generateCode();
+    exists(code);
   }, []);
 
   const exists = (code) => {
@@ -36,7 +35,11 @@ function Home() {
 
     axios.post(`${SERVER_URL}/verifyCode`, toSend, config)
       .then((response) => {
-        return response.data['exists'];
+        if (!response.data['exists']) {
+          setCode(code);
+        } else {
+          exists(generateCode());
+        }
       })
 
       .catch(function (error) {
@@ -74,6 +77,10 @@ function Home() {
       </div>
     </>
   );
+}
+
+function generateCode() {
+  return Math.floor(1000 + Math.random() * 9000);
 }
 
 export default Home;
