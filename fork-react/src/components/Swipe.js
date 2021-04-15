@@ -17,6 +17,7 @@ function Swipe(props) {
   const socket = useRef(props.location.swipeProps.socket);
   const id = useRef(99);
   const roomId = useRef(9999);
+  const [waiting, setWaiting] = useState(false);
 
   const swipeProps = props.location.swipeProps;
   if (swipeProps) {
@@ -30,19 +31,19 @@ function Swipe(props) {
 
   // const { result } = useSwipeResults(roomId.current, user, socket.current);
 
-  useEffect(() => {
+  const sendInfo = () => {
+    const message = {
+      id: id.current,
+      message: {
+        type: "update_user",
+        roomId: roomId.current,
+        username: user
+      }
+    };
+    socket.current.send(JSON.stringify(message));
+  }
 
-    const sendInfo = () => {
-      const message = {
-        id: id.current,
-        message: {
-          type: "update_user",
-          roomId: roomId.current,
-          username: user
-        }
-      };
-      socket.current.send(JSON.stringify(message));
-    }
+  useEffect(() => {
     socket.current.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       console.log(data);
@@ -57,7 +58,6 @@ function Swipe(props) {
           break;
         case MESSAGE_TYPE.UPDATE:
           // check if we get a finished message then move to next page
-          console.log("herehhhhh")
           if (data.payload.type === "done") {
             props.history.push({
               pathname: `/result`,
@@ -81,7 +81,6 @@ function Swipe(props) {
   console.log(counter.current)
   if (counter.current >= restaurants.length - 1) {
     // send done message
-    console.log("dsfjsldjfkldsajfkskldj")
     const message = {
       id: id.current,
       message: {
@@ -91,7 +90,6 @@ function Swipe(props) {
       }
     };
     socket.current.send(JSON.stringify(message));
-
   }
 
 
@@ -111,17 +109,21 @@ function Swipe(props) {
 
     if (++counter.current < restaurants.length) {
       setCurrent(restaurants[counter.current]);
+    } else {
+      setWaiting(true);
     }
   }
 
   return (
     <>
       <div className="content">
-        <div className="choices">
-          <button className="ex" onClick={() => sendDecision(0)}>&#x2715;</button>
-          <Option restaurant={currentRestaurant} />
-          <button className="check" onClick={() => sendDecision(1)}>&#x2713;</button>
-        </div>
+        {waiting ? "waiting for others..." :
+          <div className="choices">
+            <button className="ex" onClick={() => sendDecision(0)}>&#x2715;</button>
+            <Option restaurant={currentRestaurant} />
+            <button className="check" onClick={() => sendDecision(1)}>&#x2713;</button>
+          </div>
+        }
       </div>
       <div className="exit-home">
         <Link to="/home">

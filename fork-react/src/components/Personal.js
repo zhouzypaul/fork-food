@@ -5,11 +5,12 @@ import {Link} from "react-router-dom";
 function Personal(props) {
   const user = useSelector(state => state.user);
   const dispatch = useDispatch();
+
   const exit = () => {
     dispatch(logout());
-    localStorage.clear();
     props.history.push('/');
   }
+
   return (
     <div className="content">
       <div className="title-text">profile</div>
