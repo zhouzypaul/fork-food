@@ -11,13 +11,12 @@ function Option(props) {
     }
     return ret;
   }
-  console.log(restaurant.star)
 
   return (
     <div className="restaurant">
       <div className="title-text">{restaurant.name}</div>
       <div className="rest-info">
-        <div><Stars number={restaurant.star}/> from {restaurant.numReviews} reviews</div>
+        <div><Stars number={restaurant.star} /> from {restaurant.numReviews} reviews</div>
         <div>{price(restaurant.priceRange)} &#8226; {restaurant.distance.toFixed(1)} mi</div>
         <div>{restaurant.foodType}</div>
       </div>

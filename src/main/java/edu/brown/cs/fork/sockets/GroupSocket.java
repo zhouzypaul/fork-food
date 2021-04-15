@@ -36,6 +36,7 @@ public class GroupSocket {
 
   @OnWebSocketConnect
   public void connected(Session session) throws IOException {
+    System.out.println("connected " + session.getRemoteAddress());
     // add session to the sessions queue
     sessions.add(session);
 
@@ -58,6 +59,7 @@ public class GroupSocket {
 
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
+    System.out.println("Socket closed" + session);
     sessions.remove(session);
   }
 
@@ -124,7 +126,6 @@ public class GroupSocket {
 
 //          userRestaurants.put(roomId, toBeSwiped);
 
-          System.out.println(Arrays.toString(recommendedRestaurants.toArray()));
           JsonObject restaurants = new JsonObject();
           restaurants.add("restaurants", GSON.toJsonTree(recommendedRestaurants));
 
@@ -173,12 +174,11 @@ public class GroupSocket {
 
       // send usernames of everyone in room
       String update = GSON.toJson(update_message);
-      session.getRemote().sendString(update);
 
-      System.out.println(update);
       for (Session sesh : rooms.get(roomId)) {
         sesh.getRemote().sendString(update); // sending to each session in room
       }
+
     } catch (JSONException e) {
       System.out.println("ERROR: invalid json" + e);
     }
