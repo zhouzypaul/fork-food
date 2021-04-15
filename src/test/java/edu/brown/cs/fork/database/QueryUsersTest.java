@@ -28,22 +28,6 @@ public class QueryUsersTest implements ITest {
   }
 
   @Test
-  public void testGetUserGottenWay() {
-    setUp();
-
-    try {
-      float gottenWay = this.db.getUserGottenWay("sean");
-      assertEquals(gottenWay, 0.8, 0.00001);
-      gottenWay = this.db.getUserGottenWay("paul");
-      assertEquals(gottenWay, 0.9, 0.00001);
-    } catch (SQLException | NoUserException e) {
-      fail();
-    }
-
-    tearDown();
-  }
-
-  @Test
   public void testUpdateUserGottenWay() {
     setUp();
 
