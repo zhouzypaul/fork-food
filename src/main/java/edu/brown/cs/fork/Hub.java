@@ -166,11 +166,13 @@ public class Hub {
    * is finished.
    *
    * @param userIds - a set of userIds
-   * @param votes - a maps from (restaurantId --> (userId --> whether like)), representing the
+   * @param votes - a maps from (restaurantId -- (userId -- whether like)), representing the
    *              swipe results each user had on each restaurant. An integer 1 corresponds to
    *              "like", and 0 corresponds to "not like"
    *
    * @return the top ranking restaurant id
+   * @throws NoUserException when the userId set is empty
+   * @throws SQLException when an SQL query goes wrong
    */
   public static String rankRestaurants(Set<String> userIds,
                                            Map<String, Map<String, Integer>> votes)
