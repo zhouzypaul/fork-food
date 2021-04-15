@@ -26,12 +26,8 @@ function Host(props) {
     window.onbeforeunload = () => {
       return true;
     };
-    window.onunload = () => {
-      window.location.href = "/home";
-    };
     return () => {
       window.onbeforeunload = null;
-      window.onunload = null;
     }
   })
 

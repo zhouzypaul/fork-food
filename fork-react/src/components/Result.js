@@ -1,9 +1,19 @@
 import TopBar from "./TopBar";
 import Stars from "./Stars";
+import {useEffect} from "react";
 
 function Result(props) {
   const rest = props.location.resultProps.result;
   console.log(rest)
+
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      return true;
+    };
+    return () => {
+      window.onbeforeunload = null;
+    }
+  })
 
   const price = (p) => {
     let ret = "";
