@@ -36,7 +36,7 @@ function Login(props) {
           localStorage.setItem('user', username);
           props.history.push('/home');
         } else {
-          setError("username or password is incorrect")
+          setError("username or password is incorrect");
         }
       })
       .catch(function (error) {

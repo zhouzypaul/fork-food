@@ -15,6 +15,7 @@ import NewUser from './components/NewUser';
 import Survey from './components/Survey';
 import Swipe from "./components/Swipe";
 import Result from "./components/Result";
+import About from "./components/About";
 import {useEffect} from "react";
 import {login} from "./actions";
 
@@ -33,10 +34,9 @@ function App() {
     <div className="App">
       <Router>
         <Route exact path="/" component={Start} />
+        <Route path="/about" component={About} />
         <Route path="/login" component={Login} />
         <Route path="/newUser" component={NewUser} />
-
-        {/* checking if user is logged in, should we consider using JWT or something else more secure? */}
         <Route path="/home" component={user !== "" ? Home : Start} />
         <Route path="/profile" component={user !== "" ? Profile : Start} />
         <Route path="/settings" component={user !== "" ? Settings : Start} />

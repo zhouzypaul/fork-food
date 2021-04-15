@@ -20,8 +20,6 @@ import edu.brown.cs.fork.handlers.users.HandlerGetUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPwd;
 import edu.brown.cs.fork.handlers.users.HandlerInsertUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerUpdateUserPref;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
 import com.google.gson.Gson;
 import spark.ExceptionHandler;
 import spark.Request;
@@ -42,28 +40,14 @@ public final class Main {
    * @param args An array of command line arguments
    */
   public static void main(String[] args) {
-    new Main(args).run();
+    new Main().run();
   }
-
-  private String[] args;
   private final Hub hub = new Hub();
 
-  private Main(String[] args) {
-    this.args = args;
-  }
+  private Main() {  }
 
   private void run() {
-    // Parse command line arguments
-    OptionParser parser = new OptionParser();
-    parser.accepts("gui");
-    parser.accepts("port").withRequiredArg().ofType(Integer.class)
-        .defaultsTo(DEFAULT_PORT);
-    OptionSet options = parser.parse(args);
-
-    if (options.has("gui")) {
-      runSparkServer((int) options.valueOf("port"));
-    }
-
+    runSparkServer(DEFAULT_PORT);
     hub.run();
   }
 

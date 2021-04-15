@@ -46,7 +46,7 @@ function Join(props) {
     <>
       <TopBar showOptions={true} to="/home" />
       <div className="content">
-        <Code change={setValues} />
+        <Code change={setValues} go={exists}/>
         <div className="join-error">
           {error}
         </div>

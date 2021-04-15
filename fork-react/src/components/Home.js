@@ -7,7 +7,6 @@ const SERVER_URL = 'http://localhost:4567';
 
 function Home() {
   const [roomCode, setCode] = useState(0);
-  // const roomCode = Math.floor(1000 + Math.random() * 9000);
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {

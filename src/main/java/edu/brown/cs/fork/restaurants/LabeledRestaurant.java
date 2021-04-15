@@ -3,6 +3,8 @@ package edu.brown.cs.fork.restaurants;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.recommendation.LabeledData;
 
+import java.util.Objects;
+
 /**
  * A restaurant with label of whether the restaurant is liked or not liked.
  * This Labeled Restaurant is used as training data for the recommendation package.
@@ -35,5 +37,28 @@ public class LabeledRestaurant implements LabeledData<Restaurant> {
   @Override
   public int getLabel() {
     return this.label;
+  }
+
+  @Override
+  public String toString() {
+    return new StringBuilder().append("LabeledRestaurant{").append("data=").append(data)
+        .append(", label=").append(label).append('}').toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    LabeledRestaurant that = (LabeledRestaurant) o;
+    return label == that.label && Objects.equals(data, that.data);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(data, label);
   }
 }

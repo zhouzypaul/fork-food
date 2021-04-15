@@ -3,7 +3,7 @@ package edu.brown.cs.fork.handlers.login;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
-import edu.brown.cs.fork.users.Person;
+import edu.brown.cs.fork.exceptions.NoUserException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import spark.Request;
@@ -39,14 +39,15 @@ public class LoginHandler implements Route {
 
       return GSON.toJson(variables);
 
-    } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException | SQLException e) {
+    } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException
+        | SQLException | NoUserException e) {
       System.out.println("ERROR: " + e); // replace with a good exception
     }
     return null;
   }
 
   private boolean authenticate(String username, String password) throws NoSuchAlgorithmException,
-      InvalidKeySpecException, SQLException {
+    InvalidKeySpecException, SQLException, NoUserException {
     // get stored password
     String storedHash =  Hub.getUserDB().getPwd(username);
 
