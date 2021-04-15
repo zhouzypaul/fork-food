@@ -21,7 +21,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class GroupSocket {
   private static final Gson GSON = new Gson();
   // TODO: use hashmap of session queues, can we even do this, i.e. send a message to the server on conncet?
-  private static final Queue<Session> sessions = new ConcurrentLinkedQueue<>();
   private static final Hashtable<Integer, Queue<Session>> rooms = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> userRooms = new Hashtable<>();
 //  private static final Hashtable<Integer, Hashtable<String, Set<String>>> userRestaurants = new Hashtable<>();
@@ -36,10 +35,6 @@ public class GroupSocket {
 
   @OnWebSocketConnect
   public void connected(Session session) throws IOException {
-    System.out.println("connected " + session.getRemoteAddress());
-    // add session to the sessions queue
-    sessions.add(session);
-
     // build CONNECT message
     JsonObject json = new JsonObject();
     json.addProperty("type", MESSAGE_TYPE.CONNECT.ordinal());
@@ -60,7 +55,7 @@ public class GroupSocket {
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
     System.out.println("Socket closed" + session);
-    sessions.remove(session);
+    // TODO: need to handle if user just dips
   }
 
   @OnWebSocketMessage
@@ -80,6 +75,9 @@ public class GroupSocket {
       payload.addProperty("senderId", messageObj.getInt("id"));
 
       System.out.println(type);
+
+      //boolean to keep track of if room can be cleared
+      boolean doneWithRoom = false;
 
       switch (type) {
         case "update_user":
@@ -108,29 +106,19 @@ public class GroupSocket {
           userDecisions.put(roomId, new LinkedList<>());
 
           List<Restaurant> recommendedRestaurants = new ArrayList<>();
-//          Set<String> resIds = new HashSet<>();
+
           try {
             recommendedRestaurants = Hub.recommendRestaurants(usernames, new double[]{lat, lon});
           } catch (Exception e) {
             System.out.println("ERROR: " + e);
           }
 
-//          for (Restaurant res : recommendedRestaurants) {
-//            resIds.add(res.getId());
-//          }
-//
-//          Hashtable<String, Set<String>> toBeSwiped = new Hashtable<>();
-//          for (String user : usernames) {
-//            toBeSwiped.put(user, resIds);
-//          }
-
-//          userRestaurants.put(roomId, toBeSwiped);
-
           JsonObject restaurants = new JsonObject();
           restaurants.add("restaurants", GSON.toJsonTree(recommendedRestaurants));
 
           payload.addProperty("type", "start");
           payload.add("senderMessage", restaurants);
+
           break;
 
         case "swipe":
@@ -148,7 +136,10 @@ public class GroupSocket {
           if (userRooms.get(roomId).isEmpty()) {
             // return a decision
             JsonObject result = new JsonObject();
+
             String commonRes = mostCommon(userDecisions.get(roomId));
+            userDecisions.remove(roomId);
+
             System.out.println("decision " + commonRes);
             Map<String, String> rest = new HashMap<>();
             try {
@@ -161,7 +152,8 @@ public class GroupSocket {
 
             payload.addProperty("type", "done");
             payload.add("senderMessage", result);
-            // TODO: will have to remove room at some point too
+
+            doneWithRoom = true;
           } else {
             return;
           }
@@ -177,6 +169,11 @@ public class GroupSocket {
 
       for (Session sesh : rooms.get(roomId)) {
         sesh.getRemote().sendString(update); // sending to each session in room
+      }
+
+      if (doneWithRoom) {
+        userRooms.remove(roomId);
+        rooms.remove(roomId);
       }
 
     } catch (JSONException e) {
