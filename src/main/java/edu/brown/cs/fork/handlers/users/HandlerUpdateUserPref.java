@@ -136,7 +136,7 @@ public class HandlerUpdateUserPref implements Route {
           for (int j = 0; j < priceRanges.size(); j++) {
             List<String> info = Arrays.asList(userId, "", matchFoodTypes(foodTypes.get(i)), "3.0",
                 matchPriceRanges(priceRanges.get(j)), distance, "1", "", "60", "");
-            success = Hub.getUserDB().insertUserPref(userId, colsToSet, info);
+            success = Hub.getUserDB().insertUserPref(colsToSet, info);
           }
         }
       }

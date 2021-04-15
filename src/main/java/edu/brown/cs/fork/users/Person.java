@@ -56,4 +56,11 @@ public class Person {
   public double getGottenWay() {
     return this.gottenWay;
   }
+
+  @Override
+  public String toString() {
+    return new StringBuilder().append("Person{").append("userId='").append(userId)
+        .append('\'').append(", preference=").append(preference).append(", gottenWay=")
+        .append(gottenWay).append('}').toString();
+  }
 }
