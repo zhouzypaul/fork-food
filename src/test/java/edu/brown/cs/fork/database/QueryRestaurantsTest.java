@@ -69,7 +69,7 @@ public class QueryRestaurantsTest implements ITest {
     try {
       List<Map<String, String>> results = this.db.queryRestByRad(1.0, 42.359335, -71.059709);
       assertEquals(results.size(), 576);
-      for (Map rest : results) {
+      for (Map<String, String> rest : results) {
         assertEquals(rest.get("state"), "MA");
       }
     } catch (SQLException e) {
