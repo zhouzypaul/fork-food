@@ -102,15 +102,15 @@ public class QueryUsers {
    * @throws SQLException SQLException
    * @throws NoUserException NoUserException
    */
-  public float getUserGottenWay(String userId)
+  public double getUserGottenWay(String userId)
       throws SQLException, NoUserException {
     String sql = "SELECT gottenWay FROM login WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
     prep.setString(1, userId);
-    float gottenWay = -1.0f;
+    double gottenWay = -1.0;
     ResultSet rs = prep.executeQuery();
     while (rs.next()) {
-      gottenWay = rs.getFloat(1);
+      gottenWay = rs.getDouble(1);
     }
     prep.close();
     rs.close();
@@ -127,10 +127,10 @@ public class QueryUsers {
    * @return whether the update is successful
    * @throws SQLException SQLException
    */
-  public boolean updateUserGottenWay(String userId, float gottenWay) throws SQLException {
+  public boolean updateUserGottenWay(String userId, double gottenWay) throws SQLException {
     String sql = "UPDATE login SET gottenWay = ? WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
-    prep.setFloat(1, gottenWay);
+    prep.setDouble(1, gottenWay);
     prep.setString(2, userId);
     int affectedRows = prep.executeUpdate();
     return (affectedRows == 1);
@@ -376,21 +376,44 @@ public class QueryUsers {
       String businessId = rs.getString(2);
       String name = rs.getString(3);
       String foodType = rs.getString(4);
-      double star = Double.parseDouble(rs.getString(5));
-      String priceRange = rs.getString(6);
 
-      // default priceRange is 1 if database field is empty
-      int intPriceRange = 1;
-      if (!priceRange.isEmpty()) {
-        intPriceRange = Integer.parseInt(priceRange);
+      // default star is 2.5 if database field is empty
+      String starString = rs.getString(5);
+      double star = Hub.DEFAULT_STAR;
+      if (!starString.isEmpty()) {
+        star = Double.parseDouble(starString);
       }
 
-      int numReviews = Integer.parseInt(rs.getString(SEVEN));
-      double distance = Double.parseDouble(rs.getString(EIGHT));
-      int label = Integer.parseInt(rs.getString(NINE));
+      // default priceRange is 1 if database field is empty
+      String priceRangeString = rs.getString(6);
+      int priceRange = Hub.DEFAULT_PRICE_RANGE;
+      if (!priceRangeString.isEmpty()) {
+        priceRange = Integer.parseInt(priceRangeString);
+      }
+
+      // default num reviews is 0 if the database field is empty
+      String numReviewsString = rs.getString(SEVEN);
+      int numReviews = Hub.DEFAULT_NUM_REVIEWS;
+      if (!numReviewsString.isEmpty()) {
+        numReviews = Integer.parseInt(numReviewsString);
+      }
+
+      // default distance is 10 if the database field is empty
+      String distanceString = rs.getString(EIGHT);
+      double distance = Hub.DEFAULT_DISTANCE;
+      if (!distanceString.isEmpty()) {
+        distance = Double.parseDouble(distanceString);
+      }
+
+      // default label is 1 if the database field is empty.
+      String labelString = rs.getString(NINE);
+      int label = Hub.DEFAULT_LABEL;
+      if (!labelString.isEmpty()) {
+        label = Integer.parseInt(labelString);
+      }
 
       Restaurant rest =
-          new Restaurant(businessId, name, foodType, star, numReviews, distance, intPriceRange);
+          new Restaurant(businessId, name, foodType, star, numReviews, distance, priceRange);
 
       LabeledRestaurant labeledRest = new LabeledRestaurant(rest, label);
       results.add(labeledRest);
