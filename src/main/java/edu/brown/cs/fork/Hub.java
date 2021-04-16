@@ -211,6 +211,8 @@ public class Hub {
               + (1 - votes.get(highestRankingRestaurant).get(userId))
               * (1 - GOTTEN_WAY_PRESERVE_RATIO);
       USER_DB.updateUserGottenWay(userId, newGottenWay);
+      // add most recent restaurants to users login table
+      USER_DB.updateMostRecentRests(userId, highestRankingRestaurant);
     }
     // return top restaurant
     return highestRankingRestaurant;
