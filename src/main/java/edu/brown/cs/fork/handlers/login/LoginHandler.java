@@ -26,24 +26,27 @@ public class LoginHandler implements Route {
   private static final Gson GSON = new Gson();
 
   @Override
-  public String handle(Request req, Response res) {
-    try {
-      JSONObject json = new JSONObject(req.body());
-      String username = json.getString("username");
-      String password = json.getString("password");
+  public String handle(Request req, Response res) throws JSONException {
+    JSONObject json = new JSONObject(req.body());
+    String username = json.getString("username");
+    String password = json.getString("password");
 
-      // validate password
-      boolean authenticated = authenticate(username, password);
-
-      Map<String, Object> variables = ImmutableMap.of("success", authenticated);
-
-      return GSON.toJson(variables);
-
-    } catch (JSONException | NoSuchAlgorithmException | InvalidKeySpecException
-        | SQLException | NoUserException e) {
-      System.out.println("ERROR: " + e); // replace with a good exception
+    String err = "";
+    boolean success = false;
+    if (!Hub.getRestDB().isConnected()) {
+      err = "ERROR: No database connected";
+    } else {
+      try {
+        success = authenticate(username, password);
+      } catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException
+          | NoUserException e) {
+        err = e.getMessage();
+        System.out.println(e.getMessage());
+      }
     }
-    return null;
+    Map<String, Object> variables = ImmutableMap.of("success", success, "err", err);
+
+    return GSON.toJson(variables);
   }
 
   private boolean authenticate(String username, String password) throws NoSuchAlgorithmException,

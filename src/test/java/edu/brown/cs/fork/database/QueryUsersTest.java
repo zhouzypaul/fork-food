@@ -232,25 +232,15 @@ public class QueryUsersTest implements ITest {
       assertEquals(recentRests.get(1), "abcde");
       assertEquals(recentRests.get(2), "54321");
 
-      // only keep 3 restaurants
-      success = this.db.updateMostRecentRests("stranger", "edcba");
-      assertTrue(success);
-
-      recentRests = this.db.getMostRecentRests("stranger");
-      assertEquals(recentRests.size(), 3);
-      assertEquals(recentRests.get(0), "abcde");
-      assertEquals(recentRests.get(1), "54321");
-      assertEquals(recentRests.get(2), "edcba");
-
       // unique recent restaurants
-      success = this.db.updateMostRecentRests("stranger", "54321");
+      success = this.db.updateMostRecentRests("stranger", "abcde");
       assertTrue(success);
 
       recentRests = this.db.getMostRecentRests("stranger");
       assertEquals(recentRests.size(), 3);
-      assertEquals(recentRests.get(0), "abcde");
-      assertEquals(recentRests.get(1), "54321");
-      assertEquals(recentRests.get(2), "edcba");
+      assertEquals(recentRests.get(0), "12345");
+      assertEquals(recentRests.get(1), "abcde");
+      assertEquals(recentRests.get(2), "54321");
 
       success = this.db.deleteUser("stranger");
       assertTrue(success);
