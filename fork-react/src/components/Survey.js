@@ -105,8 +105,6 @@ function Survey(props) {
   useEffect(() => {
     generateObjects(TYPES, selectedTypes);
     generateObjects(PRICES, priceRange);
-    // generateBoxes(selectedTypes.current, selectType, setTypes);
-    // generateBoxes(priceRange.current, selectPrice, setPrices);
     getPreferences();
   }, []);
 
@@ -162,8 +160,8 @@ function Survey(props) {
 
   return (
     <>
-      <TopBar to="/home" showOptions={false}/>
-      <div className="content">
+      <TopBar to="/home" showOptions={false} style={{backgroundColor: "#ffffff90"}}/>
+      <div className="content" id="survey-content">
         <div className="title-text">pick your favorites</div>
         <div className="survey">
           {types}

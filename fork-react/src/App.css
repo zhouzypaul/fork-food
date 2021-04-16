@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Cabin&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Outlined');
 
+.material-icons-outlined.md-48 {
+  font-size: 64px;
+}
+
 .App {
   text-align: center;
   display: flex;
@@ -67,6 +71,10 @@
   align-items: center;
 }
 
+#survey-content {
+  position: relative;
+}
+
 .profile {
   min-width: 80vw;
   display: flex;
@@ -131,7 +139,7 @@
 .options {
   display: flex;
   flex-direction: row;
-  min-width: 200px;
+  min-width: 150px;
   justify-content: space-between;
 }
 
@@ -142,6 +150,18 @@
   align-items: center;
 }
 
+.recent {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 12px;
+  border-radius: 8px;
+  border-style: solid;
+  border-color: gainsboro;
+}
+
 .map-text {
   margin: 0 8px;
 }
@@ -149,7 +169,7 @@
 .scroll-box {
   height: 90%;
   overflow-y: auto;
-  margin-bottom: 16px;
+  margin: 12px 0;
 }
 
 .fork-home {

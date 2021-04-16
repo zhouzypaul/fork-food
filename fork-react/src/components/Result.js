@@ -3,6 +3,9 @@ import Stars from "./Stars";
 import {useEffect} from "react";
 import {Link} from "react-router-dom";
 
+const GOOGLE = "https://www.google.com/search?q=";
+const MAP = "https://google.com/maps/search/";
+
 function Result(props) {
   const rest = props.location.resultProps.result;
   console.log(rest)
@@ -31,7 +34,7 @@ function Result(props) {
       <TopBar to="/home" showOptions={true}/>
       <div className="content">
         <div className="title-text">head to</div>
-        <a href={"https://www.google.com/search?q=" + searchParameter} target="_blank" className="links">
+        <a href={GOOGLE + searchParameter} target="_blank" rel="noreferrer" className="links">
           <div className="restaurant" id="final-choice">
             <div className="title-text">{rest.name}</div>
             <div><Stars number={rest.numStars}/> from {rest.numReviews} reviews</div>
@@ -39,7 +42,7 @@ function Result(props) {
           </div>
         </a>
         <br/>
-        <a href={"https://google.com/maps/search/" + searchParameter} target="_blank" className="links">
+        <a href={MAP + searchParameter} target="_blank" rel="noreferrer" className="links">
           <div className="location">
             <i className="material-icons-outlined">place</i> <div className="map-text">find on maps</div>
           </div>
