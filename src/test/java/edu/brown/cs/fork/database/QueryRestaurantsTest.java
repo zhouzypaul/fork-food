@@ -2,6 +2,7 @@ package edu.brown.cs.fork.database;
 
 import edu.brown.cs.fork.ITest;
 import edu.brown.cs.fork.database.queries.QueryRestaurants;
+import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.restaurants.Restaurant;
 import org.junit.Test;
@@ -44,18 +45,14 @@ public class QueryRestaurantsTest implements ITest {
     setUp();
 
     try {
-      List<Map<String, String>> result = this.db.queryRestByID("6iYb2HFDywm3zjuRg0shjw");
-      assertEquals(result.size(), 1);
-      Map<String, String> rest = result.get(0);
+      Map<String, String> rest = this.db.queryRestByID("6iYb2HFDywm3zjuRg0shjw");
       assertEquals(rest.get("name"), "Oskar Blues Taproom");
       assertEquals(rest.get("city"), "Boulder");
 
-      result = this.db.queryRestByID("HPA_qyMEddpAEtFof02ixg");
-      assertEquals(result.size(), 1);
-      rest = result.get(0);
+      rest = this.db.queryRestByID("HPA_qyMEddpAEtFof02ixg");
       assertEquals(rest.get("name"), "Mr G's Pizza & Subs");
       assertEquals(rest.get("numReviews"), "39");
-    } catch (SQLException throwables) {
+    } catch (SQLException | NoRestaurantException throwables) {
       fail();
     }
 

@@ -196,4 +196,67 @@ public class QueryUsersTest implements ITest {
 
     tearDown();
   }
+
+  @Test
+  public void testRecentRestaurants() {
+    setUp();
+
+    try {
+      boolean success = this.db.registerUser("stranger", "hi");
+      assertTrue(success);
+
+      List<String> recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 0);
+
+      success = this.db.updateMostRecentRests("stranger", "12345");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 1);
+      assertEquals(recentRests.get(0), "12345");
+
+      success = this.db.updateMostRecentRests("stranger", "abcde");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 2);
+      assertEquals(recentRests.get(0), "12345");
+      assertEquals(recentRests.get(1), "abcde");
+
+      success = this.db.updateMostRecentRests("stranger", "54321");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 3);
+      assertEquals(recentRests.get(0), "12345");
+      assertEquals(recentRests.get(1), "abcde");
+      assertEquals(recentRests.get(2), "54321");
+
+      success = this.db.updateMostRecentRests("stranger", "edcba");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 3);
+      assertEquals(recentRests.get(0), "abcde");
+      assertEquals(recentRests.get(1), "54321");
+      assertEquals(recentRests.get(2), "edcba");
+
+      success = this.db.deleteUser("stranger");
+      assertTrue(success);
+    } catch (SQLException | NoUserException e) {
+      System.out.println(e.getMessage());
+      fail();
+    }
+
+    Exception exception = assertThrows(NoUserException.class, () -> {
+      this.db.getMostRecentRests("stranger");
+    });
+
+    String expectedMessage = "User: stranger doesn't exist.";
+    String actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
+
+    tearDown();
+  }
 }

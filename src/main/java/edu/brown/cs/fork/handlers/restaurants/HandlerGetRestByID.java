@@ -3,6 +3,7 @@ package edu.brown.cs.fork.handlers.restaurants;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import spark.Request;
@@ -32,21 +33,13 @@ public class HandlerGetRestByID implements Route {
     String id = data.getString("id");
 
     String err = "";
-    List<Map<String, String>> rests = new ArrayList<>();
     Map<String, String> rest = new HashMap<>();
     if (!Hub.getRestDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
       try {
-        rests = Hub.getRestDB().queryRestByID(id);
-        if (rests.size() == 0) {
-          err = "ERROR: No restaurant with ID: " + id + " is found.";
-        } else if (rests.size() == 1) {
-          rest = rests.get(0);
-        } else {
-          err = "ERROR: Something is wrong, requested ID: " + id + " has duplicates.";
-        }
-      } catch (SQLException e) {
+        rest = Hub.getRestDB().queryRestByID(id);
+      } catch (SQLException | NoRestaurantException e) {
         err = e.getMessage();
         System.out.println(e.getMessage());
       }

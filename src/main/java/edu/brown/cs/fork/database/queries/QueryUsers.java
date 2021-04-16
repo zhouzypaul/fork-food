@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
 import edu.brown.cs.fork.database.DistanceCalculator;
+import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.exceptions.SQLErrorException;
@@ -314,7 +315,7 @@ public class QueryUsers {
     try {
       PreparedStatement prep = this.conn.prepareStatement(sql);
       for (int i = 0; i < restIDs.size(); i++) {
-        Map<String, String> rest = Hub.getRestDB().queryRestByID(restIDs.get(i)).get(0);
+        Map<String, String> rest = Hub.getRestDB().queryRestByID(restIDs.get(i));
         prep.setString(1, userId);
         prep.setString(2, rest.get("business_id"));
         prep.setString(4, rest.get("numStars"));
@@ -350,7 +351,8 @@ public class QueryUsers {
         }
       }
       return true;
-    } catch (SQLException | NullPointerException | IndexOutOfBoundsException e) {
+    } catch (SQLException | NullPointerException | IndexOutOfBoundsException
+        | NoRestaurantException e) {
       System.out.println("ERROR: " + e.getMessage());
       return false;
     }
@@ -436,17 +438,93 @@ public class QueryUsers {
   }
 
   /**
+   * Get a user's most recent top restaurants.
+   * @param userId user id
+   * @return a list of strings representing business ids
+   * @throws SQLException SQLException
+   * @throws NoUserException NoUserException
+   */
+  public List<String> getMostRecentRests(String userId)
+      throws SQLException, NoUserException {
+    List<String> results = new ArrayList<>();
+    String sql = "SELECT recentRests FROM login WHERE userId = ?;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, userId);
+    ResultSet rs = prep.executeQuery();
+    int count = 0;
+    while (rs.next()) {
+      count += 1;
+      String rests = rs.getString(1);
+
+      String pattern = "[^,\\s][^,]*[^,\\s]*";
+      Pattern r = Pattern.compile(pattern);
+      Matcher m = r.matcher(rests);
+      while (m.find()) {
+        String rest = Collections.singletonList(m.group()).get(0);
+        results.add(rest);
+      }
+    }
+    if (count == 0) {
+      throw new NoUserException("User: " + userId + " doesn't exist.");
+    }
+    prep.close();
+    rs.close();
+    return results;
+  }
+
+  /**
+   * Updates a user's most recent top restaurants.
+   * @param userId user id
+   * @param restId top restaurant's id
+   * @return a boolean representing whether the update action is successful
+   */
+  public boolean updateMostRecentRests(String userId, String restId) {
+    try {
+      List<String> recentRests = getMostRecentRests(userId);
+      if (recentRests.size() < 3) {
+        recentRests.add(restId);
+      } else if (recentRests.size() == 3) {
+        recentRests.remove(0);
+        recentRests.add(restId);
+      } else {
+        System.out.println("ERROR: Too many recent restaurants.");
+        return false;
+      }
+
+      StringBuilder allRecentRests = new StringBuilder();
+      for (int i = 0; i < recentRests.size(); i++) {
+        if (i == recentRests.size() - 1) {
+          allRecentRests.append(recentRests.get(i));
+        } else {
+          allRecentRests.append(recentRests.get(i)).append(", ");
+        }
+      }
+
+      String sql = "UPDATE login SET recentRests = ? WHERE userId = ?;";
+      PreparedStatement prep = this.conn.prepareStatement(sql);
+      prep.setString(1, allRecentRests.toString());
+      prep.setString(2, userId);
+      int affectedRows = prep.executeUpdate();
+      return affectedRows == 1;
+    } catch (SQLException | NoUserException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /**
    * Puts user login information in the database.
    * @param userId user id
    * @param pwd password (already encrypted with jwt)
    * @return true if registered successfully, false if otherwise
    */
   public boolean registerUser(String userId, String pwd) {
-    String sql = "INSERT INTO login VALUES (?, ?, 1);";
+    String sql = "INSERT INTO login VALUES (?, ?, 1, ?);";
     try {
       PreparedStatement prep = this.conn.prepareStatement(sql);
       prep.setString(1, userId);
       prep.setString(2, pwd);
+      prep.setString(3, "");
       prep.executeUpdate();
       return true;
     } catch (SQLException e) {
