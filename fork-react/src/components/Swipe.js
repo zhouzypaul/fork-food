@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import Option from "./Option";
-import Waiting from "./Waiting";
 import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 

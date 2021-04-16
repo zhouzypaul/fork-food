@@ -39,7 +39,9 @@ function Result(props) {
         </a>
         <br/>
         <a href={"https://google.com/maps/search/" + searchParameter} target="_blank" className="links">
-          <i className="material-icons-outlined">place</i> find on maps
+          <div className="location">
+            <i className="material-icons-outlined">place</i> <div className="map-text">find on maps</div>
+          </div>
         </a>
       </div>
     </>
