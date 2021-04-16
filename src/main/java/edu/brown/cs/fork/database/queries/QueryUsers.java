@@ -465,7 +465,7 @@ public class QueryUsers {
       }
     }
     if (count == 0) {
-      throw new NoUserException("User: " + userId + " doesn't exist.");
+      throw new NoUserException("User: " + userId + " doesn\'t exist.");
     }
     prep.close();
     rs.close();
@@ -481,14 +481,16 @@ public class QueryUsers {
   public boolean updateMostRecentRests(String userId, String restId) {
     try {
       List<String> recentRests = getMostRecentRests(userId);
-      if (recentRests.size() < 3) {
-        recentRests.add(restId);
-      } else if (recentRests.size() == 3) {
-        recentRests.remove(0);
-        recentRests.add(restId);
-      } else {
-        System.out.println("ERROR: Too many recent restaurants.");
-        return false;
+      if (!recentRests.contains(restId)) {
+        if (recentRests.size() < 3) {
+          recentRests.add(restId);
+        } else if (recentRests.size() == 3) {
+          recentRests.remove(0);
+          recentRests.add(restId);
+        } else {
+          System.out.println("ERROR: Too many recent restaurants.");
+          return false;
+        }
       }
 
       StringBuilder allRecentRests = new StringBuilder();
@@ -552,7 +554,7 @@ public class QueryUsers {
       result = rs.getString(1);
     }
     if (count == 0) {
-      throw new NoUserException("User: " + userId + " doesn't exist.");
+      throw new NoUserException("User: " + userId + " doesn\'t exist.");
     }
     prep.close();
     rs.close();
@@ -576,7 +578,7 @@ public class QueryUsers {
       prep.setString(2, userId);
       int affectedRows = prep.executeUpdate();
       if (affectedRows == 0) {
-        throw new NoUserException("User: " + userId + " does not exist.");
+        throw new NoUserException("User: " + userId + " doesn\'t exist.");
       }
       return true;
     } catch (SQLException e) {

@@ -3,6 +3,7 @@ package edu.brown.cs.fork.handlers.restaurants;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.exceptions.NoUserException;
 import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
@@ -37,7 +38,7 @@ public class HandlerGetMostRecentRests implements Route {
             rests.add(Hub.getRestDB().queryRestByID(id));
           }
         }
-      } catch (SQLException e) {
+      } catch (SQLException | NoUserException e) {
         err = e.getMessage();
         System.out.println(e.getMessage());
       }
