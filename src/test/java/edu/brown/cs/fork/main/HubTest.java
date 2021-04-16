@@ -60,7 +60,9 @@ public class HubTest implements ITest {
     sean.add("sean");
     try {
       List<Restaurant> rec = Hub.recommendRestaurants(paul, new double[]{42.359335, -71.059709});
+      System.out.println(rec.size());
       assertEquals(10, rec.size());
+      System.out.println(rec);
       assertEquals("X3NWJlQLB-X1xlfkYaE9tw", rec.get(0).getId());
       assertEquals("3qR_bkrNs69KxMf231MWcg", rec.get(1).getId());
       assertEquals("7jJZ91A-tkOghVOrj3aE6A", rec.get(2).getId());
