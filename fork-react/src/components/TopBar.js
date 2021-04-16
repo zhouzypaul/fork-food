@@ -17,8 +17,12 @@ function TopBar (props) {
         </Link>
       </span>
       <span className="options" ref={options}>
-        <Link className="links" to="/profile">profile</Link>
-        <Link className="links" to="/settings">settings</Link>
+        <Link className="links" to="/profile">
+          <i className="material-icons-outlined md-48">account_circle</i>
+        </Link>
+        <Link className="links" to="/settings">
+          <i className="material-icons-outlined md-48">settings</i>
+        </Link>
       </span>
     </div>
   );

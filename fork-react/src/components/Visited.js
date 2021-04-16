@@ -26,11 +26,12 @@ function Visited(props) {
           const rest = response.data["restaurants"];
           console.log(rest)
           const display = [];
+          let i = 0;
           rest.forEach((r) => {
-            const param = rest.name.replace(/\s/g, "+") + "+" + rest.city + "+" + rest.state;
-            display.push(<a href={GOOGLE + param} target="_blank" className="links" rel="noreferrer">
+            const param = r.name.replace(/\s/g, "+") + "+" + r.city + "+" + r.state;
+            display.push(<a href={GOOGLE + param} target="_blank" className="links" rel="noreferrer" key={i}>
                 <div className="recent">
-                  {r.name}
+                  <i className="material-icons-outlined">restaurant</i><div className="map-text">{r.name}</div>
                 </div>
               </a>);
           });
