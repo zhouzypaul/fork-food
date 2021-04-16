@@ -3,6 +3,7 @@ package edu.brown.cs.fork.database.queries;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
 import edu.brown.cs.fork.database.DistanceCalculator;
+import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.exceptions.SQLErrorException;
 import edu.brown.cs.fork.restaurants.Restaurant;
@@ -117,57 +118,21 @@ public class QueryRestaurants {
    * @param id id of restaurant of interest
    * @return restaurant with given id in a list
    * @throws SQLException SQLException
+   * @throws NoRestaurantException NoRestaurantException
    */
-  public List<Map<String, String>> queryRestByID(String id) throws SQLException {
+  public Map<String, String> queryRestByID(String id)
+      throws SQLException, NoRestaurantException {
+    Map<String, String> rest = new HashMap<>();
     String sql = selectRestaurants() + "WHERE res.business_id = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
     prep.setString(1, id);
-    return getRestaurantsWithPrep(prep);
+    try {
+      rest = getRestaurantsWithPrep(prep).get(0);
+    } catch (IndexOutOfBoundsException | NullPointerException e) {
+      throw new NoRestaurantException("Restaurant with id: " + "" + " can't be found.");
+    }
+    return rest;
   }
-
-//  public Restaurant getRestObjByID(String id, Double lat, Double lon)
-//      throws SQLException, OutOfRangeException {
-//    List<Map<String, String>> restsInBBox = queryRestByID(id);
-//    List<Restaurant> results = new ArrayList<>();
-//    for (Map<String, String> rest : restsInBBox) {
-//      String businessId = rest.get("business_id");
-//      String name = rest.get("name");
-//      double star = Double.parseDouble(rest.get("numStars"));
-//      int numReviews = Integer.parseInt(rest.get("numReviews"));
-//
-//      // default priceRange is 1 if database field is empty
-//      String priceRange = rest.get("priceRange");
-//      int intPriceRange = 1;
-//      if (!priceRange.isEmpty()) {
-//        intPriceRange = Integer.parseInt(priceRange);
-//      }
-//
-//      // calculate the distance between the restaurant and current user location
-//      double restLat = Double.parseDouble(rest.get("latitude"));
-//      double restLon = Double.parseDouble(rest.get("longitude"));
-//      List<Double> restCoor = Arrays.asList(restLat, restLon);
-//      List<Double> userCoor = Arrays.asList(lat, lon);
-//      DistanceCalculator calc = new DistanceCalculator();
-//      double dist = calc.getHaversineDistance(userCoor, restCoor, RAD);
-//
-//      // parse long categories string into individual categories of interest
-//      String categories = rest.get("categories");
-//      String pattern = "[^,\\s][^,]*[^,\\s]*";
-//      Pattern r = Pattern.compile(pattern);
-//      Matcher m = r.matcher(categories);
-//      while (m.find()) {
-//        // get an individual category
-//        String restCategory = Collections.singletonList(m.group()).get(0);
-//        // see if this is a category that a user can select in survey
-//        if (Hub.isInCategories(restCategory)) {
-//          results.add(
-//              new Restaurant(businessId, name, restCategory,
-//                star, numReviews, dist, intPriceRange));
-//        }
-//      }
-//    }
-//    return results.get(0);
-//  }
 
   /**
    * Converts miles to latitude, longitude degrees.

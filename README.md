@@ -88,6 +88,10 @@ load user path_to_custom_user_db
 
 - ```/getRestByRad``` body format: ```{“radius": rad, "lat": center_lat, "lon": center_lon}```, returns restaurants within the square bounding box with side length ```2*rad``` around the center coordinate.
 
+- ```/getMostRecentRests``` body format: ```{"username": user_id}```, returns user's 3 most recent top restaurants in newer to older order, return format: ```{"restaurants": [{"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}, {"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}], "err": err_msg}```
+
+- ```/updateMostRecentRests``` body format: ```{"username": user_id, "business_id": rest_id}```, adds restaurant to user's most recent top restaurants, return format: ```{"success": succ, "err": err_msg}``` 
+
 #### user
 
 - ```/getAllUserIds``` no required body, returns all ```userId```s.
