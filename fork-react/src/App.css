@@ -147,7 +147,7 @@
 }
 
 .scroll-box {
-  height: 20vh;
+  height: 90%;
   overflow-y: auto;
   margin-bottom: 16px;
 }

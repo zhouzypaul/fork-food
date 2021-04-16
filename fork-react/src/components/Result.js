@@ -1,6 +1,7 @@
 import TopBar from "./TopBar";
 import Stars from "./Stars";
 import {useEffect} from "react";
+import {Link} from "react-router-dom";
 
 function Result(props) {
   const rest = props.location.resultProps.result;
@@ -43,6 +44,10 @@ function Result(props) {
             <i className="material-icons-outlined">place</i> <div className="map-text">find on maps</div>
           </div>
         </a>
+        <br/>
+        <Link to="/home">
+          <button className="primary-button">home</button>
+        </Link>
       </div>
     </>
   );

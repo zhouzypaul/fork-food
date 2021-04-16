@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
-import {login} from "../actions";
 
 const SERVER_URL = 'http://localhost:4567';
 const GOOGLE = "https://www.google.com/search?q=";
@@ -25,6 +24,7 @@ function Visited(props) {
       .then((response) => {
         if (response.data['err'].length === 0) {
           const rest = response.data["restaurants"];
+          console.log(rest)
           const display = [];
           rest.forEach((r) => {
             const param = rest.name.replace(/\s/g, "+") + "+" + rest.city + "+" + rest.state;
@@ -50,9 +50,6 @@ function Visited(props) {
 
   return (
     <div className="content" id="visited-section">
-      <div className="title-text">favorites</div>
-      <div className="scroll-box">
-      </div>
       <div className="title-text">recent</div>
       <div className="scroll-box">
         {recent}
