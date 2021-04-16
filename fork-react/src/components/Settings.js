@@ -2,7 +2,7 @@ import TopBar from "./TopBar";
 import TextBox from "./TextBox";
 import {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {login, logout} from "../actions";
+import {logout} from "../actions";
 import axios from "axios";
 
 const SERVER_URL = 'http://localhost:4567';

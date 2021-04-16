@@ -5,7 +5,7 @@ const SERVER_URL = 'http://localhost:4567';
 const GOOGLE = "https://www.google.com/search?q=";
 
 function Visited(props) {
-  const [recent, setRecent] = useState();
+  const [recent, setRecent] = useState([]);
 
   const getRecent = () => {
     const toSend = {
@@ -28,7 +28,7 @@ function Visited(props) {
           const display = [];
           rest.forEach((r) => {
             const param = rest.name.replace(/\s/g, "+") + "+" + rest.city + "+" + rest.state;
-            display.push(<a href={GOOGLE + param} target="_blank" className="links">
+            display.push(<a href={GOOGLE + param} target="_blank" className="links" rel="noreferrer">
                 <div className="recent">
                   {r.name}
                 </div>

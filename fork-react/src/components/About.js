@@ -1,8 +1,6 @@
 import TopBar from "./TopBar";
-import {useEffect} from "react";
 
 function About() {
-
   return (
     <>
       <TopBar to="/" showOptions={false}/>
