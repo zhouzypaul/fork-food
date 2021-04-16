@@ -39,6 +39,7 @@ public class QueryUsers {
   private static final int NINE = 9;
   private static final int TEN = 10;
   private static final double RAD = 3958.8;
+  private static final int RECENTSIZE = 10;
 
   /**
    * Constructor.
@@ -482,9 +483,9 @@ public class QueryUsers {
     try {
       List<String> recentRests = getMostRecentRests(userId);
       if (!recentRests.contains(restId)) {
-        if (recentRests.size() < 3) {
+        if (recentRests.size() < RECENTSIZE) {
           recentRests.add(restId);
-        } else if (recentRests.size() == 3) {
+        } else if (recentRests.size() == RECENTSIZE) {
           recentRests.remove(0);
           recentRests.add(restId);
         } else {
