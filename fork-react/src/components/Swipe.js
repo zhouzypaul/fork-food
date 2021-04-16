@@ -70,14 +70,11 @@ function Swipe(props) {
   useEffect(() => {
     socket.current.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
-      console.log(data);
-      console.log(socket.current)
       switch (data.type) {
         case MESSAGE_TYPE.CONNECT:
           console.log("reached okay")
           // send a message with our username and room
           id.current = data.payload.id
-          console.log(data)
           // send a message with our username and room
           sendInfo()
           break;

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 
 import com.google.gson.JsonObject;
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.restaurants.Restaurant;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -15,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,12 +31,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @WebSocket
 public class GroupSocket {
   private static final Gson GSON = new Gson();
-  // TODO: use hashmap of session queues, can we even do this, i.e. send a message to the server on conncet?
+
   private static final Hashtable<Integer, Queue<Session>> ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USERROOMS = new Hashtable<>();
-  // private static final Hashtable<Integer, Hashtable<String, Set<String>>> userRestaurants
-  //    = new Hashtable<>();
-  private static final Hashtable<Integer, List<String>> USERDECISIONS = new Hashtable<>();
+  private static final Hashtable<Integer, HashSet<String>> USERROOMS2 = new Hashtable<>();
+  private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>> USERDECISIONS = new Hashtable<>();
   private static int nextId = 0;
 
   private enum MESSAGETYPE {
@@ -64,7 +65,7 @@ public class GroupSocket {
 
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
-    System.out.println("Socket closed" + session);
+    System.out.println("Socket closed");
     // TODO: need to handle if user just dips
   }
 
@@ -95,8 +96,10 @@ public class GroupSocket {
           if (ROOMS.get(roomId) == null) {
             ROOMS.put(roomId, new ConcurrentLinkedQueue<>());
             USERROOMS.put(roomId, new HashSet<>());
+            USERROOMS2.put(roomId, new HashSet<>());
           }
           USERROOMS.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
+          USERROOMS2.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
           ROOMS.get(roomId).add(session);
 
           JsonObject users = new JsonObject();
@@ -112,9 +115,6 @@ public class GroupSocket {
 
           Set<String> usernames = USERROOMS.get(roomId);
 
-
-          USERDECISIONS.put(roomId, new LinkedList<>());
-
           List<Restaurant> recommendedRestaurants = new ArrayList<>();
 
           try {
@@ -122,6 +122,17 @@ public class GroupSocket {
           } catch (Exception e) {
             System.out.println("ERROR: " + e);
           }
+
+          Hashtable<String, Hashtable<String, Integer>> restaurantVotes = new Hashtable<>();
+          for (Restaurant restaurant : recommendedRestaurants) {
+            Hashtable<String, Integer> userDecision = new Hashtable<>();
+            for (String user : usernames) {
+              userDecision.put(user, 0);
+            }
+            restaurantVotes.put(restaurant.getId(), userDecision);
+          }
+
+          USERDECISIONS.put(roomId, restaurantVotes);
 
           JsonObject restaurants = new JsonObject();
           restaurants.add("restaurants", GSON.toJsonTree(recommendedRestaurants));
@@ -135,9 +146,7 @@ public class GroupSocket {
           String user = messageObj.getJSONObject("message").getString("username");
           String resId = messageObj.getJSONObject("message").getString("resId");
           // add to the USERDECISIONS table
-          if (messageObj.getJSONObject("message").getInt("like") == 1) {
-            USERDECISIONS.get(roomId).add(resId);
-          }
+          USERDECISIONS.get(roomId).get(resId).replace(user, messageObj.getJSONObject("message").getInt("like"));
           return;
 
         case "done":
@@ -147,23 +156,28 @@ public class GroupSocket {
             // return a decision
             JsonObject result = new JsonObject();
 
-            String commonRes = mostCommon(USERDECISIONS.get(roomId));
-            USERDECISIONS.remove(roomId);
-
-            System.out.println("decision " + commonRes);
-            Map<String, String> rest = new HashMap<>();
             try {
-              rest = Hub.getRestDB().queryRestByID(commonRes);
-            } catch (Exception e) {
-              System.out.println("ERROR: " + e);
+              String commonRes = Hub.rankRestaurants(USERROOMS2.get(roomId), USERDECISIONS.get(roomId));
+              USERDECISIONS.remove(roomId);
+
+              System.out.println("decision " + commonRes);
+              Map<String, String> rest = new HashMap<>();
+              try {
+                rest = Hub.getRestDB().queryRestByID(commonRes);
+              } catch (Exception e) {
+                System.out.println("ERROR: " + e);
+              }
+
+              result.add("result", GSON.toJsonTree(rest));
+
+              payload.addProperty("type", "done");
+              payload.add("senderMessage", result);
+
+              doneWithRoom = true;
+            } catch (SQLException | NoUserException e) {
+              System.out.println("ERROR " + e);
+              return;
             }
-
-            result.add("result", GSON.toJsonTree(rest));
-
-            payload.addProperty("type", "done");
-            payload.add("senderMessage", result);
-
-            doneWithRoom = true;
           } else {
             return;
           }
@@ -174,7 +188,7 @@ public class GroupSocket {
       }
       updateMessage.add("payload", payload);
 
-      // send usernames of everyone in room
+      // send message to everyone in room
       String update = GSON.toJson(updateMessage);
 
       for (Session sesh : ROOMS.get(roomId)) {
@@ -183,6 +197,7 @@ public class GroupSocket {
 
       if (doneWithRoom) {
         USERROOMS.remove(roomId);
+        USERROOMS2.remove(roomId);
         ROOMS.remove(roomId);
       }
 
@@ -195,27 +210,6 @@ public class GroupSocket {
   public void throwError(Throwable error) {
     error.printStackTrace();
   }
-
-
-  public static <T> T mostCommon(List<T> list) {
-    Map<T, Integer> map = new HashMap<>();
-
-    for (T t : list) {
-      Integer val = map.get(t);
-      map.put(t, val == null ? 1 : val + 1);
-    }
-
-    Map.Entry<T, Integer> max = null;
-
-    for (Map.Entry<T, Integer> e : map.entrySet()) {
-      if (max == null || e.getValue() > max.getValue()) {
-        max = e;
-      }
-    }
-
-    return max.getKey();
-  }
-
 
   public static boolean roomExists(int code) {
     return USERROOMS.containsKey(code);

@@ -91,17 +91,17 @@ public class HubTest implements ITest {
     users.add("alan");
     users.add("ed");
     users.add("sean");
-    Map<String, Integer> denden = new HashMap<>();
+    Hashtable<String, Integer> denden = new Hashtable<>();
     denden.put("paul", 1);
     denden.put("alan", 0);
     denden.put("ed", 0);
     denden.put("sean", 1);
-    Map<String, Integer> kfc = new HashMap<>();
+    Hashtable<String, Integer> kfc = new Hashtable<>();
     kfc.put("paul", 0);
     kfc.put("ed", 1);
     kfc.put("alan", 1);
     kfc.put("sean", 1);
-    Map<String, Map<String, Integer>> votes = new HashMap<>();
+    Hashtable<String, Hashtable<String, Integer>> votes = new Hashtable<>();
     votes.put("denden", denden);
     votes.put("kfc", kfc);
     try {

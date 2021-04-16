@@ -12,13 +12,7 @@ import edu.brown.cs.fork.users.Group;
 import edu.brown.cs.fork.users.Person;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A singleton class containing REPL and databases.
@@ -175,7 +169,7 @@ public class Hub {
    * @throws SQLException when an SQL query goes wrong
    */
   public static String rankRestaurants(Set<String> userIds,
-                                           Map<String, Map<String, Integer>> votes)
+                                           Hashtable<String, Hashtable<String, Integer>> votes)
           throws NoUserException, SQLException {
     // handle invalid inputs
     if (userIds.size() <= 0 || votes.size() <= 0) {
