@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import Option from "./Option";
-import Waiting from "./Waiting";
 import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
@@ -11,10 +10,6 @@ const MESSAGE_TYPE = {
 };
 
 function Swipe(props) {
-  const d1 = useRef(null);
-  const d2 = useRef(null);
-  const d3 = useRef(null);
-
   const counter = useRef(0);
   const restaurants = props.location.swipeProps.restaurants;
   const socket = useRef(props.location.swipeProps.socket);
@@ -141,9 +136,13 @@ function Swipe(props) {
   return (
     <>
       <div className="content">
-        {waiting ? <div className="title-text">
-          waiting for others<span ref={d1}>.</span><span ref={d2}>.</span><span ref={d3}>.</span>
-        </div> :
+        {waiting ?
+          <div className="title-text">
+            waiting for others
+            <span className="d1">.</span>
+            <span className="d2">.</span>
+            <span className="d3">.</span>
+          </div> :
           <div className="choices">
             <button className="ex" onClick={() => sendDecision(0)}>&#x2715;</button>
             <Option restaurant={currentRestaurant} />

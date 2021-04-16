@@ -3,7 +3,6 @@ import {logout} from "../actions";
 import {Link} from "react-router-dom";
 
 function Personal(props) {
-  const user = useSelector(state => state.user);
   const dispatch = useDispatch();
 
   const exit = () => {
@@ -12,9 +11,9 @@ function Personal(props) {
   }
 
   return (
-    <div className="content">
+    <div className="content" id="profile-section">
       <div className="title-text">profile</div>
-      @{user}
+      @{props.user}
       <br/>
       <br/>
       <Link to="/survey">

@@ -72,7 +72,17 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  align-items: center;
+  align-items: flex-start;
+}
+
+#profile-section {
+  margin-top: 18px;
+  min-height: min-content;
+}
+
+#visited-section {
+  margin-top: 18px;
+  min-height: min-content;
 }
 
 .links {
@@ -125,8 +135,19 @@
   justify-content: space-between;
 }
 
+.location {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.map-text {
+  margin: 0 8px;
+}
+
 .scroll-box {
-  height: 20vh;
+  height: 90%;
   overflow-y: auto;
   margin-bottom: 16px;
 }
@@ -343,6 +364,29 @@ h1 {
 #final-choice {
   margin-top: 32px;
   cursor: pointer;
+}
+
+.d1 {
+  display: inline-block;
+  animation: jump 1.5s ease-in-out 0s infinite;
+}
+
+.d2 {
+  display: inline-block;
+  animation: jump 1.5s ease-in-out 100ms infinite;
+}
+
+.d3 {
+  display: inline-block;
+  animation: jump 1.5s ease-in-out 200ms infinite;
+}
+
+@keyframes jump {
+  0% {transform: translate(0)}
+  25% {transform: translateY(-6px)}
+  50% {transform: translateY(0)}
+  75% {transform: translateY(-3px)}
+  100% {transform: translateY(0)}
 }
 
 @keyframes wobble-1 {

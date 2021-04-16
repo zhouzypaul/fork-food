@@ -33,7 +33,6 @@ function Login(props) {
       .then((response) => {
         if (response.data["success"]) {
           dispatch(login(username));
-          localStorage.setItem('user', username);
           props.history.push('/home');
         } else {
           setError("username or password is incorrect");
