@@ -3,6 +3,7 @@ import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
 
 import Bubble from "./Bubble";
+import {Link} from "react-router-dom";
 
 const MESSAGE_TYPE = {
   CONNECT: 0,
@@ -119,6 +120,11 @@ function Host(props) {
             return (<Bubble user={user} key={i++} />)
           })}
         </div>
+      </div>
+      <div className="exit-home">
+        <Link to="/home" className="links">
+          <i className="material-icons-outlined md-48">exit_to_app</i>
+        </Link>
       </div>
     </>
   );
