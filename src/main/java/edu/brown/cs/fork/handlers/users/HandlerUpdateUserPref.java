@@ -118,7 +118,7 @@ public class HandlerUpdateUserPref implements Route {
         "priceRange", "distance", "label", "timestamp", "numReviews", "name");
 
     String err = "";
-    boolean success = true;
+    boolean success = false;
     if (!Hub.getUserDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
@@ -131,7 +131,6 @@ public class HandlerUpdateUserPref implements Route {
       if (!Hub.getUserDB().deleteUserPref(userId)) {
         err = "ERROR: Can't update user preference";
       } else {
-        System.out.println("after deleting row");
         for (int i = 0; i < foodTypes.size(); i++) {
           for (int j = 0; j < priceRanges.size(); j++) {
             List<String> info = Arrays.asList(userId, "", matchFoodTypes(foodTypes.get(i)), "3.0",

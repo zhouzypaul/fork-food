@@ -28,6 +28,20 @@ function Swipe(props) {
   const [currentRestaurant, setCurrent] = useState(restaurants[counter.current]);
 
   useEffect(() => {
+    if (counter.current >= restaurants.length) {
+      // send done message
+      console.log("done swiping");
+      const message = {
+        id: id.current,
+        message: {
+          type: "done",
+          username: user,
+          roomId: roomId.current
+        }
+      };
+      socket.current.send(JSON.stringify(message));
+    }
+
     window.onbeforeunload = () => {
       return true;
     };
@@ -52,6 +66,7 @@ function Swipe(props) {
     socket.current.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       console.log(data);
+      console.log(socket.current)
       switch (data.type) {
         case MESSAGE_TYPE.CONNECT:
           console.log("reached okay")
@@ -81,23 +96,7 @@ function Swipe(props) {
       }
     }
 
-  }, [])
-
-  console.log(counter.current)
-  if (counter.current >= restaurants.length - 1) {
-    // send done message
-    const message = {
-      id: id.current,
-      message: {
-        type: "done",
-        username: user,
-        roomId: roomId.current
-      }
-    };
-    socket.current.send(JSON.stringify(message));
-  }
-
-
+  }, [roomId])
 
   const sendDecision = (choice) => {
     const message = {

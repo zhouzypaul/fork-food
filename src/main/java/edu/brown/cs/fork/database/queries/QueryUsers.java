@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
 import edu.brown.cs.fork.database.DistanceCalculator;
+import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.exceptions.SQLErrorException;
@@ -102,15 +103,15 @@ public class QueryUsers {
    * @throws SQLException SQLException
    * @throws NoUserException NoUserException
    */
-  public float getUserGottenWay(String userId)
+  public double getUserGottenWay(String userId)
       throws SQLException, NoUserException {
     String sql = "SELECT gottenWay FROM login WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
     prep.setString(1, userId);
-    float gottenWay = -1.0f;
+    double gottenWay = -1.0;
     ResultSet rs = prep.executeQuery();
     while (rs.next()) {
-      gottenWay = rs.getFloat(1);
+      gottenWay = rs.getDouble(1);
     }
     prep.close();
     rs.close();
@@ -127,10 +128,10 @@ public class QueryUsers {
    * @return whether the update is successful
    * @throws SQLException SQLException
    */
-  public boolean updateUserGottenWay(String userId, float gottenWay) throws SQLException {
+  public boolean updateUserGottenWay(String userId, double gottenWay) throws SQLException {
     String sql = "UPDATE login SET gottenWay = ? WHERE userId = ?;";
     PreparedStatement prep = this.conn.prepareStatement(sql);
-    prep.setFloat(1, gottenWay);
+    prep.setDouble(1, gottenWay);
     prep.setString(2, userId);
     int affectedRows = prep.executeUpdate();
     return (affectedRows == 1);
@@ -314,7 +315,7 @@ public class QueryUsers {
     try {
       PreparedStatement prep = this.conn.prepareStatement(sql);
       for (int i = 0; i < restIDs.size(); i++) {
-        Map<String, String> rest = Hub.getRestDB().queryRestByID(restIDs.get(i)).get(0);
+        Map<String, String> rest = Hub.getRestDB().queryRestByID(restIDs.get(i));
         prep.setString(1, userId);
         prep.setString(2, rest.get("business_id"));
         prep.setString(4, rest.get("numStars"));
@@ -350,7 +351,8 @@ public class QueryUsers {
         }
       }
       return true;
-    } catch (SQLException | NullPointerException | IndexOutOfBoundsException e) {
+    } catch (SQLException | NullPointerException | IndexOutOfBoundsException
+        | NoRestaurantException e) {
       System.out.println("ERROR: " + e.getMessage());
       return false;
     }
@@ -376,21 +378,44 @@ public class QueryUsers {
       String businessId = rs.getString(2);
       String name = rs.getString(3);
       String foodType = rs.getString(4);
-      double star = Double.parseDouble(rs.getString(5));
-      String priceRange = rs.getString(6);
 
-      // default priceRange is 1 if database field is empty
-      int intPriceRange = 1;
-      if (!priceRange.isEmpty()) {
-        intPriceRange = Integer.parseInt(priceRange);
+      // default star is 2.5 if database field is empty
+      String starString = rs.getString(5);
+      double star = Hub.DEFAULT_STAR;
+      if (!starString.isEmpty()) {
+        star = Double.parseDouble(starString);
       }
 
-      int numReviews = Integer.parseInt(rs.getString(SEVEN));
-      double distance = Double.parseDouble(rs.getString(EIGHT));
-      int label = Integer.parseInt(rs.getString(NINE));
+      // default priceRange is 1 if database field is empty
+      String priceRangeString = rs.getString(6);
+      int priceRange = Hub.DEFAULT_PRICE_RANGE;
+      if (!priceRangeString.isEmpty()) {
+        priceRange = Integer.parseInt(priceRangeString);
+      }
+
+      // default num reviews is 0 if the database field is empty
+      String numReviewsString = rs.getString(SEVEN);
+      int numReviews = Hub.DEFAULT_NUM_REVIEWS;
+      if (!numReviewsString.isEmpty()) {
+        numReviews = Integer.parseInt(numReviewsString);
+      }
+
+      // default distance is 10 if the database field is empty
+      String distanceString = rs.getString(EIGHT);
+      double distance = Hub.DEFAULT_DISTANCE;
+      if (!distanceString.isEmpty()) {
+        distance = Double.parseDouble(distanceString);
+      }
+
+      // default label is 1 if the database field is empty.
+      String labelString = rs.getString(NINE);
+      int label = Hub.DEFAULT_LABEL;
+      if (!labelString.isEmpty()) {
+        label = Integer.parseInt(labelString);
+      }
 
       Restaurant rest =
-          new Restaurant(businessId, name, foodType, star, numReviews, distance, intPriceRange);
+          new Restaurant(businessId, name, foodType, star, numReviews, distance, priceRange);
 
       LabeledRestaurant labeledRest = new LabeledRestaurant(rest, label);
       results.add(labeledRest);
@@ -413,17 +438,95 @@ public class QueryUsers {
   }
 
   /**
+   * Get a user's most recent top restaurants.
+   * @param userId user id
+   * @return a list of strings representing business ids
+   * @throws SQLException SQLException
+   * @throws NoUserException NoUserException
+   */
+  public List<String> getMostRecentRests(String userId)
+      throws SQLException, NoUserException {
+    List<String> results = new ArrayList<>();
+    String sql = "SELECT recentRests FROM login WHERE userId = ?;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, userId);
+    ResultSet rs = prep.executeQuery();
+    int count = 0;
+    while (rs.next()) {
+      count += 1;
+      String rests = rs.getString(1);
+
+      String pattern = "[^,\\s][^,]*[^,\\s]*";
+      Pattern r = Pattern.compile(pattern);
+      Matcher m = r.matcher(rests);
+      while (m.find()) {
+        String rest = Collections.singletonList(m.group()).get(0);
+        results.add(rest);
+      }
+    }
+    if (count == 0) {
+      throw new NoUserException("User: " + userId + " doesn\'t exist.");
+    }
+    prep.close();
+    rs.close();
+    return results;
+  }
+
+  /**
+   * Updates a user's most recent top restaurants.
+   * @param userId user id
+   * @param restId top restaurant's id
+   * @return a boolean representing whether the update action is successful
+   */
+  public boolean updateMostRecentRests(String userId, String restId) {
+    try {
+      List<String> recentRests = getMostRecentRests(userId);
+      if (!recentRests.contains(restId)) {
+        if (recentRests.size() < 3) {
+          recentRests.add(restId);
+        } else if (recentRests.size() == 3) {
+          recentRests.remove(0);
+          recentRests.add(restId);
+        } else {
+          System.out.println("ERROR: Too many recent restaurants.");
+          return false;
+        }
+      }
+
+      StringBuilder allRecentRests = new StringBuilder();
+      for (int i = 0; i < recentRests.size(); i++) {
+        if (i == recentRests.size() - 1) {
+          allRecentRests.append(recentRests.get(i));
+        } else {
+          allRecentRests.append(recentRests.get(i)).append(", ");
+        }
+      }
+
+      String sql = "UPDATE login SET recentRests = ? WHERE userId = ?;";
+      PreparedStatement prep = this.conn.prepareStatement(sql);
+      prep.setString(1, allRecentRests.toString());
+      prep.setString(2, userId);
+      int affectedRows = prep.executeUpdate();
+      return affectedRows == 1;
+    } catch (SQLException | NoUserException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /**
    * Puts user login information in the database.
    * @param userId user id
    * @param pwd password (already encrypted with jwt)
    * @return true if registered successfully, false if otherwise
    */
   public boolean registerUser(String userId, String pwd) {
-    String sql = "INSERT INTO login VALUES (?, ?, 1);";
+    String sql = "INSERT INTO login VALUES (?, ?, 1, ?);";
     try {
       PreparedStatement prep = this.conn.prepareStatement(sql);
       prep.setString(1, userId);
       prep.setString(2, pwd);
+      prep.setString(3, "");
       prep.executeUpdate();
       return true;
     } catch (SQLException e) {
@@ -451,7 +554,7 @@ public class QueryUsers {
       result = rs.getString(1);
     }
     if (count == 0) {
-      throw new NoUserException("User: " + userId + " doesn't exist.");
+      throw new NoUserException("User: " + userId + " doesn\'t exist.");
     }
     prep.close();
     rs.close();
@@ -475,7 +578,7 @@ public class QueryUsers {
       prep.setString(2, userId);
       int affectedRows = prep.executeUpdate();
       if (affectedRows == 0) {
-        throw new NoUserException("User: " + userId + " does not exist.");
+        throw new NoUserException("User: " + userId + " doesn\'t exist.");
       }
       return true;
     } catch (SQLException e) {

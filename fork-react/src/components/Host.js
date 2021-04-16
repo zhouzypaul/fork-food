@@ -1,6 +1,6 @@
-import {useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import TopBar from "./TopBar";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 
 import Bubble from "./Bubble";
 
@@ -36,28 +36,15 @@ function Host(props) {
   const socket = useRef();
   const id = useRef();
 
-  socket.current = new WebSocket("ws://localhost:4567/socket");
-
-  const sendInfo = () => {
-    const message = {
-      id: id.current,
-      message: {
-        type: "update_user",
-        roomId: roomCode.current,
-        username: user
-      }
-    };
-    socket.current.send(JSON.stringify(message));
-  }
-
   useEffect(() => {
+    socket.current = new WebSocket("ws://localhost:4567/socket");
     socket.current.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       switch (data.type) {
         case MESSAGE_TYPE.CONNECT:
           id.current = data.payload.id
-          console.log(data)
           // send a message with our username and room
+          console.log("connected")
           sendInfo()
           break;
         case MESSAGE_TYPE.UPDATE:
@@ -90,9 +77,19 @@ function Host(props) {
       console.log("socket closed");
     }
 
-  }, [user])
+  }, [])
 
-
+  const sendInfo = () => {
+    const message = {
+      id: id.current,
+      message: {
+        type: "update_user",
+        roomId: roomCode.current,
+        username: user
+      }
+    };
+    socket.current.send(JSON.stringify(message));
+  }
 
   const startSwiping = () => {
     const message = {
@@ -119,7 +116,7 @@ function Host(props) {
         {host.current ? <button className="primary-button" onClick={startSwiping}>start</button> : <></>}
         <div className="joined">
           {users.map((user) => {
-            return (<Bubble user={user} key={i++}/>)
+            return (<Bubble user={user} key={i++} />)
           })}
         </div>
       </div>

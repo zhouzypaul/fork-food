@@ -28,39 +28,23 @@ public class QueryUsersTest implements ITest {
   }
 
   @Test
-  public void testGetUserGottenWay() {
-    setUp();
-
-    try {
-      float gottenWay = this.db.getUserGottenWay("sean");
-      assertEquals(gottenWay, 0.8, 0.00001);
-      gottenWay = this.db.getUserGottenWay("paul");
-      assertEquals(gottenWay, 0.9, 0.00001);
-    } catch (SQLException | NoUserException e) {
-      fail();
-    }
-
-    tearDown();
-  }
-
-  @Test
   public void testUpdateUserGottenWay() {
     setUp();
 
     try {
-      boolean success = this.db.updateUserGottenWay("ed", 0.2f);
+      boolean success = this.db.updateUserGottenWay("ed", 0.2);
       assertTrue(success);
-      float gottenWay = this.db.getUserGottenWay("ed");
+      double gottenWay = this.db.getUserGottenWay("ed");
       assertEquals(gottenWay, 0.2, 0.00001);
-      success = this.db.updateUserGottenWay("ed", 0.3f);
+      success = this.db.updateUserGottenWay("ed", 0.3);
       assertTrue(success);
       gottenWay = this.db.getUserGottenWay("ed");
       assertEquals(gottenWay, 0.3, 0.00001);
-      success = this.db.updateUserGottenWay("alan", 0.65f);
+      success = this.db.updateUserGottenWay("alan", 0.65);
       assertTrue(success);
       gottenWay = this.db.getUserGottenWay("alan");
       assertEquals(gottenWay, 0.65, 0.00001);
-      success = this.db.updateUserGottenWay("alan", 0.11f);
+      success = this.db.updateUserGottenWay("alan", 0.11);
       assertTrue(success);
       gottenWay = this.db.getUserGottenWay("alan");
       assertEquals(gottenWay, 0.11, 0.00001);
@@ -203,6 +187,80 @@ public class QueryUsersTest implements ITest {
 
     Exception exception = assertThrows(NoUserException.class, () -> {
       this.db.getPwd("stranger");
+    });
+
+    String expectedMessage = "User: stranger doesn't exist.";
+    String actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
+
+    tearDown();
+  }
+
+  @Test
+  public void testRecentRestaurants() {
+    setUp();
+
+    try {
+      boolean success = this.db.registerUser("stranger", "hi");
+      assertTrue(success);
+
+      List<String> recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 0);
+
+      success = this.db.updateMostRecentRests("stranger", "12345");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 1);
+      assertEquals(recentRests.get(0), "12345");
+
+      success = this.db.updateMostRecentRests("stranger", "abcde");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 2);
+      assertEquals(recentRests.get(0), "12345");
+      assertEquals(recentRests.get(1), "abcde");
+
+      success = this.db.updateMostRecentRests("stranger", "54321");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 3);
+      assertEquals(recentRests.get(0), "12345");
+      assertEquals(recentRests.get(1), "abcde");
+      assertEquals(recentRests.get(2), "54321");
+
+      // only keep 3 restaurants
+      success = this.db.updateMostRecentRests("stranger", "edcba");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 3);
+      assertEquals(recentRests.get(0), "abcde");
+      assertEquals(recentRests.get(1), "54321");
+      assertEquals(recentRests.get(2), "edcba");
+
+      // unique recent restaurants
+      success = this.db.updateMostRecentRests("stranger", "54321");
+      assertTrue(success);
+
+      recentRests = this.db.getMostRecentRests("stranger");
+      assertEquals(recentRests.size(), 3);
+      assertEquals(recentRests.get(0), "abcde");
+      assertEquals(recentRests.get(1), "54321");
+      assertEquals(recentRests.get(2), "edcba");
+
+      success = this.db.deleteUser("stranger");
+      assertTrue(success);
+    } catch (SQLException | NoUserException e) {
+      System.out.println(e.getMessage());
+      fail();
+    }
+
+    Exception exception = assertThrows(NoUserException.class, () -> {
+      this.db.getMostRecentRests("stranger");
     });
 
     String expectedMessage = "User: stranger doesn't exist.";
