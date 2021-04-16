@@ -55,6 +55,7 @@ function Visited(props) {
       </div>
       <div className="title-text">recent</div>
       <div className="scroll-box">
+        {recent}
       </div>
     </div>
   );
