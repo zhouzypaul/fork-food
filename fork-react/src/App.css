@@ -234,11 +234,15 @@
 .exit-home {
   position: fixed;
   bottom: 0;
-  right: 0;
-  margin: 16px;
+  left: 0;
+  margin: 24px 40px;
+  transform: rotate(180deg);
 }
 
-#about {
+.about {
+  position: fixed;
+  bottom: 0;
+  right: 0;
   margin: 24px 40px;
 }
 

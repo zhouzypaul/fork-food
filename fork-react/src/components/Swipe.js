@@ -151,10 +151,8 @@ function Swipe(props) {
         }
       </div>
       <div className="exit-home">
-        <Link to="/home">
-          <button className="secondary-button">
-            leave
-          </button>
+        <Link to="/home" className="links">
+          <i className="material-icons-outlined md-48">exit_to_app</i>
         </Link>
       </div>
     </>

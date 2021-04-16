@@ -59,7 +59,7 @@ function Start() {
         </svg>
       </div>
       <Link className="links" to="/about">
-        <div className="exit-home" id="about">
+        <div className="about">
           about
         </div>
       </Link>
