@@ -28,11 +28,13 @@ public class HandlerGetMostRecentRests implements Route {
 
     String err = "";
     List<Map<String, String>> rests = new ArrayList<>();
+    List<String> timestamps = new ArrayList<>();
     if (!Hub.getRestDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
       try {
         List<String> restIds = Hub.getUserDB().getMostRecentRests(userId);
+        timestamps = Hub.getUserDB().getMostRecentTimes(userId);
         if (!restIds.isEmpty()) {
           for (String id : restIds) {
             rests.add(Hub.getRestDB().queryRestByID(id));
@@ -46,7 +48,12 @@ public class HandlerGetMostRecentRests implements Route {
 
     // most recent restaurants are reversed so order is newest -> oldest
     Collections.reverse(rests);
-    Map<String, Object> variables = ImmutableMap.of("restaurants", rests, "err", err);
+    Collections.reverse(timestamps);
+    if (rests.size() != timestamps.size()) {
+      err = "ERROR: Restaurants and Timestamps do not match.";
+    }
+    Map<String, Object> variables = ImmutableMap.of("restaurants", rests,
+        "timestamps", timestamps, "err", err);
 
     return GSON.toJson(variables);
   }

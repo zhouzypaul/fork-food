@@ -32,7 +32,12 @@ public class HandlerDeleteMostRecentRest implements Route {
     if (!Hub.getRestDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
-      success = Hub.getUserDB().deleteRecentRest(userId, restId);
+      int idx = Hub.getUserDB().deleteRecentRest(userId, restId);
+      if (idx == -1) {
+        err = "ERROR: Can't delete recent restaurant.";
+      } else {
+        success = Hub.getUserDB().deleteRecentTime(userId, idx);
+      }
     }
 
     Map<String, Object> variables = ImmutableMap.of("success", success, "err", err);

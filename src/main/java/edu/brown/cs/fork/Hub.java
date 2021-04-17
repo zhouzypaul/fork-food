@@ -12,7 +12,16 @@ import edu.brown.cs.fork.users.Group;
 import edu.brown.cs.fork.users.Person;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A singleton class containing REPL and databases.
@@ -32,6 +41,8 @@ public class Hub {
   public static final double DEFAULT_DISTANCE = 10;
   public static final int DEFAULT_NUM_REVIEWS = 0;
   public static final int DEFAULT_LABEL = 1;
+
+  private static final SimpleDateFormat SDF = new SimpleDateFormat("MM/dd/yyyy");
 
   // Food categories
   private static final List<String> CATEGORIES = Arrays.asList(
@@ -207,6 +218,9 @@ public class Hub {
       USER_DB.updateUserGottenWay(userId, newGottenWay);
       // add most recent restaurants to users login table
       USER_DB.updateMostRecentRests(userId, highestRankingRestaurant);
+      // add the corresponding timestamp to users login table
+      Date date = new Date();
+      USER_DB.updateMostRecentTimes(userId, SDF.format(date));
     }
     // return top restaurant
     return highestRankingRestaurant;

@@ -545,16 +545,14 @@ public class QueryUsers {
   public boolean updateMostRecentTimes(String userId, String timestamp) {
     try {
       List<String> recentTimes = getMostRecentTimes(userId);
-      if (!recentTimes.contains(timestamp)) {
-        if (recentTimes.size() < RECENTSIZE) {
-          recentTimes.add(timestamp);
-        } else if (recentTimes.size() == RECENTSIZE) {
-          recentTimes.remove(0);
-          recentTimes.add(timestamp);
-        } else {
-          System.out.println("ERROR: Too many recent restaurants.");
-          return false;
-        }
+      if (recentTimes.size() < RECENTSIZE) {
+        recentTimes.add(timestamp);
+      } else if (recentTimes.size() == RECENTSIZE) {
+        recentTimes.remove(0);
+        recentTimes.add(timestamp);
+      } else {
+        System.out.println("ERROR: Too many recent restaurants.");
+        return false;
       }
 
       return setRecentTimestamps(userId, recentTimes);
@@ -568,9 +566,9 @@ public class QueryUsers {
    * Deletes a specific recent restaurant id.
    * @param userId user id
    * @param restId rest id to delete
-   * @return whether the update is successful
+   * @return the restaurant id, -1 if unsuccessful
    */
-  public boolean deleteRecentRest(String userId, String restId)
+  public int deleteRecentRest(String userId, String restId)
       throws NoRestaurantException {
     try {
       List<String> recentRests = getMostRecentRests(userId);
@@ -578,29 +576,35 @@ public class QueryUsers {
         throw new NoRestaurantException("Restaurant with id: " + restId
             + " is not one of " + userId + "'s most recent restaurants.");
       }
+      int restIdx = recentRests.indexOf(restId);
       recentRests.remove(restId);
-      return setRecentRests(userId, recentRests);
+      boolean success = setRecentRests(userId, recentRests);
+      if (success) {
+        return restIdx;
+      } else {
+        return -1;
+      }
     } catch (SQLException | NoUserException e) {
       System.out.println("ERROR: " + e.getMessage());
-      return false;
+      return -1;
     }
   }
 
   /**
    * Deletes a specific recent restaurant's timestamp.
    * @param userId user id
-   * @param timestamp restaurant timestamp to delete
+   * @param idx index of restaurant timestamp to delete
    * @return whether the update is successful
    */
-  public boolean deleteRecentTime(String userId, String timestamp)
+  public boolean deleteRecentTime(String userId, int idx)
     throws NoRestaurantException {
     try {
       List<String> recentTimes = getMostRecentTimes(userId);
-      if (!recentTimes.contains(timestamp)) {
-        throw new NoRestaurantException("Timestamp: " + timestamp
-          + " is not one of " + userId + "'s most recent restaurants.");
+      if (idx >= recentTimes.size()) {
+        throw new NoRestaurantException("Timestamp at: " + idx
+          + " is not one of " + userId + "'s most recent timestamps.");
       }
-      recentTimes.remove(timestamp);
+      recentTimes.remove(idx);
       return setRecentTimestamps(userId, recentTimes);
     } catch (SQLException | NoUserException e) {
       System.out.println("ERROR: " + e.getMessage());

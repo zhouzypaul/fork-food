@@ -244,7 +244,7 @@ public class QueryUsersTest implements ITest {
       assertEquals(recentRests.get(2), "54321");
 
       // delete a recent restaurant
-      success = this.db.deleteRecentRest("stranger", "abcde");
+      success = this.db.deleteRecentRest("stranger", "abcde") != -1;
       assertTrue(success);
 
       recentRests = this.db.getMostRecentRests("stranger");
@@ -306,24 +306,26 @@ public class QueryUsersTest implements ITest {
       assertEquals(recentTimes.get(1), "3/1/2021");
       assertEquals(recentTimes.get(2), "4/1/2021");
 
-      // unique recent restaurants
+      // non-unique timestamps
       success = this.db.updateMostRecentTimes("stranger", "3/1/2021");
+      assertTrue(success);
+
+      recentTimes = this.db.getMostRecentTimes("stranger");
+      assertEquals(recentTimes.size(), 4);
+      assertEquals(recentTimes.get(0), "2/1/2021");
+      assertEquals(recentTimes.get(1), "3/1/2021");
+      assertEquals(recentTimes.get(2), "4/1/2021");
+      assertEquals(recentTimes.get(3), "3/1/2021");
+
+      // delete a recent restaurant
+      success = this.db.deleteRecentTime("stranger", 1);
       assertTrue(success);
 
       recentTimes = this.db.getMostRecentTimes("stranger");
       assertEquals(recentTimes.size(), 3);
       assertEquals(recentTimes.get(0), "2/1/2021");
-      assertEquals(recentTimes.get(1), "3/1/2021");
-      assertEquals(recentTimes.get(2), "4/1/2021");
-
-      // delete a recent restaurant
-      success = this.db.deleteRecentTime("stranger", "3/1/2021");
-      assertTrue(success);
-
-      recentTimes = this.db.getMostRecentTimes("stranger");
-      assertEquals(recentTimes.size(), 2);
-      assertEquals(recentTimes.get(0), "2/1/2021");
       assertEquals(recentTimes.get(1), "4/1/2021");
+      assertEquals(recentTimes.get(2), "3/1/2021");
 
       success = this.db.deleteUser("stranger");
       assertTrue(success);

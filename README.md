@@ -90,7 +90,7 @@ load user path_to_custom_user_db
 
 - ```/getMostRecentRests``` body format: ```{"username": user_id}```, returns user's 3 most recent top restaurants in newer to older order, return format: ```{"restaurants": [{"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}, {"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}], "err": err_msg}```
 
-- ```/updateMostRecentRests``` body format: ```{"username": user_id, "business_id": rest_id}```, adds restaurant to user's most recent top restaurants, return format: ```{"success": succ, "err": err_msg}``` 
+- ```/deleteMostRecentRest``` body format: ```{"username": user_id, "business_id": rest_id}```, delete restaurant from user's most recent top restaurants, return format: ```{"success": succ, "err": err_msg}``` 
 
 #### user
 
