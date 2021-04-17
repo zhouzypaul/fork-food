@@ -17,16 +17,18 @@ function Host(props) {
   const user = useSelector(state => state.user);
 
 
-  const roomProps = props.location.roomProps
+  const roomProps = props.location.roomProps;
   if (roomProps) {
-    roomCode.current = roomProps.roomCode
-    host.current = roomProps.isHost
+    roomCode.current = roomProps.roomCode;
+    host.current = roomProps.isHost;
+  } else {
+    props.history.push("/home");
   }
 
   useEffect(() => {
     window.onbeforeunload = () => {
       return true;
-    };
+    }
     return () => {
       window.onbeforeunload = null;
     }
@@ -34,8 +36,8 @@ function Host(props) {
 
   const [users, setUsers] = useState([]);
 
-  const socket = useRef();
-  const id = useRef();
+  const socket = useRef(null);
+  const id = useRef(0);
 
   useEffect(() => {
     socket.current = new WebSocket("ws://localhost:4567/socket");

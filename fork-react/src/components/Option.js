@@ -4,6 +4,10 @@ function Option(props) {
 
   const restaurant = props.restaurant;
 
+  if (!props.restaurant) {
+    window.location.href = "/home";
+  }
+
   const price = (p) => {
     let ret = "";
     for (let i = 0; i < p; i++) {

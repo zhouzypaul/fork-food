@@ -11,8 +11,8 @@ const MESSAGE_TYPE = {
 
 function Swipe(props) {
   const counter = useRef(0);
-  const restaurants = props.location.swipeProps.restaurants;
-  const socket = useRef(props.location.swipeProps.socket);
+  const restaurants = useRef([]);
+  const socket = useRef(undefined);
   const id = useRef(99);
   const roomId = useRef(9999);
   const [waiting, setWaiting] = useState(false);
@@ -21,16 +21,20 @@ function Swipe(props) {
   if (swipeProps) {
     roomId.current = swipeProps.roomId;
     id.current = swipeProps.id;
+    restaurants.current = swipeProps.restaurants;
+    socket.current = swipeProps.socket;
+  } else {
+    props.history.push("/home");
   }
 
   const user = useSelector(state => state.user);
 
-  const [currentRestaurant, setCurrent] = useState(restaurants[counter.current]);
+  const [currentRestaurant, setCurrent] = useState(restaurants.current[counter.current]);
 
   useEffect(() => {
     window.onbeforeunload = () => {
       return true;
-    };
+    }
     return () => {
       window.onbeforeunload = null;
     }
@@ -110,8 +114,8 @@ function Swipe(props) {
     };
     socket.current.send(JSON.stringify(message));
 
-    if (++counter.current < restaurants.length) {
-      setCurrent(restaurants[counter.current]);
+    if (++counter.current < restaurants.current.length) {
+      setCurrent(restaurants.current[counter.current]);
     } else {
       setWaiting(true);
     }

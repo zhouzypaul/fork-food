@@ -1,6 +1,5 @@
 import TopBar from "./TopBar";
 import Stars from "./Stars";
-import {useEffect} from "react";
 import {Link} from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -8,17 +7,12 @@ const GOOGLE = "https://www.google.com/search?q=";
 const MAP = "https://google.com/maps/search/";
 
 function Result(props) {
-  const rest = props.location.resultProps.result;
+  const resultProp = props.location.resultProps;
+  if (!resultProp) {
+    window.location.href = "/home";
+  }
+  const rest = resultProp.result;
   const user = useSelector(state => state.user);
-
-  useEffect(() => {
-    window.onbeforeunload = () => {
-      return true;
-    };
-    return () => {
-      window.onbeforeunload = null;
-    }
-  })
 
   const price = (p) => {
     let ret = "";
