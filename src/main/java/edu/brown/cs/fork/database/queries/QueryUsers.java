@@ -474,6 +474,41 @@ public class QueryUsers {
   }
 
   /**
+   * Gets the most recent timestamps for recent restaurants.
+   * @param userId user id
+   * @return a list of strings representing timestamps in MM/DD/YYYY format
+   * @throws SQLException SQLException
+   * @throws NoUserException NoUserException
+   */
+  public List<String> getMostRecentTimes(String userId)
+        throws SQLException, NoUserException {
+    List<String> results = new ArrayList<>();
+    String sql = "SELECT recentTimes FROM login WHERE userId = ?;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    prep.setString(1, userId);
+    ResultSet rs = prep.executeQuery();
+    int count = 0;
+    while (rs.next()) {
+      count += 1;
+      String rests = rs.getString(1);
+
+      String pattern = "[^,\\s][^,]*[^,\\s]*";
+      Pattern r = Pattern.compile(pattern);
+      Matcher m = r.matcher(rests);
+      while (m.find()) {
+        String rest = Collections.singletonList(m.group()).get(0);
+        results.add(rest);
+      }
+    }
+    if (count == 0) {
+      throw new NoUserException("User: " + userId + " doesn\'t exist.");
+    }
+    prep.close();
+    rs.close();
+    return results;
+  }
+
+  /**
    * Updates a user's most recent top restaurants.
    * @param userId user id
    * @param restId top restaurant's id
@@ -494,25 +529,142 @@ public class QueryUsers {
         }
       }
 
-      StringBuilder allRecentRests = new StringBuilder();
-      for (int i = 0; i < recentRests.size(); i++) {
-        if (i == recentRests.size() - 1) {
-          allRecentRests.append(recentRests.get(i));
+      return setRecentRests(userId, recentRests);
+    } catch (SQLException | NoUserException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /**
+   * Updates a user's most recent top restaurant's timestamp.
+   * @param userId user id
+   * @param timestamp time restaurant associated with a restaurant
+   * @return a boolean representing whether the update action is successful
+   */
+  public boolean updateMostRecentTimes(String userId, String timestamp) {
+    try {
+      List<String> recentTimes = getMostRecentTimes(userId);
+      if (!recentTimes.contains(timestamp)) {
+        if (recentTimes.size() < RECENTSIZE) {
+          recentTimes.add(timestamp);
+        } else if (recentTimes.size() == RECENTSIZE) {
+          recentTimes.remove(0);
+          recentTimes.add(timestamp);
         } else {
-          allRecentRests.append(recentRests.get(i)).append(", ");
+          System.out.println("ERROR: Too many recent restaurants.");
+          return false;
         }
       }
 
-      String sql = "UPDATE login SET recentRests = ? WHERE userId = ?;";
+      return setRecentTimestamps(userId, recentTimes);
+    } catch (SQLException | NoUserException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /**
+   * Deletes a specific recent restaurant id.
+   * @param userId user id
+   * @param restId rest id to delete
+   * @return whether the update is successful
+   */
+  public boolean deleteRecentRest(String userId, String restId)
+      throws NoRestaurantException {
+    try {
+      List<String> recentRests = getMostRecentRests(userId);
+      if (!recentRests.contains(restId)) {
+        throw new NoRestaurantException("Restaurant with id: " + restId
+            + " is not one of " + userId + "'s most recent restaurants.");
+      }
+      recentRests.remove(restId);
+      return setRecentRests(userId, recentRests);
+    } catch (SQLException | NoUserException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /**
+   * Deletes a specific recent restaurant's timestamp.
+   * @param userId user id
+   * @param timestamp restaurant timestamp to delete
+   * @return whether the update is successful
+   */
+  public boolean deleteRecentTime(String userId, String timestamp)
+    throws NoRestaurantException {
+    try {
+      List<String> recentTimes = getMostRecentTimes(userId);
+      if (!recentTimes.contains(timestamp)) {
+        throw new NoRestaurantException("Timestamp: " + timestamp
+          + " is not one of " + userId + "'s most recent restaurants.");
+      }
+      recentTimes.remove(timestamp);
+      return setRecentTimestamps(userId, recentTimes);
+    } catch (SQLException | NoUserException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+  }
+
+  /**
+   * Sets the recentRests field in the login table.
+   * @param userId user id
+   * @param restIds ids to parse into a string for db
+   * @return whether the update is successful
+   */
+  public boolean setRecentRests(String userId, List<String> restIds) {
+    StringBuilder allRecentRests = new StringBuilder();
+    for (int i = 0; i < restIds.size(); i++) {
+      if (i == restIds.size() - 1) {
+        allRecentRests.append(restIds.get(i));
+      } else {
+        allRecentRests.append(restIds.get(i)).append(", ");
+      }
+    }
+
+    String sql = "UPDATE login SET recentRests = ? WHERE userId = ?;";
+    try {
       PreparedStatement prep = this.conn.prepareStatement(sql);
       prep.setString(1, allRecentRests.toString());
       prep.setString(2, userId);
       int affectedRows = prep.executeUpdate();
       return affectedRows == 1;
-    } catch (SQLException | NoUserException e) {
+    } catch (SQLException e) {
       System.out.println("ERROR: " + e.getMessage());
       return false;
     }
+  }
+
+  /**
+   * Sets the recentTimes field in the login table.
+   * @param userId user id
+   * @param timestamps timestamps to parse into a string for db
+   * @return whether the update is successful
+   */
+  public boolean setRecentTimestamps(String userId, List<String> timestamps) {
+    StringBuilder allRecentTimes = new StringBuilder();
+    for (int i = 0; i < timestamps.size(); i++) {
+      if (i == timestamps.size() - 1) {
+        allRecentTimes.append(timestamps.get(i));
+      } else {
+        allRecentTimes.append(timestamps.get(i)).append(", ");
+      }
+    }
+
+    String sql = "UPDATE login SET recentTimes = ? WHERE userId = ?;";
+    try {
+      PreparedStatement prep = this.conn.prepareStatement(sql);
+      prep.setString(1, allRecentTimes.toString());
+      prep.setString(2, userId);
+      int affectedRows = prep.executeUpdate();
+      return affectedRows == 1;
+    } catch (SQLException e) {
+      System.out.println("ERROR: " + e.getMessage());
+      return false;
+    }
+
   }
 
   /**
@@ -522,12 +674,13 @@ public class QueryUsers {
    * @return true if registered successfully, false if otherwise
    */
   public boolean registerUser(String userId, String pwd) {
-    String sql = "INSERT INTO login VALUES (?, ?, 1, ?);";
+    String sql = "INSERT INTO login VALUES (?, ?, 1, ?, ?);";
     try {
       PreparedStatement prep = this.conn.prepareStatement(sql);
       prep.setString(1, userId);
       prep.setString(2, pwd);
       prep.setString(3, "");
+      prep.setString(4, "");
       prep.executeUpdate();
       return true;
     } catch (SQLException e) {
