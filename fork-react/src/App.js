@@ -8,7 +8,7 @@ import Login from "./components/Login";
 import Home from "./components/Home";
 import Profile from "./components/Profile";
 import Settings from "./components/Settings";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Host from "./components/Host";
 import Join from "./components/Join";
 import NewUser from './components/NewUser';
@@ -16,9 +16,19 @@ import Survey from './components/Survey';
 import Swipe from "./components/Swipe";
 import Result from "./components/Result";
 import About from "./components/About";
+import {useEffect} from "react";
+import {login} from "./actions";
 
 function App() {
   const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const loggedIn = sessionStorage.getItem("user");
+    if (loggedIn) {
+      dispatch(login(loggedIn));
+    }
+  }, []);
 
   return (
     <div className="App">

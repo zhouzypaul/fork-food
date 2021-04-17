@@ -2,13 +2,14 @@ import TopBar from "./TopBar";
 import Stars from "./Stars";
 import {useEffect} from "react";
 import {Link} from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const GOOGLE = "https://www.google.com/search?q=";
 const MAP = "https://google.com/maps/search/";
 
 function Result(props) {
   const rest = props.location.resultProps.result;
-  console.log(rest)
+  const user = useSelector(state => state.user);
 
   useEffect(() => {
     window.onbeforeunload = () => {
@@ -26,6 +27,10 @@ function Result(props) {
     }
     return ret;
   }
+
+  const restKey = rest['business_id'] + user;
+
+  localStorage.setItem(restKey, new Date().toLocaleDateString());
 
   const searchParameter = rest.name.replace(/\s/g, "+") + "+" + rest.city + "+" + rest.state;
 

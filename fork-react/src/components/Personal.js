@@ -7,14 +7,13 @@ function Personal(props) {
 
   const exit = () => {
     dispatch(logout());
+    sessionStorage.clear();
     props.history.push('/');
   }
 
   return (
     <div className="content" id="profile-section">
-      <div className="title-text">profile</div>
-      @{props.user}
-      <br/>
+      <div className="title-text">@{props.user}</div>
       <br/>
       <Link to="/survey">
         <button className="primary-button">update preferences</button>

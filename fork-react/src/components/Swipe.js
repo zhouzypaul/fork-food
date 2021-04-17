@@ -115,24 +115,6 @@ function Swipe(props) {
     }
   }
 
-  const toggleDot = (dot) => {
-    if (dot.current.style.visibility === "hidden") {
-      dot.current.style.visibility = "visible";
-    } else {
-      dot.current.style.visibility = "hidden";
-    }
-  }
-
-  // useEffect(() => {
-  //   while (waiting) {
-  //     setTimeout(() => {
-  //       toggleDot(d1);
-  //       toggleDot(d2);
-  //       toggleDot(d3);
-  //     }, 400);
-  //   }
-  // }, [waiting])
-
   return (
     <>
       <div className="content">

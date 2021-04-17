@@ -63,7 +63,7 @@
   border-color: #dcdcdc80;
 }
 
-.content {
+.start-content {
   display: flex;
   flex-direction: column;
   min-height: 60vh;
@@ -71,8 +71,13 @@
   align-items: center;
 }
 
-#survey-content {
+.content {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 60vh;
+  justify-content: center;
+  align-items: center;
 }
 
 .profile {
@@ -167,8 +172,10 @@
 }
 
 .scroll-box {
-  height: 90%;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
   margin: 12px 0;
 }
 
@@ -187,7 +194,7 @@
 
 .login-error {
   margin: 4px;
-  color: darkred;
+  color: #e63030;
   font-size: medium;
   min-height: 20px;
 }
@@ -333,7 +340,7 @@ h1 {
   height: 64px;
   margin: 16px 32px;
   padding: 12px;
-  background-color: #EB2D2D95;
+  background-color: #e6303095;
   border-radius: 50%;
   border-style: none;
   outline: none;
@@ -363,7 +370,7 @@ h1 {
   font-size: large;
   margin: 6px 0 4px 0;
   min-height: 24px;
-  color: darkred;
+  color: #e63030;
 }
 
 .bubble {
@@ -388,6 +395,11 @@ h1 {
 #final-choice {
   margin-top: 32px;
   cursor: pointer;
+}
+
+.days {
+  font-size: medium;
+  color: #5c5c5c 
 }
 
 .d1 {

@@ -20,18 +20,24 @@ const SERVER_URL = 'http://localhost:4567';
 
 function Option(props) {
   const selected = useRef(props.selected);
+  const [color, setColor] = useState("");
+
   const toggle = (e) => {
     props.pick(e.target.innerText);
     selected.current = !selected.current;
     if (selected.current) {
-      e.target.style.backgroundColor = "#DDAFF980";
+      setColor("#DDAFF980");
     } else {
-      e.target.style.backgroundColor = "gainsboro";
+      setColor("gainsboro");
     }
   }
 
+  useEffect(() => {
+    setColor(props.selected ? "#DDAFF980" : "gainsboro");
+  }, [props.selected]);
+
   return(
-    <button className="survey-box" onClick={toggle} style={{backgroundColor: props.selected ? "#DDAFF980" : "gainsboro"}}>
+    <button className="survey-box" onClick={toggle} style={{backgroundColor: color}}>
       {props.value}
     </button>
   );
@@ -45,6 +51,7 @@ function Survey(props) {
   const selectedTypes = useRef({});
   const priceRange = useRef({});
   const user = useSelector(state => state.user);
+  const key = useRef(0);
 
   const generateObjects = (options, ref) => {
     let selections = {};
@@ -54,11 +61,9 @@ function Survey(props) {
 
   const generateBoxes = (options, handler, setter) => {
     const boxes = [];
-    let i = 1;
     for (let op in options) {
       if (options.hasOwnProperty(op)) {
-        boxes.push(<Option value={op} selected={options[op]} color={options[op] ? "#DDAFF980" : "gainsboro"} pick={handler} key={i}/>);
-        i++;
+        boxes.push(<Option value={op} selected={options[op]} pick={handler} key={key.current++}/>);
       }
     }
     setter(boxes);
@@ -121,15 +126,15 @@ function Survey(props) {
     // send to backend
     const typePref = [];
     const pricePref = [];
-    const types = selectedTypes.current;
-    const prices = priceRange.current;
-    for (let type in types) {
-      if (types[type]) {
+    const allTypes = selectedTypes.current;
+    const allPrices = priceRange.current;
+    for (let type in allTypes) {
+      if (allTypes[type]) {
         typePref.push(type);
       }
     }
-    for (let price in prices) {
-      if (prices[price]){
+    for (let price in allPrices) {
+      if (allPrices[price]){
         pricePref.push(price);
       }
     }
@@ -155,13 +160,30 @@ function Survey(props) {
       .catch(function (e) {
         console.log(e);
       })
+  }
 
+  const falsify = (options, setter) => {
+    console.log("clearing")
+    for (let op in options) {
+      if (options.hasOwnProperty(op)) {
+        options[op] = false;
+      }
+    }
+    setter([]);
+  }
+
+  const clear = () => {
+    falsify(selectedTypes.current, setTypes);
+    falsify(priceRange.current, setPrices);
+    console.log(selectedTypes.current)
+    generateBoxes(selectedTypes.current, selectType, setTypes);
+    generateBoxes(priceRange.current, selectPrice, setPrices);
   }
 
   return (
     <>
       <TopBar to="/home" showOptions={false} style={{backgroundColor: "#ffffff90"}}/>
-      <div className="content" id="survey-content">
+      <div className="content">
         <div className="title-text">pick your favorites</div>
         <div className="survey">
           {types}
@@ -177,9 +199,12 @@ function Survey(props) {
             {radius} {unit}
           </div>
         </div>
-        <button className="primary-button" onClick={savePreferences}>save</button>
+        <div className="location">
+          <button className="secondary-button" onClick={clear}>clear selections</button>
+          <button className="primary-button" onClick={savePreferences}>save</button>
+        </div>
       </div>
-      <div className="exit-home">
+      <div className="about">
         <Link to="/home">
           <button className="secondary-button">
             skip
