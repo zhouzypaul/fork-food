@@ -20,7 +20,7 @@ public class RoomCheckHandler implements Route {
       JSONObject json = new JSONObject(req.body());
       int code = json.getInt("code");
 
-      boolean exists = GroupSocket.roomExists(code);
+      boolean exists = GroupSocket.valid(code);
       System.out.println(exists);
 
       Map<String, Object> variables = ImmutableMap.of("exists", exists);

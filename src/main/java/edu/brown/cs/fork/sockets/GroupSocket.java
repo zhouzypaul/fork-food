@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -33,12 +32,13 @@ public class GroupSocket {
   private static final Gson GSON = new Gson();
 
   private static final Hashtable<Integer, Queue<Session>> ROOMS = new Hashtable<>();
-  private static final Hashtable<Integer, HashSet<String>> USERROOMS = new Hashtable<>();
-  private static final Hashtable<Integer, HashSet<String>> USERROOMS2 = new Hashtable<>();
-  private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>> USERDECISIONS = new Hashtable<>();
+  private static final Hashtable<Integer, HashSet<String>> USER_ROOMS = new Hashtable<>();
+  private static final Hashtable<Integer, HashSet<String>> USERS_COPY = new Hashtable<>();
+  private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>> USER_DECISIONS = new Hashtable<>();
+  private static final HashSet<Integer> STARTED_ROOMS = new HashSet<>();
   private static int nextId = 0;
 
-  private enum MESSAGETYPE {
+  private enum MESSAGE_TYPE {
     CONNECT,
     UPDATE,
     SEND
@@ -48,7 +48,7 @@ public class GroupSocket {
   public void connected(Session session) throws IOException {
     // build CONNECT message
     JsonObject json = new JsonObject();
-    json.addProperty("type", MESSAGETYPE.CONNECT.ordinal());
+    json.addProperty("type", MESSAGE_TYPE.CONNECT.ordinal());
 
     JsonObject payload = new JsonObject();
     payload.addProperty("id", nextId++);
@@ -80,7 +80,7 @@ public class GroupSocket {
 
       // prepare update message
       JsonObject updateMessage = new JsonObject();
-      updateMessage.addProperty("type", MESSAGETYPE.UPDATE.ordinal());
+      updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
 
       JsonObject payload = new JsonObject();
       payload.addProperty("senderId", messageObj.getInt("id"));
@@ -95,15 +95,15 @@ public class GroupSocket {
           // add current session to correct room
           if (ROOMS.get(roomId) == null) {
             ROOMS.put(roomId, new ConcurrentLinkedQueue<>());
-            USERROOMS.put(roomId, new HashSet<>());
-            USERROOMS2.put(roomId, new HashSet<>());
+            USER_ROOMS.put(roomId, new HashSet<>());
+            USERS_COPY.put(roomId, new HashSet<>());
           }
-          USERROOMS.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
-          USERROOMS2.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
+          USER_ROOMS.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
+          USERS_COPY.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
           ROOMS.get(roomId).add(session);
 
           JsonObject users = new JsonObject();
-          users.add("users", GSON.toJsonTree(USERROOMS.get(roomId)));
+          users.add("users", GSON.toJsonTree(USER_ROOMS.get(roomId)));
 
           payload.addProperty("type", "update_user");
           payload.add("senderMessage", users);
@@ -113,7 +113,8 @@ public class GroupSocket {
           double lat = messageObj.getJSONObject("message").getDouble("lat");
           double lon = messageObj.getJSONObject("message").getDouble("lon");
 
-          Set<String> usernames = USERROOMS.get(roomId);
+          Set<String> usernames = USER_ROOMS.get(roomId);
+          STARTED_ROOMS.add(roomId);
 
           List<Restaurant> recommendedRestaurants = new ArrayList<>();
 
@@ -132,7 +133,7 @@ public class GroupSocket {
             restaurantVotes.put(restaurant.getId(), userDecision);
           }
 
-          USERDECISIONS.put(roomId, restaurantVotes);
+          USER_DECISIONS.put(roomId, restaurantVotes);
 
           JsonObject restaurants = new JsonObject();
           restaurants.add("restaurants", GSON.toJsonTree(recommendedRestaurants));
@@ -145,20 +146,20 @@ public class GroupSocket {
         case "swipe":
           String user = messageObj.getJSONObject("message").getString("username");
           String resId = messageObj.getJSONObject("message").getString("resId");
-          // add to the USERDECISIONS table
-          USERDECISIONS.get(roomId).get(resId).replace(user, messageObj.getJSONObject("message").getInt("like"));
+          // add to the USER_DECISIONS table
+          USER_DECISIONS.get(roomId).get(resId).replace(user, messageObj.getJSONObject("message").getInt("like"));
           return;
 
         case "done":
           String username = messageObj.getJSONObject("message").getString("username");
-          USERROOMS.get(roomId).remove(username);
-          if (USERROOMS.get(roomId).isEmpty()) {
+          USER_ROOMS.get(roomId).remove(username);
+          if (USER_ROOMS.get(roomId).isEmpty()) {
             // return a decision
             JsonObject result = new JsonObject();
 
             try {
-              String commonRes = Hub.rankRestaurants(USERROOMS2.get(roomId), USERDECISIONS.get(roomId));
-              USERDECISIONS.remove(roomId);
+              String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId), USER_DECISIONS.get(roomId));
+              USER_DECISIONS.remove(roomId);
 
               System.out.println("decision " + commonRes);
               Map<String, String> rest = new HashMap<>();
@@ -196,8 +197,8 @@ public class GroupSocket {
       }
 
       if (doneWithRoom) {
-        USERROOMS.remove(roomId);
-        USERROOMS2.remove(roomId);
+        USER_ROOMS.remove(roomId);
+        USERS_COPY.remove(roomId);
         ROOMS.remove(roomId);
       }
 
@@ -211,8 +212,8 @@ public class GroupSocket {
     error.printStackTrace();
   }
 
-  public static boolean roomExists(int code) {
-    return USERROOMS.containsKey(code);
+  public static boolean valid(int code) {
+    return USER_ROOMS.containsKey(code) && !STARTED_ROOMS.contains(code);
   }
 
 }

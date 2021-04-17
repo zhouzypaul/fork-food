@@ -28,7 +28,16 @@ function Swipe(props) {
   const [currentRestaurant, setCurrent] = useState(restaurants[counter.current]);
 
   useEffect(() => {
-    if (counter.current >= restaurants.length) {
+    window.onbeforeunload = () => {
+      return true;
+    };
+    return () => {
+      window.onbeforeunload = null;
+    }
+  })
+
+  useEffect(() => {
+    if (waiting) {
       // send done message
       console.log("done swiping");
       const message = {
@@ -41,14 +50,7 @@ function Swipe(props) {
       };
       socket.current.send(JSON.stringify(message));
     }
-
-    window.onbeforeunload = () => {
-      return true;
-    };
-    return () => {
-      window.onbeforeunload = null;
-    }
-  })
+  }, [waiting, user])
 
   const sendInfo = () => {
     const message = {
