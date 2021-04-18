@@ -5,11 +5,15 @@ import axios from "axios";
 
 const SERVER_URL = 'http://localhost:4567';
 
+/**
+ * Renders join page
+ */
 function Join(props) {
   // values same as room code
   const [values, setValues] = useState("");
   const [error, setError] = useState(" ");
 
+  // checks if room exists and is valid
   const exists = () => {
     const toSend = {
       code: values,

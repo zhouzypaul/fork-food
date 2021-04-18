@@ -2,9 +2,13 @@ import {useDispatch} from "react-redux";
 import {logout} from "../actions";
 import {Link} from "react-router-dom";
 
+/**
+ * Renders personal information portion of profile.
+ */
 function Personal(props) {
   const dispatch = useDispatch();
 
+  // logout user
   const exit = () => {
     dispatch(logout());
     sessionStorage.clear();

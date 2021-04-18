@@ -3,9 +3,11 @@
  * @param props
  */
 function TextBox(props) {
+  // sets value on change
   const mutate = (event) => {
     props.change(event.target.value);
   }
+
   return (
     <>
       <label>

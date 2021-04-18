@@ -1,5 +1,8 @@
 import TopBar from "./TopBar";
 
+/**
+ * Renders about page.
+ */
 function About() {
   return (
     <>

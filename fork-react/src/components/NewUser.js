@@ -7,6 +7,9 @@ import axios from 'axios';
 
 const SERVER_URL = 'http://localhost:4567';
 
+/**
+ * Renders new user page.
+ */
 function NewUser(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -14,10 +17,12 @@ function NewUser(props) {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
+  // checks if string has white spaces globally
   const hasWhiteSpace = (s) => {
     return /\s/g.test(s);
   }
 
+  // creates user if certain criteria are met
   const createUser = () => {
     let valid = true;
     if (password !== confirm) {
@@ -41,7 +46,7 @@ function NewUser(props) {
     }
   }
 
-
+  // registers users on back end
   const registerUser = (username, password) => {
     const toSend = {
       // username and password
@@ -55,10 +60,8 @@ function NewUser(props) {
       },
     };
 
-    axios
-      .post(`${SERVER_URL}/register`, toSend, config)
+    axios.post(`${SERVER_URL}/register`, toSend, config)
       .then((response) => {
-        // if response is true, do this otherwise, say username already exists setError
         if (response.data["success"]) {
           dispatch(login(username));
           props.history.push('/survey');
@@ -73,6 +76,7 @@ function NewUser(props) {
       });
   }
 
+  // create user on enter
   const submit = (e) => {
     const key = e.key;
     if (key === "Enter") {

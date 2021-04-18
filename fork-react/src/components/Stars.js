@@ -1,8 +1,12 @@
 import {useEffect, useState} from "react";
 
+/**
+ * Renders stars for reviews.
+ */
 function Stars(props) {
   const [stars, setStars] = useState("");
 
+  // converts reviews to stars
   useEffect(() => {
     const s = Math.ceil(props.number);
     let ret = "";

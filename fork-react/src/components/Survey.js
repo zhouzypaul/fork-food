@@ -18,10 +18,14 @@ const CONFIG = {
 
 const SERVER_URL = 'http://localhost:4567';
 
+/**
+ * Renders survey option buttons.
+ */
 function Option(props) {
   const selected = useRef(props.selected);
   const [color, setColor] = useState("");
 
+  // toggles color on click
   const toggle = (e) => {
     props.pick(e.target.innerText);
     selected.current = !selected.current;
@@ -32,6 +36,7 @@ function Option(props) {
     }
   }
 
+  // changes color based on selection
   useEffect(() => {
     setColor(props.selected ? "#DDAFF980" : "gainsboro");
   }, [props.selected]);
@@ -43,6 +48,9 @@ function Option(props) {
   );
 }
 
+/**
+ * Renders survey.
+ */
 function Survey(props) {
   const [types, setTypes] = useState([]);
   const [prices, setPrices] = useState([]);
@@ -53,12 +61,14 @@ function Survey(props) {
   const user = useSelector(state => state.user);
   const key = useRef(0);
 
+  // generates option objects
   const generateObjects = (options, ref) => {
     let selections = {};
     options.forEach(op => {selections[op] = false});
     ref.current = selections;
   }
 
+  // generates option boxes
   const generateBoxes = (options, handler, setter) => {
     const boxes = [];
     for (let op in options) {
@@ -69,6 +79,7 @@ function Survey(props) {
     setter(boxes);
   }
 
+  // gets user preferences to display
   const getPreferences = () => {
     const toSend = {
       id: user
@@ -95,24 +106,28 @@ function Survey(props) {
       })
   }
 
+  // changes value based on selection
   const selectType = (name) => {
     if (selectedTypes.current.hasOwnProperty(name)) {
       selectedTypes.current[name] = !selectedTypes.current[name];
     }
   }
 
+  // changes value based on selection
   const selectPrice = (name) => {
     if (priceRange.current.hasOwnProperty(name)) {
       priceRange.current[name] = !priceRange.current[name];
     }
   }
 
+  // generates survey on load
   useEffect(() => {
     generateObjects(TYPES, selectedTypes);
     generateObjects(PRICES, priceRange);
     getPreferences();
   }, []);
 
+  // changes unit based on range
   const changeRange = (e) => {
     setRadius(e.target.value);
     if (e.target.value === "1") {
@@ -122,6 +137,7 @@ function Survey(props) {
     }
   }
 
+  // saves preferences on back end
   const savePreferences = () => {
     // send to backend
     const typePref = [];
@@ -162,6 +178,7 @@ function Survey(props) {
       })
   }
 
+  // sets all option values to false
   const falsify = (options, setter) => {
     console.log("clearing")
     for (let op in options) {
@@ -172,10 +189,10 @@ function Survey(props) {
     setter([]);
   }
 
+  // clears selections
   const clear = () => {
     falsify(selectedTypes.current, setTypes);
     falsify(priceRange.current, setPrices);
-    console.log(selectedTypes.current)
     generateBoxes(selectedTypes.current, selectType, setTypes);
     generateBoxes(priceRange.current, selectPrice, setPrices);
   }

@@ -3,6 +3,9 @@ import Visited from "./Visited";
 import Personal from "./Personal";
 import {useSelector} from "react-redux";
 
+/**
+ * Renders profile page
+ */
 function Profile(props) {
   const user = useSelector(state => state.user);
 

@@ -11,13 +11,23 @@ const MESSAGE_TYPE = {
   SEND: 2
 };
 
+const HOST_LATITUDE = 42.359335;
+const HOST_LONGITUDE = -71.059709;
+
+/**
+ * Renders host page.
+ */
 function Host(props) {
   const roomCode = useRef(9999);
   const host = useRef(false);
   const user = useSelector(state => state.user);
-
+  const [users, setUsers] = useState([]);
+  const socket = useRef(null);
+  const id = useRef(0);
 
   const roomProps = props.location.roomProps;
+
+  // if undefined go back home
   if (roomProps) {
     roomCode.current = roomProps.roomCode;
     host.current = roomProps.isHost;
@@ -25,6 +35,7 @@ function Host(props) {
     props.history.push("/home");
   }
 
+  // generates warning before page unloads
   useEffect(() => {
     window.onbeforeunload = () => {
       return true;
@@ -34,11 +45,7 @@ function Host(props) {
     }
   })
 
-  const [users, setUsers] = useState([]);
-
-  const socket = useRef(null);
-  const id = useRef(0);
-
+  // creates socket and handles messages
   useEffect(() => {
     socket.current = new WebSocket("ws://localhost:4567/socket");
     socket.current.onmessage = (msg) => {
@@ -46,15 +53,13 @@ function Host(props) {
       switch (data.type) {
         case MESSAGE_TYPE.CONNECT:
           id.current = data.payload.id
-          // send a message with our username and room
-          console.log("connected")
+          // send a message with username and room
           sendInfo()
           break;
         case MESSAGE_TYPE.UPDATE:
-          // check if we're updating users or doing something else
+          // check if updating users or starting
           if (data.payload.type === "update_user") {
             setUsers(data.payload.senderMessage.users);
-            console.log("users set");
           } else if (data.payload.type === "start") {
             props.history.push({
               pathname: `/swipe`,
@@ -65,7 +70,6 @@ function Host(props) {
                 roomId: roomCode.current
               }
             });
-            console.log("start swiping");
           }
           break;
         default:
@@ -75,13 +79,13 @@ function Host(props) {
     };
 
     socket.current.onclose = () => {
-      //should remove the user
-      setUsers()
-      console.log("socket closed");
+      // remove the users
+      setUsers([]);
     }
 
   }, [])
 
+  // sends user info to back end
   const sendInfo = () => {
     const message = {
       id: id.current,
@@ -94,14 +98,15 @@ function Host(props) {
     socket.current.send(JSON.stringify(message));
   }
 
+  // request restaurants to start swiping
   const startSwiping = () => {
     const message = {
       id: id.current,
       message: {
         type: "start",
         roomId: roomCode.current,
-        lat: 42.359335,
-        lon: -71.059709
+        lat: HOST_LATITUDE,
+        lon: HOST_LONGITUDE
       }
     };
     socket.current.send(JSON.stringify(message));

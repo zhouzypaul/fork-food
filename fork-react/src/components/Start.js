@@ -1,6 +1,9 @@
 import React from 'react';
 import {Link} from "react-router-dom";
 
+/**
+ * Renders starting page.
+ */
 function Start() {
   return (
     <>

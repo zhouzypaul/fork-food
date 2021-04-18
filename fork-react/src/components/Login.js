@@ -8,16 +8,18 @@ import axios from 'axios';
 
 const SERVER_URL = 'http://localhost:4567';
 
+/**
+ * Renders login page.
+ */
 function Login(props) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const dispatch = useDispatch();
 
+  // verify user
   const verify = () => {
-    // verify user on backend
     const toSend = {
-      // username and password
       username: username,
       password: password
     };
@@ -28,8 +30,7 @@ function Login(props) {
       },
     };
 
-    axios
-      .post(`${SERVER_URL}/login`, toSend, config)
+    axios.post(`${SERVER_URL}/login`, toSend, config)
       .then((response) => {
         if (response.data["success"]) {
           dispatch(login(username));
@@ -44,6 +45,7 @@ function Login(props) {
       });
   }
 
+  // verify user on enter
   const submit = (e) => {
     const key = e.key;
     if (key === "Enter") {

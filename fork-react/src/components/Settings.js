@@ -4,9 +4,13 @@ import {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {logout} from "../actions";
 import axios from "axios";
+import Popup from "./Popup";
 
 const SERVER_URL = 'http://localhost:4567';
 
+/**
+ * Renders settings page.
+ */
 function Settings(props) {
   const [old, setOld] = useState("");
   const [newPassword, setNew] = useState("");
@@ -14,14 +18,20 @@ function Settings(props) {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const user = useSelector(state => state.user);
+  const [pop, setPop] = useState(false);
 
+  // checks for white spaces globally
   const hasWhiteSpace = (s) => {
     return /\s/g.test(s);
   }
 
+  // changes password on back end
   const changePassword = () => {
     let valid = true;
-    if (newPassword !== confirm) {
+    if (newPassword === old) {
+      valid = false;
+      setError("old and new passwords must be different");
+    } else if (newPassword !== confirm) {
       valid = false;
       setError("passwords do not match");
     } else if (newPassword.length < 8) {
@@ -36,10 +46,9 @@ function Settings(props) {
     }
   }
 
+  // validates new password
   const validPassword = () => {
-    // verify user on backend
     const toSend = {
-      // username and password
       username: user,
       password: old
     };
@@ -51,8 +60,7 @@ function Settings(props) {
       },
     };
 
-    axios
-      .post(`${SERVER_URL}/login`, toSend, config)
+    axios.post(`${SERVER_URL}/login`, toSend, config)
       .then((response) => {
         if (response.data["success"]) {
           change();
@@ -66,9 +74,9 @@ function Settings(props) {
       });
   }
 
+  // changes password on back end
   const change = () => {
     const toSend = {
-      // username and password
       username: user,
       password: newPassword
     };
@@ -79,11 +87,10 @@ function Settings(props) {
       },
     };
 
-    axios
-      .post(`${SERVER_URL}/updatePwd`, toSend, config)
+    axios.post(`${SERVER_URL}/updatePwd`, toSend, config)
       .then((response) => {
         if (response.data["success"]) {
-          props.history.push('/home');
+          togglePop();
         } else {
           setError("failed to update password");
         }
@@ -93,6 +100,7 @@ function Settings(props) {
       });
   }
 
+  // changes password on enter
   const submit = (e) => {
     const key = e.key;
     if (key === "Enter") {
@@ -100,6 +108,7 @@ function Settings(props) {
     }
   }
 
+  // deletes account
   const deleteAccount = () => {
     const resp = prompt("Type 'DELETE' to delete account permanently.");
     if (resp === "DELETE") {
@@ -107,6 +116,7 @@ function Settings(props) {
     }
   }
 
+  // deletes user data
   const dataDelete = () => {
     const toSend = {
       id: user
@@ -119,8 +129,7 @@ function Settings(props) {
       },
     };
 
-    axios
-      .post(`${SERVER_URL}/deleteUser`, toSend, config)
+    axios.post(`${SERVER_URL}/deleteUser`, toSend, config)
       .then((response) => {
         if (response.data["success"]) {
           alert("Account deleted successfully.");
@@ -133,6 +142,11 @@ function Settings(props) {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  // toggles popup
+  const togglePop = () => {
+    setPop(old => !old);
   }
 
   return (
@@ -154,6 +168,7 @@ function Settings(props) {
           save
         </button>
       </div>
+      {pop ? <Popup message="password changed successfully" to="/home" toggle={togglePop}/> : null}
       <button className="secondary-button" id="delete" onClick={deleteAccount}>
         delete account
       </button>

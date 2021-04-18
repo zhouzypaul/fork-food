@@ -1,14 +1,20 @@
 import {Link} from "react-router-dom";
 import {useRef, useEffect} from "react";
 
+/**
+ * Renders the top bar.
+ */
 function TopBar (props) {
   const options = useRef(null);
+
+  // displays options conditionally
   const displayOptions = () => {
     if (!props.showOptions) {
       options.current.style.visibility = 'hidden';
     }
   }
   useEffect(displayOptions, [props.showOptions]);
+
   return (
     <div className="top-bar">
       <span className="fork-home">

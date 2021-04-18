@@ -9,6 +9,9 @@ const MESSAGE_TYPE = {
   SEND: 2
 };
 
+/**
+ * Renders swiping page.
+ */
 function Swipe(props) {
   const counter = useRef(0);
   const restaurants = useRef([]);
@@ -16,8 +19,10 @@ function Swipe(props) {
   const id = useRef(99);
   const roomId = useRef(9999);
   const [waiting, setWaiting] = useState(false);
-
   const swipeProps = props.location.swipeProps;
+  const user = useSelector(state => state.user);
+
+  // redirects if props are undefined
   if (swipeProps) {
     roomId.current = swipeProps.roomId;
     id.current = swipeProps.id;
@@ -27,10 +32,9 @@ function Swipe(props) {
     props.history.push("/home");
   }
 
-  const user = useSelector(state => state.user);
-
   const [currentRestaurant, setCurrent] = useState(restaurants.current[counter.current]);
 
+  // warning before page unload
   useEffect(() => {
     window.onbeforeunload = () => {
       return true;
@@ -40,10 +44,10 @@ function Swipe(props) {
     }
   })
 
+  // sends message once done swiping
   useEffect(() => {
     if (waiting) {
       // send done message
-      console.log("done swiping");
       const message = {
         id: id.current,
         message: {
@@ -56,6 +60,7 @@ function Swipe(props) {
     }
   }, [waiting, user])
 
+  // sends user info
   const sendInfo = () => {
     const message = {
       id: id.current,
@@ -68,15 +73,14 @@ function Swipe(props) {
     socket.current.send(JSON.stringify(message));
   }
 
+  // responds to messages
   useEffect(() => {
     socket.current.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
       switch (data.type) {
         case MESSAGE_TYPE.CONNECT:
-          console.log("reached okay")
           // send a message with our username and room
           id.current = data.payload.id
-          // send a message with our username and room
           sendInfo()
           break;
         case MESSAGE_TYPE.UPDATE:
@@ -101,6 +105,7 @@ function Swipe(props) {
 
   }, [roomId])
 
+  // sends individual decisions
   const sendDecision = (choice) => {
     const message = {
       id: id.current,
@@ -114,6 +119,7 @@ function Swipe(props) {
     };
     socket.current.send(JSON.stringify(message));
 
+    // check if there are more restaurants to swipe on
     if (++counter.current < restaurants.current.length) {
       setCurrent(restaurants.current[counter.current]);
     } else {

@@ -6,14 +6,21 @@ import { useSelector } from "react-redux";
 const GOOGLE = "https://www.google.com/search?q=";
 const MAP = "https://google.com/maps/search/";
 
+/**
+ * Renders result page.
+ */
 function Result(props) {
   const resultProp = props.location.resultProps;
+
+  // redirect to home if restaurant is undefined
   if (!resultProp) {
     window.location.href = "/home";
   }
-  const rest = resultProp.result;
-  const user = useSelector(state => state.user);
 
+  const rest = resultProp.result;
+  const searchParameter = rest.name.replace(/\s/g, "+") + "+" + rest.city + "+" + rest.state;
+
+  // converts price into dollar signs
   const price = (p) => {
     let ret = "";
     for (let i = 0; i < p; i++) {
@@ -21,12 +28,6 @@ function Result(props) {
     }
     return ret;
   }
-
-  const restKey = rest['business_id'] + user;
-
-  localStorage.setItem(restKey, new Date().toLocaleDateString());
-
-  const searchParameter = rest.name.replace(/\s/g, "+") + "+" + rest.city + "+" + rest.state;
 
   return (
     <>

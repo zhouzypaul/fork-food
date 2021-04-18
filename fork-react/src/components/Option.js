@@ -1,13 +1,17 @@
 import Stars from "./Stars";
 
+/**
+ * Renders restaurant option for swiping.
+ */
 function Option(props) {
-
   const restaurant = props.restaurant;
 
+  // redirect to home if restaurant is undefined
   if (!props.restaurant) {
     window.location.href = "/home";
   }
 
+  // get price in terms of dollar signs
   const price = (p) => {
     let ret = "";
     for (let i = 0; i < p; i++) {
