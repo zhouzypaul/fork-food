@@ -113,7 +113,7 @@ public class RecentTimestamps {
    * @param timestamps timestamps to parse into a string for db
    * @return whether the update is successful
    */
-  private boolean setRecentTimestamps(String userId, List<String> timestamps) {
+  public boolean setRecentTimestamps(String userId, List<String> timestamps) {
     StringBuilder allRecentTimes = new StringBuilder();
     for (int i = 0; i < timestamps.size(); i++) {
       if (i == timestamps.size() - 1) {

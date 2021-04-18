@@ -33,7 +33,7 @@ function Visited(props) {
           for (let i = 0; i < rest.length; i++) {
             const r = rest[i];
             const param = r.name.replace(/\s/g, "+") + "+" + r.city + "+" + r.state;
-            display.push(<a href={GOOGLE + param} target="_blank" className="links" rel="noreferrer" key={i++}>
+            display.push(<a href={GOOGLE + param} target="_blank" className="links" rel="noreferrer" key={i}>
               <div className="recent">
                 <i className="material-icons-outlined">restaurant</i>
                 <div className="map-text">{r.name}</div>

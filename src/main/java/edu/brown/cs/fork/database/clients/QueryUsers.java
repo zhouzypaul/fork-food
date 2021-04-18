@@ -15,6 +15,7 @@ import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 import edu.brown.cs.fork.users.Person;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -253,6 +254,26 @@ public class QueryUsers {
   public boolean deleteRecentTime(String userId, int idx)
       throws NoRestaurantException {
     return this.recentTimes.deleteRecentTime(userId, idx);
+  }
+
+  /**
+   * Sets the recentRests field in the login table.
+   * @param userId user id
+   * @param restIds ids to parse into a string for db
+   * @return whether the update is successful
+   */
+  public boolean setRecentRests(String userId, List<String> restIds) {
+    return this.recentRests.setRecentRests(userId, restIds);
+  }
+
+  /**
+   * Sets the recentTimes field in the login table.
+   * @param userId user id
+   * @param timestamps timestamps to parse into a string for db
+   * @return whether the update is successful
+   */
+  public boolean setRecentTimestamps(String userId, List<String> timestamps) {
+    return this.recentTimes.setRecentTimestamps(userId, timestamps);
   }
 
   /**

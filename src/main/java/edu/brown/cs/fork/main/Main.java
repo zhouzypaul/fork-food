@@ -91,7 +91,7 @@ public final class Main {
     Spark.post("/insertUserPref", new HandlerInsertUserPref());
     Spark.post("/updateUserPref", new HandlerUpdateUserPref());
     Spark.post("/getMostRecentRests", new HandlerGetMostRecentRests());
-    Spark.post("/deleteMostRecentRest", new HandlerDeleteMostRecentRest());
+    Spark.post("/deleteMostRecentRests", new HandlerDeleteMostRecentRests());
 
     // using other registration endpoint
     // Spark.post("/registerUser", new HandlerRegisterUser());

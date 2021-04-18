@@ -8,36 +8,33 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * Deletes a recent restaurant id.
  */
-public class HandlerDeleteMostRecentRest implements Route {
+public class HandlerDeleteMostRecentRests implements Route {
   private static final Gson GSON = new Gson();
 
   /**
    * Constructor.
    */
-  public HandlerDeleteMostRecentRest() {  }
+  public HandlerDeleteMostRecentRests() {  }
 
   @Override
   public Object handle(Request req, Response res) throws Exception {
     JSONObject data = new JSONObject(req.body());
     String userId = data.getString("username");
-    String restId = data.getString("business_id");
 
     String err = "";
     boolean success = false;
     if (!Hub.getRestDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
-      int idx = Hub.getUserDB().deleteRecentRest(userId, restId);
-      if (idx == -1) {
-        err = "ERROR: Can't delete recent restaurant.";
-      } else {
-        success = Hub.getUserDB().deleteRecentTime(userId, idx);
-      }
+      // delete all the recent restaurant ids and timestamps
+      success = Hub.getUserDB().setRecentRests(userId, new ArrayList<>())
+          && Hub.getUserDB().setRecentTimestamps(userId, new ArrayList<>());
     }
 
     Map<String, Object> variables = ImmutableMap.of("success", success, "err", err);
