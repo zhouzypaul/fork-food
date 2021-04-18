@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,11 +31,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @WebSocket
 public class GroupSocket {
   private static final Gson GSON = new Gson();
+  private static final Integer MIN_IN_HOURS = 60;
 
   private static final Hashtable<Integer, Queue<Session>> ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USER_ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USERS_COPY = new Hashtable<>();
   private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>> USER_DECISIONS = new Hashtable<>();
+  private static final Hashtable<Integer, LocalTime> ROOM_TIME = new Hashtable<>();
   private static final HashSet<Integer> STARTED_ROOMS = new HashSet<>();
   private static int nextId = 0;
 
@@ -87,16 +90,19 @@ public class GroupSocket {
 
       System.out.println(type);
 
-      //boolean to keep track of if room can be cleared
+      // boolean to keep track of if room can be cleared
       boolean doneWithRoom = false;
 
       switch (type) {
         case "update_user":
+          // cleanup any unfinished rooms
+          cleanupOldRooms();
           // add current session to correct room
           if (ROOMS.get(roomId) == null) {
             ROOMS.put(roomId, new ConcurrentLinkedQueue<>());
             USER_ROOMS.put(roomId, new HashSet<>());
             USERS_COPY.put(roomId, new HashSet<>());
+            ROOM_TIME.put(roomId, LocalTime.now());
           }
           USER_ROOMS.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
           USERS_COPY.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
@@ -159,7 +165,6 @@ public class GroupSocket {
 
             try {
               String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId), USER_DECISIONS.get(roomId));
-              USER_DECISIONS.remove(roomId);
 
               System.out.println("decision " + commonRes);
               Map<String, String> rest = new HashMap<>();
@@ -197,9 +202,7 @@ public class GroupSocket {
       }
 
       if (doneWithRoom) {
-        USER_ROOMS.remove(roomId);
-        USERS_COPY.remove(roomId);
-        ROOMS.remove(roomId);
+        cleanup(roomId);
       }
 
     } catch (JSONException e) {
@@ -212,8 +215,56 @@ public class GroupSocket {
     error.printStackTrace();
   }
 
+  /**
+   * Checks if a room code is valid, meaning that it exists and has not started yet.
+   * @param code to verify
+   * @return true if valid, false if not
+   */
   public static boolean valid(int code) {
     return USER_ROOMS.containsKey(code) && !STARTED_ROOMS.contains(code);
   }
 
+  /**
+   * Method to cleanup any old rooms that did not complete.
+   */
+  private static void cleanupOldRooms() {
+    Set<Integer> toRemove = new HashSet<>();
+    Set<Integer> rooms = ROOM_TIME.keySet();
+
+    // check time of room to see how long it has existed for
+    for (Integer id : rooms) {
+      Integer started = getTime(ROOM_TIME.get(id));
+      Integer current = getTime(LocalTime.now());
+
+      // remove rooms that have been active for more than an hour
+      if (Math.abs(current - started) > MIN_IN_HOURS) {
+        toRemove.add(id);
+      }
+    }
+    for (Integer id : toRemove) {
+      cleanup(id);
+    }
+  }
+
+  /**
+   * Removes entry with id as key from all data structures.
+   * @param id of entry to remove
+   */
+  private static void cleanup(Integer id) {
+    USER_ROOMS.remove(id);
+    USERS_COPY.remove(id);
+    ROOMS.remove(id);
+    STARTED_ROOMS.remove(id);
+    ROOM_TIME.remove(id);
+    USER_DECISIONS.remove(id);
+  }
+
+  /**
+   * Converts LocalTime into time in minutes.
+   * @param time to convert into minutes
+   * @return integer representing minutes
+   */
+  private static Integer getTime(LocalTime time) {
+    return time.getHour() * MIN_IN_HOURS + time.getMinute();
+  }
 }
