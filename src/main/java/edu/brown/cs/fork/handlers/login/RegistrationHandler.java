@@ -32,10 +32,8 @@ public class RegistrationHandler implements Route {
       String password = json.getString("password");
 
       // use a fixed salt for now, defeats the purpose but will come back to this
-//      SecureRandom random = new SecureRandom();
       byte[] salt = new byte[16];
       Arrays.fill(salt, (byte) 0);
-//      random.nextBytes(salt);
 
       // hash user password before storing in db
       KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
@@ -51,7 +49,8 @@ public class RegistrationHandler implements Route {
         if (Hub.getUserDB().queryAllUserIds().contains(username)) {
           err = "ERROR: user already exists";
         } else {
-          success = Hub.getUserDB().registerUser(username, hash) && Hub.getUserDB().insertBlankRow(username);
+          success = Hub.getUserDB().registerUser(username, hash)
+              && Hub.getUserDB().insertBlankRow(username);
         }
       }
       Map<String, Object> variables = ImmutableMap.of("success", success, "err", err);

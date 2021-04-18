@@ -6,12 +6,40 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
+/**
+ * For all user login functionalities.
+ */
 public class Login {
   private final Connection conn;
 
+  /**
+   * Establishes database connection.
+   * @param conn connection
+   */
   public Login(Connection conn) {
     this.conn = conn;
+  }
+
+  /**
+   * Queries all userIds.
+   * @return a list of string representing all user ids
+   * @throws SQLException SQLException
+   */
+  public Set<String> queryAllUserIds() throws SQLException {
+    String sql = "SELECT login.userId FROM login;";
+    PreparedStatement prep = this.conn.prepareStatement(sql);
+    Set<String> results = new HashSet<>();
+    ResultSet rs = prep.executeQuery();
+    while (rs.next()) {
+      String userId = rs.getString(1);
+      results.add(userId);
+    }
+    prep.close();
+    rs.close();
+    return results;
   }
 
   /**
