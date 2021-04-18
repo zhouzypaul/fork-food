@@ -24,6 +24,9 @@ import java.util.Map;
  */
 public class LoginHandler implements Route {
   private static final Gson GSON = new Gson();
+  private static final int SALT_LENGTH = 16;
+  private static final int PWD_ITERATION_COUNT = 65536;
+  private static final int PWD_KEY_LENGTH = 128;
 
   @Override
   public String handle(Request req, Response res) throws JSONException {
@@ -55,10 +58,11 @@ public class LoginHandler implements Route {
     String storedHash =  Hub.getUserDB().getPwd(username);
 
     // hash input password
-    byte[] salt = new byte[16];
+    byte[] salt = new byte[SALT_LENGTH];
     Arrays.fill(salt, (byte) 0);
 
-    KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+    KeySpec spec =
+            new PBEKeySpec(password.toCharArray(), salt, PWD_ITERATION_COUNT, PWD_KEY_LENGTH);
     SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
 
     byte[] hash = factory.generateSecret(spec).getEncoded();

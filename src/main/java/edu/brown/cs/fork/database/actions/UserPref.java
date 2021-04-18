@@ -109,7 +109,7 @@ public class UserPref {
       String timestamp = rs.getString(TEN);
       // make a list out of the queried column info
       List<String> vals = Arrays.asList(userId, businessId, foodType, star,
-        priceRange, numReviews, distance, label, timestamp);
+          priceRange, numReviews, distance, label, timestamp);
       // for each <column_name, info> pair, add info in the ArrayList
       // associated with the column name
       for (int i = 0; i < cols.size(); i++) {

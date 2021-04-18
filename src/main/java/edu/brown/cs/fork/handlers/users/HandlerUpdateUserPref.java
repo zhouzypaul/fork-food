@@ -64,11 +64,11 @@ public class HandlerUpdateUserPref implements Route {
         err = "ERROR: Can't update user preference";
       } else {
         try {
-          for (int i = 0; i < foodTypes.size(); i++) {
-            for (int j = 0; j < priceRanges.size(); j++) {
+          for (String foodType : foodTypes) {
+            for (String priceRange : priceRanges) {
               List<String> info = Arrays.asList(userId, "",
-                  Hub.frontendCategoryToBackend(foodTypes.get(i)), "3.0",
-                  Hub.frontendPriceRangeToBackend(priceRanges.get(j)), distance, "1", "", "60", "");
+                      Hub.frontendCategoryToBackend(foodType), "3.0",
+                      Hub.frontendPriceRangeToBackend(priceRange), distance, "1", "", "60", "");
               success = Hub.getUserDB().insertUserPref(colsToSet, info);
             }
           }

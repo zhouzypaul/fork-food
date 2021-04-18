@@ -52,7 +52,7 @@ public class RecentTimestamps {
       }
     }
     if (count == 0) {
-      throw new NoUserException("User: " + userId + " doesn\'t exist.");
+      throw new NoUserException("User: " + userId + " doesn't exist.");
     }
     prep.close();
     rs.close();

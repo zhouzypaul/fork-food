@@ -83,7 +83,7 @@ public class Login {
       result = rs.getString(1);
     }
     if (count == 0) {
-      throw new NoUserException("User: " + userId + " doesn\'t exist.");
+      throw new NoUserException("User: " + userId + " doesn't exist.");
     }
     prep.close();
     rs.close();
@@ -107,7 +107,7 @@ public class Login {
       prep.setString(2, userId);
       int affectedRows = prep.executeUpdate();
       if (affectedRows == 0) {
-        throw new NoUserException("User: " + userId + " doesn\'t exist.");
+        throw new NoUserException("User: " + userId + " doesn't exist.");
       }
       return true;
     } catch (SQLException e) {

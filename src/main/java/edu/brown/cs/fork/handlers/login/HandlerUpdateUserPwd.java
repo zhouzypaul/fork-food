@@ -20,6 +20,9 @@ import java.util.Map;
 
 public class HandlerUpdateUserPwd implements Route {
   private static final Gson GSON = new Gson();
+  private static final int SALT_LENGTH = 16;
+  private static final int PWD_ITERATION_COUNT = 65536;
+  private static final int PWD_KEY_LENGTH = 128;
 
   public HandlerUpdateUserPwd() {  }
 
@@ -32,12 +35,13 @@ public class HandlerUpdateUserPwd implements Route {
 
       // use a fixed salt for now, defeats the purpose but will come back to this
 //      SecureRandom random = new SecureRandom();
-      byte[] salt = new byte[16];
+      byte[] salt = new byte[SALT_LENGTH];
       Arrays.fill(salt, (byte) 0);
 //      random.nextBytes(salt);
 
       // hash user password before storing in db
-      KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);
+      KeySpec spec =
+              new PBEKeySpec(password.toCharArray(), salt, PWD_ITERATION_COUNT, PWD_KEY_LENGTH);
       SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
       String hash = Arrays.toString(factory.generateSecret(spec).getEncoded());
 

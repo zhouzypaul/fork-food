@@ -36,12 +36,13 @@ public class GroupSocket {
   private static final Hashtable<Integer, Queue<Session>> ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USER_ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USERS_COPY = new Hashtable<>();
-  private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>> USER_DECISIONS = new Hashtable<>();
+  private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>>
+          USER_DECISIONS = new Hashtable<>();
   private static final Hashtable<Integer, LocalTime> ROOM_TIME = new Hashtable<>();
   private static final HashSet<Integer> STARTED_ROOMS = new HashSet<>();
   private static int nextId = 0;
 
-  private enum MESSAGE_TYPE {
+  private enum MESSAGETYPE {
     CONNECT,
     UPDATE,
     SEND
@@ -51,14 +52,14 @@ public class GroupSocket {
   public void connected(Session session) throws IOException {
     // build CONNECT message
     JsonObject json = new JsonObject();
-    json.addProperty("type", MESSAGE_TYPE.CONNECT.ordinal());
+    json.addProperty("type", MESSAGETYPE.CONNECT.ordinal());
 
     JsonObject payload = new JsonObject();
     payload.addProperty("id", nextId++);
 
     json.add("payload", payload);
     // make sure to send a unique id!
-    // Hint: can use ordinal to get the number position of an enum, MESSAGE_TYPE.CONNECT.ordinal());
+    // Hint: can use ordinal to get the number position of an enum, MESSAGETYPE.CONNECT.ordinal());
 
     String message = GSON.toJson(json);
 
@@ -83,7 +84,7 @@ public class GroupSocket {
 
       // prepare update message
       JsonObject updateMessage = new JsonObject();
-      updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
+      updateMessage.addProperty("type", MESSAGETYPE.UPDATE.ordinal());
 
       JsonObject payload = new JsonObject();
       payload.addProperty("senderId", messageObj.getInt("id"));
@@ -153,7 +154,8 @@ public class GroupSocket {
           String user = messageObj.getJSONObject("message").getString("username");
           String resId = messageObj.getJSONObject("message").getString("resId");
           // add to the USER_DECISIONS table
-          USER_DECISIONS.get(roomId).get(resId).replace(user, messageObj.getJSONObject("message").getInt("like"));
+          USER_DECISIONS.get(roomId).get(resId).replace(user,
+                  messageObj.getJSONObject("message").getInt("like"));
           return;
 
         case "done":
@@ -164,7 +166,8 @@ public class GroupSocket {
             JsonObject result = new JsonObject();
 
             try {
-              String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId), USER_DECISIONS.get(roomId));
+              String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId),
+                      USER_DECISIONS.get(roomId));
 
               System.out.println("decision " + commonRes);
               Map<String, String> rest = new HashMap<>();
