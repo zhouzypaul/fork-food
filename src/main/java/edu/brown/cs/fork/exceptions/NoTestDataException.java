@@ -4,6 +4,7 @@ package edu.brown.cs.fork.exceptions;
  * used by the recommendation algorithm, when no training data is provided.
  */
 public class NoTestDataException extends ErrorException {
+  private static final long serialVersionUID = 0L;
   /**
    * constructor for ErrorException.
    *
