@@ -123,7 +123,7 @@ public class RecentRestaurants {
    * @param restIds ids to parse into a string for db
    * @return whether the update is successful
    */
-  private boolean setRecentRests(String userId, List<String> restIds) {
+  public boolean setRecentRests(String userId, List<String> restIds) {
     StringBuilder allRecentRests = new StringBuilder();
     for (int i = 0; i < restIds.size(); i++) {
       if (i == restIds.size() - 1) {

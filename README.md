@@ -90,7 +90,7 @@ load user path_to_custom_user_db
 
 - ```/getMostRecentRests``` body format: ```{"username": user_id}```, returns user's 10 most recent top restaurants in newer to older order, return format: ```{"restaurants": [map, map, ..], "timestamps": [string, string, ...], "err": err_msg}```
 
-- ```/deleteMostRecentRest``` body format: ```{"username": user_id, "business_id": rest_id}```, delete restaurant from user's most recent top restaurants, return format: ```{"success": succ, "err": err_msg}``` 
+- ```/deleteMostRecentRests``` body format: ```{"username": user_id}```, delete all of user's most recent top restaurants, return format: ```{"success": succ, "err": err_msg}``` 
 
 #### user
 
@@ -104,7 +104,7 @@ load user path_to_custom_user_db
 
 - ```/updatePwd``` body format: ```{"username": user_id, "password": new_pwd}```, returns whether the action is successful
 
-- ```/getUserPwd``` body format: ```{"id": user_id}```, returns user's password in format ```{"pwd": user_pwd}```
+- ```/getUserPwd``` body format: ```{"username": user_id}```, returns user's password in format ```{"pwd": user_pwd}```
 
 - ```/getUserPref``` gets user's survey response from /user/training table. body format: ```{"id": user_id}```, returns user with ```user_id``` in format ```{"types": [], "prices": [], "radius": "", "err": ""}```
 
