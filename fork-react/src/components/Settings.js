@@ -11,7 +11,7 @@ const SERVER_URL = 'http://localhost:4567';
 /**
  * Renders settings page.
  */
-function Settings(props) {
+function Settings() {
   const [old, setOld] = useState("");
   const [newPassword, setNew] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -19,6 +19,8 @@ function Settings(props) {
   const dispatch = useDispatch();
   const user = useSelector(state => state.user);
   const [pop, setPop] = useState(false);
+  const [deletePop, setDelete] = useState(false);
+  const [password, setPassword] = useState("");
 
   // checks for white spaces globally
   const hasWhiteSpace = (s) => {
@@ -42,15 +44,15 @@ function Settings(props) {
       setError("password can not contain white spaces");
     }
     if (valid) {
-      validPassword();
+      validPassword(change, old);
     }
   }
 
   // validates new password
-  const validPassword = () => {
+  const validPassword = (func, password) => {
     const toSend = {
       username: user,
-      password: old
+      password: password
     };
 
     let config = {
@@ -63,7 +65,7 @@ function Settings(props) {
     axios.post(`${SERVER_URL}/login`, toSend, config)
       .then((response) => {
         if (response.data["success"]) {
-          change();
+          func();
         } else {
           setError("incorrect password");
         }
@@ -90,6 +92,7 @@ function Settings(props) {
     axios.post(`${SERVER_URL}/updatePwd`, toSend, config)
       .then((response) => {
         if (response.data["success"]) {
+          setError("");
           togglePop();
         } else {
           setError("failed to update password");
@@ -110,16 +113,13 @@ function Settings(props) {
 
   // deletes account
   const deleteAccount = () => {
-    const resp = prompt("Type 'DELETE' to delete account permanently.");
-    if (resp === "DELETE") {
-      dataDelete();
-    }
+    validPassword(dataDelete, password);
   }
 
   // deletes user data
   const dataDelete = () => {
     const toSend = {
-      id: user
+      username: user
     };
 
     let config = {
@@ -149,6 +149,22 @@ function Settings(props) {
     setPop(old => !old);
   }
 
+  // toggles delete box
+  const toggleDelete = () => {
+    setDelete(old => !old);
+  }
+
+  // redirects home
+  const goHome = () => {
+    window.location.href = "/home";
+  }
+
+  const enterDelete = (e) => {
+    if (e.key === "Enter") {
+      deleteAccount();
+    }
+  }
+
   return (
     <>
       <TopBar to="/home" showOptions={false}/>
@@ -156,11 +172,8 @@ function Settings(props) {
         <div className="title-text">
           settings
         </div>
-        <br/>
         change password
-        <div className="login-error">
-          {error}
-        </div>
+        <div className="login-error">{error}</div>
         <TextBox initial="old password" change={setOld} onKeyDown={submit} type="password" />
         <TextBox initial="new password" change={setNew} onKeyDown={submit} type="password" />
         <TextBox initial="confirm password" change={setConfirm} onKeyDown={submit} type="password" />
@@ -168,8 +181,16 @@ function Settings(props) {
           save
         </button>
       </div>
-      {pop ? <Popup message="password changed successfully" to="/home" toggle={togglePop}/> : null}
-      <button className="secondary-button" id="delete" onClick={deleteAccount}>
+      {pop ? <Popup message="password changed successfully" click={goHome} button="home" toggle={togglePop}/> : null}
+      {deletePop ?
+        <Popup message={
+          <>
+            <div>enter password to delete account permanently</div>
+            <div className="login-error">{error}</div>
+            <TextBox initial="password" change={setPassword} onKeyDown={enterDelete} type="password"/>
+          </>
+        } click={deleteAccount} button="enter" toggle={toggleDelete}/> : null}
+      <button className="secondary-button" id="delete" onClick={toggleDelete}>
         delete account
       </button>
     </>
