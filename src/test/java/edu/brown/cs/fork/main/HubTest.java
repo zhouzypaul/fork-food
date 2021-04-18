@@ -33,6 +33,14 @@ public class HubTest implements ITest {
       Hub.getUserDB().updateUserGottenWay("sean", 0.8);
       Hub.getUserDB().updateUserGottenWay("ed", 0.3);
       Hub.getUserDB().updateUserGottenWay("alan", 0.11);
+      Hub.getUserDB().setRecentRests("paul", Collections.singletonList("denden"));
+      Hub.getUserDB().setRecentRests("sean", Collections.singletonList("denden"));
+      Hub.getUserDB().setRecentRests("ed", Collections.singletonList("denden"));
+      Hub.getUserDB().setRecentRests("alan", Collections.singletonList("denden"));
+      Hub.getUserDB().setRecentTimestamps("paul", Collections.singletonList("4/17/2021"));
+      Hub.getUserDB().setRecentTimestamps("sean", Collections.singletonList("4/17/2021"));
+      Hub.getUserDB().setRecentTimestamps("ed", Collections.singletonList("4/17/2021"));
+      Hub.getUserDB().setRecentTimestamps("alan", Collections.singletonList("4/17/2021"));
     } catch (Exception e) {
       fail();
     }
