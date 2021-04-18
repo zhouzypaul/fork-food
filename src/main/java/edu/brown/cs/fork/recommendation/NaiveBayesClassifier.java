@@ -156,12 +156,6 @@ public class NaiveBayesClassifier<R extends Recommendable, L extends LabeledData
    * (the dimension of the given attribute).
    */
   private void getClassCondProb() {
-
-    // iterate through the training data
-    for (L labeledData : this.trainingData) {
-      int label = labeledData.getLabel();
-    }
-
     // init
     this.classCondProb = new LinkedList<>();
 
