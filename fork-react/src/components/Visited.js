@@ -4,6 +4,12 @@ import axios from "axios";
 const SERVER_URL = 'http://localhost:4567';
 const GOOGLE = "https://www.google.com/search?q=";
 const MS_IN_DAY = 1000 * 60 * 60 * 24;
+const CONFIG = {
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+  },
+};
 
 /**
  * Renders visited restaurants.
@@ -17,14 +23,7 @@ function Visited(props) {
       username: props.user,
     };
 
-    let config = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    };
-
-    axios.post(`${SERVER_URL}/getMostRecentRests`, toSend, config)
+    axios.post(`${SERVER_URL}/getMostRecentRests`, toSend, CONFIG)
       .then((response) => {
         if (response.data['err'].length === 0) {
           const rest = response.data["restaurants"];
@@ -41,10 +40,25 @@ function Visited(props) {
               </div>
             </a>);
           }
-          rest.forEach((r) => {
-
-          });
           setRecent(display);
+        } else {
+          alert(response.data['err']);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  const clearRecent = () => {
+    const toSend = {
+      username: props.user,
+    };
+
+    axios.post(`${SERVER_URL}/deleteMostRecentRests`, toSend, CONFIG)
+      .then((response) => {
+        if (response.data['success']) {
+          setRecent([]);
         } else {
           alert(response.data['err']);
         }
@@ -56,7 +70,7 @@ function Visited(props) {
 
   useEffect(() => {
     getRecent();
-  }, [])
+  }, []);
 
   return (
     <div className="content" id="visited-section">
@@ -64,6 +78,7 @@ function Visited(props) {
       <div className="scroll-box">
         {recent}
       </div>
+      <button className="primary-button" onClick={clearRecent}>clear recent</button>
     </div>
   );
 }
