@@ -51,7 +51,6 @@ public class Hub {
       "Burgers", "Chinese", "Pizza", "Italian", "Japanese", "Indian", "Vietnamese", "Steakhouses",
       "Breakfast & Brunch", "Desserts", "Coffee & Tea", "Greek", "Middle Eastern", "Vegan",
       "Mexican", "Thai", "American (Traditional)", "Salad", "Barbeque", "Seafood", "");
-
   private static final List<String> FRONTEND_CATEGORIES = Arrays.asList(
       "burgers", "chinese", "pizza", "italian", "japanese", "indian", "vietnamese", "steak",
       "breakfast", "dessert", "coffee & tea", "greek", "middle eastern", "vegan",
@@ -59,7 +58,6 @@ public class Hub {
 
   // Price Ranges
   private static final List<String> PRICE_RANGES = Arrays.asList("1", "2", "3", "");
-
   private static final List<String> FRONTEND_PRICE_RANGES = Arrays.asList("$", "$$", "$$$", "");
 
   /**
