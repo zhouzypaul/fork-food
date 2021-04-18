@@ -505,7 +505,7 @@ h1 {
   fill: #DDAFF950;
   width: 50vmax;
   z-index: -1;
-  animation: move 10s ease-in-out infinite;
+  animation: move 15s ease-in-out infinite;
   transform-origin: 50% 50%;
 }
 
