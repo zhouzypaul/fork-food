@@ -2,9 +2,7 @@ package edu.brown.cs.fork;
 
 import edu.brown.cs.fork.database.queries.QueryRestaurants;
 import edu.brown.cs.fork.database.queries.QueryUsers;
-import edu.brown.cs.fork.exceptions.NoTestDataException;
-import edu.brown.cs.fork.exceptions.NoUserException;
-import edu.brown.cs.fork.exceptions.OutOfRangeException;
+import edu.brown.cs.fork.exceptions.*;
 import edu.brown.cs.fork.recommendation.NaiveBayesClassifier;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 import edu.brown.cs.fork.restaurants.Restaurant;
@@ -50,6 +48,15 @@ public class Hub {
       "Breakfast & Brunch", "Desserts", "Coffee & Tea", "Greek", "Middle Eastern", "Vegan",
       "Mexican", "Thai", "American", "Salad", "Barbeque", "Seafood");
 
+  private static final List<String> FRONTEND_CATEGORIES = Arrays.asList(
+      "burgers", "chinese", "pizza", "italian", "sushi", "indian", "vietnamese", "steakhouses",
+      "breakfast", "desserts", "coffee & tea", "greek", "middle eastern", "vegan",
+      "mexican", "thai", "american", "salad", "barbeque", "seafood");
+
+  // Price Ranges
+  private static final List<String> PRICE_RANGES = Arrays.asList("1", "2", "3");
+
+  private static final List<String> FRONTEND_PRICE_RANGES = Arrays.asList("$", "$$", "$$$");
 
   /**
    * Constructor.
@@ -224,6 +231,66 @@ public class Hub {
     }
     // return top restaurant
     return highestRankingRestaurant;
+  }
+
+  /**
+   * Maps a frontend category string to backend category string.
+   * @param category frontend category
+   * @return matching backend category
+   * @throws CategoryNotFoundException if category can't be found
+   */
+  public static String frontendCategoryToBackend(String category)
+      throws CategoryNotFoundException {
+    if (!FRONTEND_CATEGORIES.contains(category)) {
+      throw new CategoryNotFoundException("Category " + category + " can't be found.");
+    }
+    int idx = FRONTEND_CATEGORIES.indexOf(category);
+    return CATEGORIES.get(idx);
+  }
+
+  /**
+   * Maps a backend category string to frontend category string.
+   * @param category backend category
+   * @return matching frontend category
+   * @throws CategoryNotFoundException if category can't be found
+   */
+  public static String backendCategoryToFrontend(String category)
+      throws CategoryNotFoundException {
+    if (!CATEGORIES.contains(category)) {
+      throw new CategoryNotFoundException("Category " + category + " can't be found.");
+    }
+    int idx = CATEGORIES.indexOf(category);
+    return FRONTEND_CATEGORIES.get(idx);
+  }
+
+  /**
+   * Matches frontend price range with backend price range.
+   * @param frontendPriceRange frontend price range
+   * @return backend price range
+   */
+  public static String frontendPriceRangeToBackend(String frontendPriceRange)
+      throws PriceRangeNotFoundException {
+    if (!FRONTEND_PRICE_RANGES.contains(frontendPriceRange)) {
+      throw new PriceRangeNotFoundException("Price range " + frontendPriceRange
+          + " can't be found.");
+    }
+    int idx = FRONTEND_PRICE_RANGES.indexOf(frontendPriceRange);
+    return PRICE_RANGES.get(idx);
+  }
+
+  /**
+   * Matches backend priceRange to frontend.
+   * @param backendPR backend price range
+   * @return frontend price range
+   */
+  public static String backendPriceRangeToFrontend(String backendPR)
+      throws PriceRangeNotFoundException {
+    if (!PRICE_RANGES.contains(backendPR)) {
+      throw new PriceRangeNotFoundException("Price range " + backendPR
+        + " can't be found.");
+    }
+    int idx = PRICE_RANGES.indexOf(backendPR);
+    return FRONTEND_PRICE_RANGES.get(idx);
   }
 
   /**

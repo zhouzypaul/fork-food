@@ -2,8 +2,10 @@ package edu.brown.cs.fork.main;
 
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.ITest;
+import edu.brown.cs.fork.exceptions.CategoryNotFoundException;
 import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
+import edu.brown.cs.fork.exceptions.PriceRangeNotFoundException;
 import edu.brown.cs.fork.restaurants.Restaurant;
 import org.junit.Test;
 
@@ -160,5 +162,79 @@ public class HubTest implements ITest {
             Hub.getOverlap(Arrays.asList("Burgers", "Chinese", "Danny", "Wells")));
     assertEquals(Collections.emptyList(), Hub.getOverlap(Arrays.asList("NoNoNO", "Nothing")));
     this.tearDown();
+  }
+
+  /**
+   * tests for frontendCategoryToBackend and backendCategoryToFrontend
+   */
+  @Test
+  public void testMappingCategories() {
+    try {
+      String frontend = Hub.backendCategoryToFrontend("Sushi Bars");
+      assertEquals(frontend, "sushi");
+
+      frontend = Hub.backendCategoryToFrontend("Italian");
+      assertEquals(frontend, "italian");
+
+      String backend = Hub.frontendCategoryToBackend("burgers");
+      assertEquals(backend, "Burgers");
+
+      backend = Hub.frontendCategoryToBackend("vegan");
+      assertEquals(backend, "Vegan");
+    } catch (CategoryNotFoundException e) {
+      fail();
+    }
+
+    Exception exception = assertThrows(CategoryNotFoundException.class, () -> {
+      Hub.backendCategoryToFrontend("hello");
+    });
+
+    String expectedMessage = "Category hello can't be found.";
+    String actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
+
+    exception = assertThrows(CategoryNotFoundException.class, () -> {
+      Hub.frontendCategoryToBackend("hello");
+    });
+
+    expectedMessage = "Category hello can't be found.";
+    actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
+  }
+
+  /**
+   * tests for frontendPriceRangeToBackend and backendPriceRangeToFrontend
+   */
+  @Test
+  public void testMappingPriceRanges() {
+    try {
+      String frontend = Hub.backendPriceRangeToFrontend("2");
+      assertEquals(frontend, "$$");
+
+      String backend = Hub.frontendPriceRangeToBackend("$$$");
+      assertEquals(backend, "3");
+    } catch (PriceRangeNotFoundException e) {
+      fail();
+    }
+
+    Exception exception = assertThrows(PriceRangeNotFoundException.class, () -> {
+      Hub.backendPriceRangeToFrontend("5");
+    });
+
+    String expectedMessage = "Price range 5 can't be found.";
+    String actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
+
+    exception = assertThrows(PriceRangeNotFoundException.class, () -> {
+      Hub.frontendPriceRangeToBackend("$$$$");
+    });
+
+    expectedMessage = "Price range $$$$ can't be found.";
+    actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
   }
 }
