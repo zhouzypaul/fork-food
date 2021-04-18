@@ -1,4 +1,4 @@
-package edu.brown.cs.fork.database.queries;
+package edu.brown.cs.fork.database.clients;
 
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
@@ -227,11 +227,6 @@ public class QueryRestaurants {
         String restCategory = Collections.singletonList(m.group()).get(0);
         // see if this is a category that a user can select in survey
         if (Hub.isInCategories(restCategory)) {
-//          System.out.println(star);
-//          System.out.println(numReviews);
-//          System.out.println(dist);
-//          System.out.println(intPriceRange);
-//          System.out.println();
           results.add(
               new Restaurant(businessId, name, restCategory,
                 star, numReviews, dist, intPriceRange));

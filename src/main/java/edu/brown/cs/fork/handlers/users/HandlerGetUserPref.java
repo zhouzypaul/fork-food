@@ -3,6 +3,8 @@ package edu.brown.cs.fork.handlers.users;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.exceptions.CategoryNotFoundException;
+import edu.brown.cs.fork.exceptions.PriceRangeNotFoundException;
 import org.json.JSONObject;
 import spark.Request;
 import spark.Response;
@@ -26,66 +28,6 @@ public class HandlerGetUserPref implements Route {
    * Constructor.
    */
   public HandlerGetUserPref() {  }
-
-  public String matchPriceRange(String backendPR) {
-    switch (backendPR) {
-      case "1":
-        return "$";
-      case "2":
-        return "$$";
-      case "3":
-        return "$$$";
-      default:
-        return "NONE";
-    }
-  }
-
-  public String matchFoodTypes(String backendType) {
-    switch (backendType) {
-      case "Burgers":
-        return "burgers";
-      case "Chinese":
-        return "chinese";
-      case "Pizza":
-        return "pizza";
-      case "Italian":
-        return "italian";
-      case "Sushi Bars":
-        return "sushi";
-      case "Indian":
-        return "indian";
-      case "Vietnamese":
-        return "vietnamese";
-      case "Steakhouses":
-        return "steakhouses";
-      case "Breakfast & Brunch":
-        return "breakfast";
-      case "Desserts":
-        return "dessert";
-      case "Coffee & Tea":
-        return "coffee & tea";
-      case "Greek":
-        return "greek";
-      case "Middle Eastern":
-        return "middle eastern";
-      case "Vegan":
-        return "vegan";
-      case "Mexican":
-        return "mexican";
-      case "Thai":
-        return "thai";
-      case "American":
-        return "american";
-      case "Salad":
-        return "salad";
-      case "Barbeque":
-        return "barbeque";
-      case "Seafood":
-        return "seafood";
-      default:
-        return "NONE";
-    }
-  }
 
   @Override
   public Object handle(Request req, Response res) throws Exception {
@@ -117,17 +59,18 @@ public class HandlerGetUserPref implements Route {
         }
         if (priceRanges.size() > 0) {
           for (int i = 0; i < priceRanges.size(); i++) {
-            priceRanges.set(i, matchPriceRange(priceRanges.get(i)));
+            priceRanges.set(i, Hub.backendPriceRangeToFrontend(priceRanges.get(i)));
           }
         }
         if (foodTypes.size() > 0) {
           for (int i = 0; i < foodTypes.size(); i++) {
-            foodTypes.set(i, matchFoodTypes(foodTypes.get(i)));
+            foodTypes.set(i, Hub.backendCategoryToFrontend(foodTypes.get(i)));
           }
         }
-      } catch (SQLException | NumberFormatException e) {
+      } catch (SQLException | NumberFormatException | CategoryNotFoundException
+            | PriceRangeNotFoundException e) {
         err = "ERROR: " + e.getMessage();
-        System.out.println("ERROR: " + e.getMessage());
+        System.out.println(e.getMessage());
       }
     }
     Map<String, Object> variables = ImmutableMap.of("types", foodTypes,

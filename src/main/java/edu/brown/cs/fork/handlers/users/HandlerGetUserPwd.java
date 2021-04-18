@@ -36,7 +36,7 @@ public class HandlerGetUserPwd implements Route {
         pwd = Hub.getUserDB().getPwd(id);
       } catch (SQLException e) {
         err = "ERROR: " + e.getMessage();
-        System.out.println("ERROR: " + e.getMessage());
+        System.out.println(e.getMessage());
       }
     }
     Map<String, Object> variables = ImmutableMap.of("pwd", pwd, "err", err);

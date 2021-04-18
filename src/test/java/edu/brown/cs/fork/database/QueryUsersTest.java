@@ -2,7 +2,8 @@ package edu.brown.cs.fork.database;
 
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.ITest;
-import edu.brown.cs.fork.database.queries.QueryUsers;
+import edu.brown.cs.fork.database.clients.QueryUsers;
+import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
@@ -232,25 +233,99 @@ public class QueryUsersTest implements ITest {
       assertEquals(recentRests.get(1), "abcde");
       assertEquals(recentRests.get(2), "54321");
 
-      // unique recent restaurants
-      success = this.db.updateMostRecentRests("stranger", "abcde");
+      // delete a recent restaurant
+      success = this.db.deleteRecentRest("stranger", "abcde") != -1;
       assertTrue(success);
 
       recentRests = this.db.getMostRecentRests("stranger");
-      assertEquals(recentRests.size(), 3);
+      assertEquals(recentRests.size(), 2);
       assertEquals(recentRests.get(0), "12345");
-      assertEquals(recentRests.get(1), "abcde");
-      assertEquals(recentRests.get(2), "54321");
+      assertEquals(recentRests.get(1), "54321");
 
       success = this.db.deleteUser("stranger");
       assertTrue(success);
-    } catch (SQLException | NoUserException e) {
+    } catch (SQLException | NoUserException | NoRestaurantException e) {
       System.out.println(e.getMessage());
       fail();
     }
 
     Exception exception = assertThrows(NoUserException.class, () -> {
       this.db.getMostRecentRests("stranger");
+    });
+
+    String expectedMessage = "User: stranger doesn't exist.";
+    String actualMessage = exception.getMessage();
+
+    assertTrue(actualMessage.contains(expectedMessage));
+
+    tearDown();
+  }
+
+  @Test
+  public void testRecentTimes() {
+    setUp();
+
+    try {
+      boolean success = this.db.registerUser("stranger", "hi");
+      assertTrue(success);
+
+      List<String> recentTimes = this.db.getMostRecentTimes("stranger");
+      assertEquals(recentTimes.size(), 0);
+
+      success = this.db.updateMostRecentTimes("stranger", "2/1/2021");
+      assertTrue(success);
+
+      recentTimes = this.db.getMostRecentTimes("stranger");
+      assertEquals(recentTimes.size(), 1);
+      assertEquals(recentTimes.get(0), "2/1/2021");
+
+      success = this.db.updateMostRecentTimes("stranger", "3/1/2021");
+      assertTrue(success);
+
+      recentTimes = this.db.getMostRecentTimes("stranger");
+      assertEquals(recentTimes.size(), 2);
+      assertEquals(recentTimes.get(0), "2/1/2021");
+      assertEquals(recentTimes.get(1), "3/1/2021");
+
+      success = this.db.updateMostRecentTimes("stranger", "4/1/2021");
+      assertTrue(success);
+
+      recentTimes = this.db.getMostRecentTimes("stranger");
+      assertEquals(recentTimes.size(), 3);
+      assertEquals(recentTimes.get(0), "2/1/2021");
+      assertEquals(recentTimes.get(1), "3/1/2021");
+      assertEquals(recentTimes.get(2), "4/1/2021");
+
+      // non-unique timestamps
+      success = this.db.updateMostRecentTimes("stranger", "3/1/2021");
+      assertTrue(success);
+
+      recentTimes = this.db.getMostRecentTimes("stranger");
+      assertEquals(recentTimes.size(), 4);
+      assertEquals(recentTimes.get(0), "2/1/2021");
+      assertEquals(recentTimes.get(1), "3/1/2021");
+      assertEquals(recentTimes.get(2), "4/1/2021");
+      assertEquals(recentTimes.get(3), "3/1/2021");
+
+      // delete a recent restaurant
+      success = this.db.deleteRecentTime("stranger", 1);
+      assertTrue(success);
+
+      recentTimes = this.db.getMostRecentTimes("stranger");
+      assertEquals(recentTimes.size(), 3);
+      assertEquals(recentTimes.get(0), "2/1/2021");
+      assertEquals(recentTimes.get(1), "4/1/2021");
+      assertEquals(recentTimes.get(2), "3/1/2021");
+
+      success = this.db.deleteUser("stranger");
+      assertTrue(success);
+    } catch (SQLException | NoUserException | NoRestaurantException e) {
+      System.out.println(e.getMessage());
+      fail();
+    }
+
+    Exception exception = assertThrows(NoUserException.class, () -> {
+      this.db.getMostRecentTimes("stranger");
     });
 
     String expectedMessage = "User: stranger doesn't exist.";

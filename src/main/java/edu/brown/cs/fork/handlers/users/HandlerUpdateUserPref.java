@@ -3,6 +3,8 @@ package edu.brown.cs.fork.handlers.users;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
+import edu.brown.cs.fork.exceptions.CategoryNotFoundException;
+import edu.brown.cs.fork.exceptions.PriceRangeNotFoundException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import spark.Request;
@@ -24,76 +26,6 @@ public class HandlerUpdateUserPref implements Route {
    * Constructor.
    */
   public HandlerUpdateUserPref() {  }
-
-  /**
-   * Matches frontend food types with backend food types.
-   * @param frontendType frontend food type
-   * @return backend food type
-   */
-  public String matchFoodTypes(String frontendType) {
-    switch (frontendType) {
-      case "burgers":
-        return "Burgers";
-      case "chinese":
-        return "Chinese";
-      case "pizza":
-        return "Pizza";
-      case "italian":
-        return "Italian";
-      case "sushi":
-        return "Sushi Bars";
-      case "indian":
-        return "Indian";
-      case "vietnamese":
-        return "Vietnamese";
-      case "steak":
-        return "Steakhouses";
-      case "breakfast":
-        return "Breakfast & Brunch";
-      case "dessert":
-        return "Desserts";
-      case "coffee & tea":
-        return "Coffee & Tea";
-      case "greek":
-        return "Greek";
-      case "middle eastern":
-        return "Middle Eastern";
-      case "vegan":
-        return "Vegan";
-      case "mexican":
-        return "Mexican";
-      case "thai":
-        return "Thai";
-      case "american":
-        return "American";
-      case "salad":
-        return "Salad";
-      case "barbeque":
-        return "Barbeque";
-      case "seafood":
-        return "Seafood";
-      default:
-        return "";
-    }
-  }
-
-  /**
-   * Matches frontend price range with backend price range.
-   * @param frontendPriceRange frontend price range
-   * @return backend price range
-   */
-  public String matchPriceRanges(String frontendPriceRange) {
-    switch (frontendPriceRange) {
-      case "$":
-        return "1";
-      case "$$":
-        return "2";
-      case "$$$":
-        return "3";
-      default:
-        return "";
-    }
-  }
 
   @Override
   public Object handle(Request req, Response res) throws Exception {
@@ -131,12 +63,19 @@ public class HandlerUpdateUserPref implements Route {
       if (!Hub.getUserDB().deleteUserPref(userId)) {
         err = "ERROR: Can't update user preference";
       } else {
-        for (int i = 0; i < foodTypes.size(); i++) {
-          for (int j = 0; j < priceRanges.size(); j++) {
-            List<String> info = Arrays.asList(userId, "", matchFoodTypes(foodTypes.get(i)), "3.0",
-                matchPriceRanges(priceRanges.get(j)), distance, "1", "", "60", "");
-            success = Hub.getUserDB().insertUserPref(colsToSet, info);
+        try {
+          for (int i = 0; i < foodTypes.size(); i++) {
+            for (int j = 0; j < priceRanges.size(); j++) {
+              List<String> info = Arrays.asList(userId, "",
+                  Hub.frontendCategoryToBackend(foodTypes.get(i)), "3.0",
+                  Hub.frontendPriceRangeToBackend(priceRanges.get(j)), distance, "1", "", "60", "");
+              success = Hub.getUserDB().insertUserPref(colsToSet, info);
+            }
           }
+        } catch (CategoryNotFoundException | PriceRangeNotFoundException e) {
+          System.out.println(e.getMessage());
+          success = false;
+          err = e.getMessage();
         }
       }
     }

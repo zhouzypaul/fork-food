@@ -1,10 +1,12 @@
 package edu.brown.cs.fork;
 
-import edu.brown.cs.fork.database.queries.QueryRestaurants;
-import edu.brown.cs.fork.database.queries.QueryUsers;
+import edu.brown.cs.fork.database.clients.QueryRestaurants;
+import edu.brown.cs.fork.database.clients.QueryUsers;
+import edu.brown.cs.fork.exceptions.CategoryNotFoundException;
 import edu.brown.cs.fork.exceptions.NoTestDataException;
 import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
+import edu.brown.cs.fork.exceptions.PriceRangeNotFoundException;
 import edu.brown.cs.fork.recommendation.NaiveBayesClassifier;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 import edu.brown.cs.fork.restaurants.Restaurant;
@@ -12,7 +14,16 @@ import edu.brown.cs.fork.users.Group;
 import edu.brown.cs.fork.users.Person;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A singleton class containing REPL and databases.
@@ -33,12 +44,21 @@ public class Hub {
   public static final int DEFAULT_NUM_REVIEWS = 0;
   public static final int DEFAULT_LABEL = 1;
 
+  private static final SimpleDateFormat SDF = new SimpleDateFormat("MM/dd/yyyy");
+
   // Food categories
   private static final List<String> CATEGORIES = Arrays.asList(
-      "Burgers", "Chinese", "Pizza", "Italian", "Sushi Bars", "Indian", "Vietnamese", "Steakhouses",
+      "Burgers", "Chinese", "Pizza", "Italian", "Japanese", "Indian", "Vietnamese", "Steakhouses",
       "Breakfast & Brunch", "Desserts", "Coffee & Tea", "Greek", "Middle Eastern", "Vegan",
-      "Mexican", "Thai", "American", "Salad", "Barbeque", "Seafood");
+      "Mexican", "Thai", "American (Traditional)", "Salad", "Barbeque", "Seafood", "");
+  private static final List<String> FRONTEND_CATEGORIES = Arrays.asList(
+      "burgers", "chinese", "pizza", "italian", "japanese", "indian", "vietnamese", "steak",
+      "breakfast", "dessert", "coffee & tea", "greek", "middle eastern", "vegan",
+      "mexican", "thai", "american", "salad", "barbeque", "seafood", "");
 
+  // Price Ranges
+  private static final List<String> PRICE_RANGES = Arrays.asList("1", "2", "3", "");
+  private static final List<String> FRONTEND_PRICE_RANGES = Arrays.asList("$", "$$", "$$$", "");
 
   /**
    * Constructor.
@@ -207,9 +227,72 @@ public class Hub {
       USER_DB.updateUserGottenWay(userId, newGottenWay);
       // add most recent restaurants to users login table
       USER_DB.updateMostRecentRests(userId, highestRankingRestaurant);
+      // add the corresponding timestamp to users login table
+      Date date = new Date();
+      USER_DB.updateMostRecentTimes(userId, SDF.format(date));
     }
     // return top restaurant
     return highestRankingRestaurant;
+  }
+
+  /**
+   * Maps a frontend category string to backend category string.
+   * @param category frontend category
+   * @return matching backend category
+   * @throws CategoryNotFoundException if category can't be found
+   */
+  public static String frontendCategoryToBackend(String category)
+      throws CategoryNotFoundException {
+    if (!FRONTEND_CATEGORIES.contains(category)) {
+      throw new CategoryNotFoundException("Category " + category + " can't be found.");
+    }
+    int idx = FRONTEND_CATEGORIES.indexOf(category);
+    return CATEGORIES.get(idx);
+  }
+
+  /**
+   * Maps a backend category string to frontend category string.
+   * @param category backend category
+   * @return matching frontend category
+   * @throws CategoryNotFoundException if category can't be found
+   */
+  public static String backendCategoryToFrontend(String category)
+      throws CategoryNotFoundException {
+    if (!CATEGORIES.contains(category)) {
+      throw new CategoryNotFoundException("Category " + category + " can't be found.");
+    }
+    int idx = CATEGORIES.indexOf(category);
+    return FRONTEND_CATEGORIES.get(idx);
+  }
+
+  /**
+   * Matches frontend price range with backend price range.
+   * @param frontendPriceRange frontend price range
+   * @return backend price range
+   */
+  public static String frontendPriceRangeToBackend(String frontendPriceRange)
+      throws PriceRangeNotFoundException {
+    if (!FRONTEND_PRICE_RANGES.contains(frontendPriceRange)) {
+      throw new PriceRangeNotFoundException("Price range " + frontendPriceRange
+          + " can't be found.");
+    }
+    int idx = FRONTEND_PRICE_RANGES.indexOf(frontendPriceRange);
+    return PRICE_RANGES.get(idx);
+  }
+
+  /**
+   * Matches backend priceRange to frontend.
+   * @param backendPR backend price range
+   * @return frontend price range
+   */
+  public static String backendPriceRangeToFrontend(String backendPR)
+      throws PriceRangeNotFoundException {
+    if (!PRICE_RANGES.contains(backendPR)) {
+      throw new PriceRangeNotFoundException("Price range " + backendPR
+        + " can't be found.");
+    }
+    int idx = PRICE_RANGES.indexOf(backendPR);
+    return FRONTEND_PRICE_RANGES.get(idx);
   }
 
   /**

@@ -10,8 +10,16 @@ import spark.Route;
 
 import java.util.Map;
 
-public class HandlerUpdateMostRecentRests implements Route {
+/**
+ * Deletes a recent restaurant id.
+ */
+public class HandlerDeleteMostRecentRest implements Route {
   private static final Gson GSON = new Gson();
+
+  /**
+   * Constructor.
+   */
+  public HandlerDeleteMostRecentRest() {  }
 
   @Override
   public Object handle(Request req, Response res) throws Exception {
@@ -24,7 +32,12 @@ public class HandlerUpdateMostRecentRests implements Route {
     if (!Hub.getRestDB().isConnected()) {
       err = "ERROR: No database connected";
     } else {
-      success = Hub.getUserDB().updateMostRecentRests(userId, restId);
+      int idx = Hub.getUserDB().deleteRecentRest(userId, restId);
+      if (idx == -1) {
+        err = "ERROR: Can't delete recent restaurant.";
+      } else {
+        success = Hub.getUserDB().deleteRecentTime(userId, idx);
+      }
     }
 
     Map<String, Object> variables = ImmutableMap.of("success", success, "err", err);
