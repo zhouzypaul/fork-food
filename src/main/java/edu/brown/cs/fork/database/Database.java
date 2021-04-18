@@ -37,7 +37,7 @@ public class Database {
    * @return the database connection
    */
   public Connection getConn() {
-    return this.conn;
+    return conn;
   }
 
   /**
@@ -55,7 +55,7 @@ public class Database {
    */
   public void close() throws SQLErrorException {
     try {
-      this.conn.close();
+      conn.close();
     } catch (SQLException e) {
       throw new SQLErrorException("could not close database connection");
     }
