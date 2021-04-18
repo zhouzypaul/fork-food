@@ -179,6 +179,8 @@ public class Hub {
    * This method also updates the gottenWay field of the user in the database after the ranking
    * is finished.
    *
+   * This method also updates the database fields after a final restaurant is selected.
+   *
    * @param userIds - a set of userIds
    * @param votes - a maps from (restaurantId -- (userId -- whether like)), representing the
    *              swipe results each user had on each restaurant. An integer 1 corresponds to
@@ -219,12 +221,15 @@ public class Hub {
     }
     assert maxEntry != null;
     String highestRankingRestaurant = maxEntry.getKey();
-    // update user's gottenWay in DB
+    // update the DB
     for (String userId : userIds) {
       double newGottenWay = userGottenWays.get(userId) * GOTTEN_WAY_PRESERVE_RATIO
               + (1 - votes.get(highestRankingRestaurant).get(userId))
               * (1 - GOTTEN_WAY_PRESERVE_RATIO);
-      USER_DB.updateUserGottenWay(userId, newGottenWay);
+      // update user's gottenWay in DB
+      if (userIds.size() != 1) {
+        USER_DB.updateUserGottenWay(userId, newGottenWay);
+      }
       // add most recent restaurants to users login table
       USER_DB.updateMostRecentRests(userId, highestRankingRestaurant);
       // add the corresponding timestamp to users login table
