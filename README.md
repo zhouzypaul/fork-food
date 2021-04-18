@@ -104,7 +104,7 @@ load user path_to_custom_user_db
 
 - ```/updatePwd``` body format: ```{"username": user_id, "password": new_pwd}```, returns whether the action is successful
 
-- ```/getUserPwd``` body format: ```{"id": user_id}```, returns user's password in format ```{"pwd": user_pwd}```
+- ```/getUserPwd``` body format: ```{"username": user_id}```, returns user's password in format ```{"pwd": user_pwd}```
 
 - ```/getUserPref``` gets user's survey response from /user/training table. body format: ```{"id": user_id}```, returns user with ```user_id``` in format ```{"types": [], "prices": [], "radius": "", "err": ""}```
 
