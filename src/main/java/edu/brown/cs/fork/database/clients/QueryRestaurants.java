@@ -1,4 +1,4 @@
-package edu.brown.cs.fork.database.queries;
+package edu.brown.cs.fork.database.clients;
 
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;

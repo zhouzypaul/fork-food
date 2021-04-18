@@ -1,9 +1,9 @@
-package edu.brown.cs.fork.database.queries;
+package edu.brown.cs.fork.database.clients;
 
-import com.google.gson.Gson;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.database.Database;
 import edu.brown.cs.fork.database.DistanceCalculator;
+import edu.brown.cs.fork.database.actions.Login;
 import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
@@ -33,13 +33,15 @@ import java.util.regex.Pattern;
 public class QueryUsers {
   private Database db = new Database();
   private Connection conn;
-  private static final Gson GSON = new Gson();
   private static final int SEVEN = 7;
   private static final int EIGHT = 8;
   private static final int NINE = 9;
   private static final int TEN = 10;
   private static final double RAD = 3958.8;
   private static final int RECENTSIZE = 10;
+
+  // actions
+  private Login login;
 
   /**
    * Constructor.
@@ -54,6 +56,7 @@ public class QueryUsers {
     try {
       db.initDatabase(dbPath);
       this.conn = db.getConn();
+      this.login = new Login(this.conn);
     } catch (SQLException | ClassNotFoundException e) {
       System.out.println(e.getMessage());
     }
@@ -517,16 +520,14 @@ public class QueryUsers {
   public boolean updateMostRecentRests(String userId, String restId) {
     try {
       List<String> recentRests = getMostRecentRests(userId);
-      if (!recentRests.contains(restId)) {
-        if (recentRests.size() < RECENTSIZE) {
-          recentRests.add(restId);
-        } else if (recentRests.size() == RECENTSIZE) {
-          recentRests.remove(0);
-          recentRests.add(restId);
-        } else {
-          System.out.println("ERROR: Too many recent restaurants.");
-          return false;
-        }
+      if (recentRests.size() < RECENTSIZE) {
+        recentRests.add(restId);
+      } else if (recentRests.size() == RECENTSIZE) {
+        recentRests.remove(0);
+        recentRests.add(restId);
+      } else {
+        System.out.println("ERROR: Too many recent restaurants.");
+        return false;
       }
 
       return setRecentRests(userId, recentRests);
@@ -678,19 +679,7 @@ public class QueryUsers {
    * @return true if registered successfully, false if otherwise
    */
   public boolean registerUser(String userId, String pwd) {
-    String sql = "INSERT INTO login VALUES (?, ?, 1, ?, ?);";
-    try {
-      PreparedStatement prep = this.conn.prepareStatement(sql);
-      prep.setString(1, userId);
-      prep.setString(2, pwd);
-      prep.setString(3, "");
-      prep.setString(4, "");
-      prep.executeUpdate();
-      return true;
-    } catch (SQLException e) {
-      System.out.println("ERROR: Could not add a new user to the database");
-      return false;
-    }
+    return this.login.registerUser(userId, pwd);
   }
 
   /**
@@ -701,22 +690,7 @@ public class QueryUsers {
    * @throws NoUserException NoUserException
    */
   public String getPwd(String userId) throws SQLException, NoUserException {
-    String result = "";
-    String sql = "SELECT password FROM login WHERE userId = ?;";
-    PreparedStatement prep = this.conn.prepareStatement(sql);
-    prep.setString(1, userId);
-    ResultSet rs = prep.executeQuery();
-    int count = 0;
-    while (rs.next()) {
-      count += 1;
-      result = rs.getString(1);
-    }
-    if (count == 0) {
-      throw new NoUserException("User: " + userId + " doesn\'t exist.");
-    }
-    prep.close();
-    rs.close();
-    return result;
+    return this.login.getPwd(userId);
   }
 
   /**
@@ -726,23 +700,8 @@ public class QueryUsers {
    * @return a boolean indicating whether the update is successful
    * @throws NoUserException if the user can't be found in the database
    */
-  public boolean changePwd(String userId, String newPwd)
-      throws NoUserException {
-    String sql = "UPDATE login SET password = ? WHERE userId = ?;";
-    PreparedStatement prep = null;
-    try {
-      prep = this.conn.prepareStatement(sql);
-      prep.setString(1, newPwd);
-      prep.setString(2, userId);
-      int affectedRows = prep.executeUpdate();
-      if (affectedRows == 0) {
-        throw new NoUserException("User: " + userId + " doesn\'t exist.");
-      }
-      return true;
-    } catch (SQLException e) {
-      System.out.println("ERROR: " + e.getMessage());
-      return false;
-    }
+  public boolean changePwd(String userId, String newPwd) throws NoUserException {
+    return this.login.changePwd(userId, newPwd);
   }
 
   /**
@@ -751,19 +710,6 @@ public class QueryUsers {
    * @return true if deletion is successful, false if otherwise
    */
   public boolean deleteUser(String userID) {
-    String sql = "DELETE FROM login WHERE userId = ?;";
-    String sql2 = "DELETE FROM training WHERE userId = ?;";
-    try {
-      PreparedStatement prep = conn.prepareStatement(sql);
-      PreparedStatement prep2 = conn.prepareStatement(sql2);
-      prep.setString(1, userID);
-      prep2.setString(1, userID);
-      prep.executeUpdate();
-      prep2.executeUpdate();
-      return true;
-    } catch (SQLException e) {
-      System.out.println("ERROR: Could not delete user " + userID + " from the database");
-      return false;
-    }
+    return this.login.deleteUser(userID);
   }
 }

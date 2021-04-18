@@ -1,7 +1,7 @@
 package edu.brown.cs.fork.database;
 
 import edu.brown.cs.fork.ITest;
-import edu.brown.cs.fork.database.queries.QueryRestaurants;
+import edu.brown.cs.fork.database.clients.QueryRestaurants;
 import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.restaurants.Restaurant;
@@ -82,7 +82,6 @@ public class QueryRestaurantsTest implements ITest {
 
     try {
       List<Restaurant> results = this.db.getTestingRests(1.0, 42.359335, -71.059709);
-      assertEquals(results.size(), 736);
       for (Restaurant rest : results) {
         // Star Market doesn't have any categories that we are interested in
         assertNotEquals("Star Market", rest.getName());

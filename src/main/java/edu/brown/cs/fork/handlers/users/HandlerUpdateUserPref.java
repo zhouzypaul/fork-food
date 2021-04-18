@@ -73,7 +73,7 @@ public class HandlerUpdateUserPref implements Route {
             }
           }
         } catch (CategoryNotFoundException | PriceRangeNotFoundException e) {
-          System.out.println("ERROR: " + e.getMessage());
+          System.out.println(e.getMessage());
           success = false;
           err = e.getMessage();
         }

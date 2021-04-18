@@ -2,7 +2,7 @@ package edu.brown.cs.fork.database;
 
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.ITest;
-import edu.brown.cs.fork.database.queries.QueryUsers;
+import edu.brown.cs.fork.database.clients.QueryUsers;
 import edu.brown.cs.fork.exceptions.NoRestaurantException;
 import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
@@ -225,16 +225,6 @@ public class QueryUsersTest implements ITest {
       assertEquals(recentRests.get(1), "abcde");
 
       success = this.db.updateMostRecentRests("stranger", "54321");
-      assertTrue(success);
-
-      recentRests = this.db.getMostRecentRests("stranger");
-      assertEquals(recentRests.size(), 3);
-      assertEquals(recentRests.get(0), "12345");
-      assertEquals(recentRests.get(1), "abcde");
-      assertEquals(recentRests.get(2), "54321");
-
-      // unique recent restaurants
-      success = this.db.updateMostRecentRests("stranger", "abcde");
       assertTrue(success);
 
       recentRests = this.db.getMostRecentRests("stranger");

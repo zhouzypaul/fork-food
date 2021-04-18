@@ -1,8 +1,12 @@
 package edu.brown.cs.fork;
 
-import edu.brown.cs.fork.database.queries.QueryRestaurants;
-import edu.brown.cs.fork.database.queries.QueryUsers;
-import edu.brown.cs.fork.exceptions.*;
+import edu.brown.cs.fork.database.clients.QueryRestaurants;
+import edu.brown.cs.fork.database.clients.QueryUsers;
+import edu.brown.cs.fork.exceptions.CategoryNotFoundException;
+import edu.brown.cs.fork.exceptions.NoTestDataException;
+import edu.brown.cs.fork.exceptions.NoUserException;
+import edu.brown.cs.fork.exceptions.OutOfRangeException;
+import edu.brown.cs.fork.exceptions.PriceRangeNotFoundException;
 import edu.brown.cs.fork.recommendation.NaiveBayesClassifier;
 import edu.brown.cs.fork.restaurants.LabeledRestaurant;
 import edu.brown.cs.fork.restaurants.Restaurant;
@@ -44,19 +48,19 @@ public class Hub {
 
   // Food categories
   private static final List<String> CATEGORIES = Arrays.asList(
-      "Burgers", "Chinese", "Pizza", "Italian", "Sushi Bars", "Indian", "Vietnamese", "Steakhouses",
+      "Burgers", "Chinese", "Pizza", "Italian", "Japanese", "Indian", "Vietnamese", "Steakhouses",
       "Breakfast & Brunch", "Desserts", "Coffee & Tea", "Greek", "Middle Eastern", "Vegan",
-      "Mexican", "Thai", "American", "Salad", "Barbeque", "Seafood");
+      "Mexican", "Thai", "American (Traditional)", "Salad", "Barbeque", "Seafood", "");
 
   private static final List<String> FRONTEND_CATEGORIES = Arrays.asList(
-      "burgers", "chinese", "pizza", "italian", "sushi", "indian", "vietnamese", "steakhouses",
-      "breakfast", "desserts", "coffee & tea", "greek", "middle eastern", "vegan",
-      "mexican", "thai", "american", "salad", "barbeque", "seafood");
+      "burgers", "chinese", "pizza", "italian", "japanese", "indian", "vietnamese", "steak",
+      "breakfast", "dessert", "coffee & tea", "greek", "middle eastern", "vegan",
+      "mexican", "thai", "american", "salad", "barbeque", "seafood", "");
 
   // Price Ranges
-  private static final List<String> PRICE_RANGES = Arrays.asList("1", "2", "3");
+  private static final List<String> PRICE_RANGES = Arrays.asList("1", "2", "3", "");
 
-  private static final List<String> FRONTEND_PRICE_RANGES = Arrays.asList("$", "$$", "$$$");
+  private static final List<String> FRONTEND_PRICE_RANGES = Arrays.asList("$", "$$", "$$$", "");
 
   /**
    * Constructor.

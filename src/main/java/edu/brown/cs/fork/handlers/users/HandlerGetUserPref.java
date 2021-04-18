@@ -70,7 +70,7 @@ public class HandlerGetUserPref implements Route {
       } catch (SQLException | NumberFormatException | CategoryNotFoundException
             | PriceRangeNotFoundException e) {
         err = "ERROR: " + e.getMessage();
-        System.out.println("ERROR: " + e.getMessage());
+        System.out.println(e.getMessage());
       }
     }
     Map<String, Object> variables = ImmutableMap.of("types", foodTypes,

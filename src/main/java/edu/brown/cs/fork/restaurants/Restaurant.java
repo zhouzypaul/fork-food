@@ -1,5 +1,6 @@
 package edu.brown.cs.fork.restaurants;
 
+import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.exceptions.OutOfRangeException;
 import edu.brown.cs.fork.recommendation.Recommendable;
 
@@ -28,10 +29,6 @@ public class Restaurant implements Recommendable {
   private final int numReviews;
   private final double distance;
   private final int priceRange;
-  private final String[] allFoodTypes = new String[] {"Burgers", "Chinese", "Pizza", "Italian",
-      "Sushi Bars", "Indian", "Vietnamese", "Steakhouses", "Breakfast & Brunch", "Desserts",
-      "Coffee & Tea", "Greek", "Middle Eastern", "Vegan", "Mexican", "Thai", "American",
-      "Salad", "Barbeque", "Seafood"};
   // dim of attributes
   // a restaurant object has 4 recommendable features, each with dimension
   // 1) the distance to the user: dimension of 4 (separated into 4 bins: close, walk, drive, far)
@@ -40,7 +37,7 @@ public class Restaurant implements Recommendable {
   // 4) the star review: dimension of 5 (separated into 5 bins, one for each integer star)
   // 5) the priceRange: dimension of 3 (low, med, high)
   private final int dimDistance = 4;
-  private final int dimFoodType = this.allFoodTypes.length;
+  private final int dimFoodType = Hub.getCategories().size();
   private final int dimStar = 5;
   private final int dimNumReviews = 3;
   private final int dimPriceRange = 3;
@@ -207,7 +204,7 @@ public class Restaurant implements Recommendable {
   private int mapFoodType() {
     // if one of the food types we care about
     for (int i = 0; i < this.dimFoodType; i++) {
-      if (this.foodType.equals(this.allFoodTypes[i])) {
+      if (this.foodType.equals(Hub.getCategories().get(i))) {
         return i;
       }
     }
@@ -290,7 +287,10 @@ public class Restaurant implements Recommendable {
       return false;
     }
     Restaurant that = (Restaurant) o;
-    return Double.compare(that.star, star) == 0 && numReviews == that.numReviews && Double.compare(that.distance, distance) == 0 && priceRange == that.priceRange && Objects.equals(id, that.id) && Objects.equals(name, that.name) && Objects.equals(foodType, that.foodType);
+    return Double.compare(that.star, star) == 0 && numReviews == that.numReviews
+        && Double.compare(that.distance, distance) == 0 && priceRange == that.priceRange
+        && Objects.equals(id, that.id) && Objects.equals(name, that.name)
+        && Objects.equals(foodType, that.foodType);
   }
 
   @Override

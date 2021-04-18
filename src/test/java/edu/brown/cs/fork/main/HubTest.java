@@ -73,8 +73,8 @@ public class HubTest implements ITest {
       assertEquals("w07VkLk8BQZncFy9VdRxXA", rec.get(5).getId());
       assertEquals("0exn6MoH5MVASUYkEj6XOg", rec.get(6).getId());
       assertEquals("U0XHkvLa_aegtuHJDaGuZg", rec.get(7).getId());
-      assertEquals("DrpjkkW4Yk9pTrV1iafrJA", rec.get(8).getId());
-      assertEquals("tfdTgV2Sgvk4kY_BpuYeMg", rec.get(9).getId());
+      assertEquals("XHE0nHI1k8zmJVW7Ls_lVg", rec.get(8).getId());
+      assertEquals("DrpjkkW4Yk9pTrV1iafrJA", rec.get(9).getId());
       List<Restaurant> recSean = Hub.recommendRestaurants(sean, new double[]{42.359335, -71.059709});
       assertEquals(rec, recSean);
     } catch (Exception e) {
@@ -144,9 +144,9 @@ public class HubTest implements ITest {
   public void testGetCategories() {
     this.setUp();
     assertEquals(Arrays.asList(
-            "Burgers", "Chinese", "Pizza", "Italian", "Sushi Bars", "Indian", "Vietnamese", "Steakhouses",
+            "Burgers", "Chinese", "Pizza", "Italian", "Japanese", "Indian", "Vietnamese", "Steakhouses",
             "Breakfast & Brunch", "Desserts", "Coffee & Tea", "Greek", "Middle Eastern", "Vegan",
-            "Mexican", "Thai", "American", "Salad", "Barbeque", "Seafood"), Hub.getCategories());
+            "Mexican", "Thai", "American (Traditional)", "Salad", "Barbeque", "Seafood", ""), Hub.getCategories());
     this.tearDown();
   }
 
@@ -170,8 +170,8 @@ public class HubTest implements ITest {
   @Test
   public void testMappingCategories() {
     try {
-      String frontend = Hub.backendCategoryToFrontend("Sushi Bars");
-      assertEquals(frontend, "sushi");
+      String frontend = Hub.backendCategoryToFrontend("Japanese");
+      assertEquals(frontend, "japanese");
 
       frontend = Hub.backendCategoryToFrontend("Italian");
       assertEquals(frontend, "italian");
