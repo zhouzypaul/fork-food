@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,7 +67,6 @@ public class GroupSocket {
     String message = GSON.toJson(json);
 
     session.getRemote().sendString(message);
-
   }
 
   @OnWebSocketClose

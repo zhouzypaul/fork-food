@@ -20,6 +20,10 @@ public class RecentTimestamps {
   private static final int RECENTSIZE = 10;
   private final Connection conn;
 
+  /**
+   * Establishes database connection.
+   * @param conn connection to database
+   */
   public RecentTimestamps(Connection conn) {
     this.conn = conn;
   }
@@ -90,6 +94,7 @@ public class RecentTimestamps {
    * @param userId user id
    * @param idx index of restaurant timestamp to delete
    * @return whether the update is successful
+   * @throws NoRestaurantException NoRestaurantException
    */
   public boolean deleteRecentTime(String userId, int idx)
     throws NoRestaurantException {

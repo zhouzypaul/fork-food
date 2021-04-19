@@ -94,6 +94,7 @@ public class RecentRestaurants {
    * @param userId user id
    * @param restId rest id to delete
    * @return the restaurant id, -1 if unsuccessful
+   * @throws NoRestaurantException NoRestaurantException
    */
   public int deleteRecentRest(String userId, String restId)
     throws NoRestaurantException {

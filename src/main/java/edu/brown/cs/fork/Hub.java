@@ -274,6 +274,7 @@ public class Hub {
    * Matches frontend price range with backend price range.
    * @param frontendPriceRange frontend price range
    * @return backend price range
+   * @throws PriceRangeNotFoundException PriceRangeNotFoundException
    */
   public static String frontendPriceRangeToBackend(String frontendPriceRange)
       throws PriceRangeNotFoundException {
@@ -289,6 +290,7 @@ public class Hub {
    * Matches backend priceRange to frontend.
    * @param backendPR backend price range
    * @return frontend price range
+   * @throws PriceRangeNotFoundException PriceRangeNotFoundException
    */
   public static String backendPriceRangeToFrontend(String backendPR)
       throws PriceRangeNotFoundException {

@@ -238,6 +238,7 @@ public class QueryUsers {
    * @param userId user id
    * @param restId rest id to delete
    * @return the restaurant id, -1 if unsuccessful
+   * @throws NoRestaurantException NoRestaurantException
    */
   public int deleteRecentRest(String userId, String restId)
       throws NoRestaurantException {
@@ -249,6 +250,7 @@ public class QueryUsers {
    * @param userId user id
    * @param idx index of restaurant timestamp to delete
    * @return whether the update is successful
+   * @throws NoRestaurantException NoRestaurantException
    */
   public boolean deleteRecentTime(String userId, int idx)
       throws NoRestaurantException {

@@ -18,12 +18,18 @@ import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * Updates user's password.
+ */
 public class HandlerUpdateUserPwd implements Route {
   private static final Gson GSON = new Gson();
   private static final int SALT_LENGTH = 16;
   private static final int PWD_ITERATION_COUNT = 65536;
   private static final int PWD_KEY_LENGTH = 128;
 
+  /**
+   * Constructor.
+   */
   public HandlerUpdateUserPwd() {  }
 
   @Override
