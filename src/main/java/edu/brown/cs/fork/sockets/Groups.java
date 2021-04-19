@@ -117,9 +117,6 @@ public class Groups {
    * @return is the room valid
    */
   public static boolean valid(int roomId) {
-    if (ROOMS.containsKey(roomId)) {
-      return !ROOMS.get(roomId).started();
-    }
-    return false;
+    return ROOMS.containsKey(roomId) && !ROOMS.get(roomId).started();
   }
 }
