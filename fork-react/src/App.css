@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Cabin&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Outlined');
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
 
 .material-icons-outlined.md-48 {
   font-size: 64px;
@@ -263,6 +264,29 @@
   text-align: left;
 }
 
+.terms {
+  font-size: medium;
+  font-family: 'Lato', sans-serif;
+  text-align: left;
+  height: inherit;
+  overflow-y: auto;
+  margin: 8px 0;
+}
+
+#term-btn {
+  margin: 12px;
+  font-size: medium;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#term-check {
+  cursor: pointer;
+  margin: 0 6px;
+}
+
 h1 {
   font-weight: normal;
 }
@@ -295,10 +319,12 @@ h1 {
   justify-content: center;
   align-items: center;
   background-color: white;
-  width: 30%;
+  min-width: 30%;
+  max-width: 80%;
   padding: 20px;
   border-radius: 8px;
   border: 2px solid gainsboro;
+  max-height: 60vh;
 }
 
 .divider {
