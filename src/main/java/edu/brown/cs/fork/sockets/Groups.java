@@ -49,9 +49,10 @@ public class Groups {
 
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
-    int roomId = SESSION_ROOM.get(session);
+    int roomId = SESSION_ROOM.get(session); // get room ID
+
+    // cleanup
     if (ROOMS.get(roomId).removeUserSession(session)) {
-      // cleanup
       ROOMS.remove(roomId);
       SESSION_ROOM.remove(session);
     }
@@ -60,36 +61,37 @@ public class Groups {
   @OnWebSocketMessage
   public void message(Session session, String message) throws IOException {
     try {
+      // extract info from incoming message
       JSONObject messageObj = new JSONObject(message);
-      String type = messageObj.getJSONObject("message").getString("type");
       int roomId = messageObj.getJSONObject("message").getInt("roomId");
-      int senderId = messageObj.getInt("id");
       String username = messageObj.getJSONObject("message").getString("username");
 
+      // create a new room
       if (ROOMS.get(roomId) == null) {
         ROOMS.put(roomId, new Room());
       }
       Room room = ROOMS.get(roomId);
 
-      switch (type) {
-        case "update_user":
-          room.addUserSession(session, username, senderId);
+      String type = messageObj.getJSONObject("message").getString("type");
+      switch (type) { // check what type of message
+        case "update_user": // updates waiting room with new users
+          room.addUserSession(session, username);
           SESSION_ROOM.put(session, roomId);
           break;
 
-        case "start":
+        case "start": // starts swiping process
           double lat = messageObj.getJSONObject("message").getDouble("lat");
           double lon = messageObj.getJSONObject("message").getDouble("lon");
           room.startSwiping(new double[]{lat, lon});
           break;
 
-        case "swipe":
+        case "swipe": // registers a user swipe
           String resId = messageObj.getJSONObject("message").getString("resId");
           int like = messageObj.getJSONObject("message").getInt("like");
           room.swipe(session, resId, like);
           break;
 
-        case "done":
+        case "done": // marks a user as done swiping
           room.done(username);
           break;
 
@@ -108,6 +110,12 @@ public class Groups {
     error.printStackTrace();
   }
 
+  /**
+   * Checks if a code is available to create a new room.
+   *
+   * @param roomId - the room code to check
+   * @return is the room valid
+   */
   public static boolean valid(int roomId) {
     if (ROOMS.containsKey(roomId)) {
       return !ROOMS.get(roomId).started();

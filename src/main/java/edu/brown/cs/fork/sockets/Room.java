@@ -11,21 +11,30 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * Class representing Rooms.
+ */
 public class Room {
+  // room data
+  private double[] coordinate; // of host
+  private boolean started = false; // has swiping started
+
+  // users and their statuses
   private final Hashtable<String, USER_STATUS> users = new Hashtable<>();
   private final Hashtable<Session, String> sessionToUser = new Hashtable<>();
-  private final Hashtable<String, Hashtable<String, Integer>> decisions = new Hashtable<>();
-  // private HashSet<Restaurant> restaurants;
-  // private double[] coordinate;
-  private boolean started = false;
-
-  private static final Gson GSON = new Gson();
 
   private enum USER_STATUS {
     WAITING_ROOM,
     SWIPING,
     DONE
   }
+
+  // keep track of user swipes
+  private final Hashtable<String, Hashtable<String, Integer>> decisions = new Hashtable<>();
+  private final Map<String, Map<String, List<String>>> swipes = new HashMap<>();
+
+  // for socket utility
+  private static final Gson GSON = new Gson();
 
   private enum MESSAGE_TYPE {
     CONNECT,
@@ -35,20 +44,23 @@ public class Room {
 
   /**
    * Add a user to the room with the associated socket Session.
-   * @param session
-   * @param username
+   *
+   * @param session  - the session to add to the room
+   * @param username - the username of the user to add
    */
-  public void addUserSession(Session session, String username, int senderId) {
-    // add session and username to sessiontouser
+  public void addUserSession(Session session, String username) {
+    // add session and username
     users.put(username, USER_STATUS.WAITING_ROOM);
     sessionToUser.put(session, username);
 
+    // send update message
     sendMessage("update_user", "users", users());
   }
 
   /**
    * Remove a user from room.
-   * @param session
+   *
+   * @param session - the session to remove from the room
    * @return true if room is ready to be cleaned up and false otherwise
    */
   public boolean removeUserSession(Session session) {
@@ -56,19 +68,22 @@ public class Room {
     if (!sessionToUser.containsKey(session)) {
       return false;
     }
-
     String username = sessionToUser.get(session);
 
+    // remove user
     users.remove(username);
     sessionToUser.remove(session);
 
-    if (!started) { // if room not started resend the userlist
+    // has the room started swiping yet?
+    if (!started) { // still in waiting room
       sendMessage("update_users", "users", users());
-    } else {
+    } else { // swiping has started
+      // remove the users swipes
       for (String resId : decisions.keySet()) {
         decisions.get(resId).remove(username);
       }
 
+      // check if we're ready to send a decision
       if (allDone()) {
         try {
           sendMessage("done", "result", getResult());
@@ -76,19 +91,21 @@ public class Room {
           System.out.println("ERROR " + e);
           return false;
         }
-      } else {
-        return false;
       }
     }
 
+    // return if the room is empty
     return users().isEmpty();
   }
 
   /**
-   * Starts the restaurant swiping process.
+   * Starts the swiping process by querying a list of recommended restaurants.
+   *
+   * @param coords - coordinates of where to start searching from
    */
   public void startSwiping(double[] coords) {
     this.started = true;
+    this.coordinate = coords;
 
     // generate and store list of recommended restaurants
     List<Restaurant> recommendedRestaurants = new ArrayList<>();
@@ -99,6 +116,7 @@ public class Room {
       System.out.println("ERROR: " + e);
     }
 
+    // initialize a hashtable to store user swipes
     for (Restaurant restaurant : recommendedRestaurants) {
       Hashtable<String, Integer> userDecision = new Hashtable<>();
       for (String username : users()) {
@@ -113,6 +131,7 @@ public class Room {
 
   /**
    * Records a user swipe for a restaurant.
+   *
    * @param session
    * @param resId
    * @param like
@@ -120,15 +139,26 @@ public class Room {
   public void swipe(Session session, String resId, int like) {
     String username = sessionToUser.get(session);
     decisions.get(resId).replace(username, like);
+
+    // add to swipe preferences for user
+    addToSwipePref(username, resId, Integer.toString(like));
   }
 
   /**
    * Marks a user as done with swiping. If all users are done, send a decision.
-   * @param username
+   *
+   * @param username - user that is done
    */
   public void done(String username) {
     // mark user as done
     users.replace(username, USER_STATUS.DONE);
+
+    // send user swipe preferences to database
+    if (!addToDatabase(username, coordinate)) {
+      System.out.println("ERROR: Can't add user swiping preferences.");
+      return;
+    }
+
     // check if all users done, then generate and send decision
     if (allDone()) {
       try {
@@ -139,18 +169,38 @@ public class Room {
     }
   }
 
+  /**
+   * Returns if the room has started the swiping process.
+   *
+   * @return true if the room has started and false otherwise
+   */
   public boolean started() {
     return started;
   }
 
+  /**
+   * Gets all sessions.
+   *
+   * @return all sessions in the room
+   */
   private Set<Session> sessions() {
     return sessionToUser.keySet();
   }
 
+  /**
+   * Gets all usernames.
+   *
+   * @return all usernames in the room
+   */
   private Set<String> users() {
     return users.keySet();
   }
 
+  /**
+   * Checks if all users are done swiping.
+   *
+   * @return true if all users are done, and false otherwise
+   */
   private boolean allDone() {
     for (USER_STATUS status : users.values()) {
       if (status != USER_STATUS.DONE) {
@@ -162,8 +212,9 @@ public class Room {
 
   /**
    * Gets restaurant result.
+   *
    * @throws NoUserException on error
-   * @throws SQLException on error
+   * @throws SQLException    on error
    */
   private Map<String, String> getResult() throws NoUserException, SQLException {
     String resultId = Hub.rankRestaurants(users(), decisions);
@@ -177,6 +228,13 @@ public class Room {
     return resultRestaurant;
   }
 
+  /**
+   * Helper to put together a socket update message.
+   *
+   * @param type  - the type of message "update_user", "start", "swipe", or "done"
+   * @param label - the label of the payload
+   * @param load  - the load itself to send
+   */
   private void sendMessage(String type, String label, Object load) {
     JsonObject updateMessage = new JsonObject();
     updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
@@ -201,5 +259,39 @@ public class Room {
     } catch (IOException e) {
       System.out.println("ERROR: " + e);
     }
+  }
+
+  /**
+   * Add to SWIPE_PREF.
+   *
+   * @param user     username
+   * @param resId    restaurant id
+   * @param decision whether user likes the restaurant
+   */
+  private void addToSwipePref(String user, String resId, String decision) {
+    if (!swipes.containsKey(user)) {
+      Map<String, List<String>> prefs = new HashMap<>();
+      prefs.put("business_id", new ArrayList<>());
+      prefs.put("decisions", new ArrayList<>());
+      swipes.put(user, prefs);
+    }
+    List<String> restIds = swipes.get(user).get("business_id");
+    List<String> decisions = swipes.get(user).get("decisions");
+    restIds.add(resId);
+    decisions.add(decision);
+  }
+
+  /**
+   * Add all swipe decisions to database.
+   *
+   * @param username user
+   * @param coor     host coordinate
+   * @return whether the action is successful
+   */
+  private boolean addToDatabase(String username, double[] coor) {
+    List<String> prefRestaurants = swipes.get(username).get("business_id");
+    List<String> prefDecisions = swipes.get(username).get("decisions");
+    return Hub.getUserDB().insertUserSwipePref(username, coor[0],
+        coor[1], prefRestaurants, prefDecisions);
   }
 }
