@@ -76,7 +76,7 @@ public class Room {
 
     // has the room started swiping yet?
     if (!started) { // still in waiting room
-      sendMessage("update_users", "users", users());
+      sendMessage("update_user", "users", users());
     } else { // swiping has started
       // remove the users swipes
       for (String resId : decisions.keySet()) {
@@ -202,6 +202,9 @@ public class Room {
    * @return true if all users are done, and false otherwise
    */
   private boolean allDone() {
+    if (users.isEmpty()) {
+      return false;
+    }
     for (USER_STATUS status : users.values()) {
       if (status != USER_STATUS.DONE) {
         return false;
