@@ -2,7 +2,7 @@ package edu.brown.cs.fork.handlers.room;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import edu.brown.cs.fork.sockets.GroupSocket;
+import edu.brown.cs.fork.sockets.Groups;
 import org.json.JSONException;
 import org.json.JSONObject;
 import spark.Request;
@@ -22,7 +22,7 @@ public class RoomCheckHandler implements Route {
     try {
       JSONObject json = new JSONObject(req.body());
       int code = json.getInt("code");
-      boolean exists = GroupSocket.valid(code);
+      boolean exists = Groups.valid(code);
       Map<String, Object> variables = ImmutableMap.of("exists", exists);
       return GSON.toJson(variables);
     } catch (JSONException e) {

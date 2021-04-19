@@ -13,7 +13,6 @@ import edu.brown.cs.fork.handlers.restaurants.HandlerGetMostRecentRests;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
 import edu.brown.cs.fork.handlers.room.RoomCheckHandler;
-import edu.brown.cs.fork.sockets.GroupSocket;
 
 import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
 import edu.brown.cs.fork.handlers.login.HandlerDeleteUser;
@@ -22,6 +21,7 @@ import edu.brown.cs.fork.handlers.users.HandlerGetUserPwd;
 import edu.brown.cs.fork.handlers.users.HandlerInsertUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerUpdateUserPref;
 import com.google.gson.Gson;
+import edu.brown.cs.fork.sockets.Groups;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
@@ -57,7 +57,7 @@ public final class Main {
     Spark.externalStaticFileLocation("fork-react/build/");
 
     // websocket
-    Spark.webSocket("/socket", GroupSocket.class);
+    Spark.webSocket("/socket", Groups.class);
 
     Spark.options("/*", (request, response) -> {
       String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
