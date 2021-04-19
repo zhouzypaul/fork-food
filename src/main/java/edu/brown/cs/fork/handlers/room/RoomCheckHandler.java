@@ -2,7 +2,6 @@ package edu.brown.cs.fork.handlers.room;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import edu.brown.cs.fork.sockets.GroupSocket;
 import edu.brown.cs.fork.sockets.Groups;
 import org.json.JSONException;
 import org.json.JSONObject;

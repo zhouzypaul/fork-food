@@ -14,7 +14,6 @@ import edu.brown.cs.fork.handlers.restaurants.HandlerGetMostRecentRests;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByRad;
 import edu.brown.cs.fork.handlers.room.RoomCheckHandler;
-import edu.brown.cs.fork.sockets.GroupSocket;
 
 import edu.brown.cs.fork.handlers.users.HandlerAllUserIds;
 import edu.brown.cs.fork.handlers.login.HandlerDeleteUser;
