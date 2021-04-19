@@ -22,12 +22,8 @@ public class RoomCheckHandler implements Route {
     try {
       JSONObject json = new JSONObject(req.body());
       int code = json.getInt("code");
-
       boolean exists = GroupSocket.valid(code);
-      System.out.println(exists);
-
       Map<String, Object> variables = ImmutableMap.of("exists", exists);
-
       return GSON.toJson(variables);
     } catch (JSONException e) {
       System.out.println("ERROR: JSON exception"); // replace with a good exception

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import edu.brown.cs.fork.Hub;
 import edu.brown.cs.fork.exceptions.NoUserException;
 import edu.brown.cs.fork.restaurants.Restaurant;
+import org.eclipse.jetty.websocket.api.CloseException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -45,7 +46,7 @@ public class GroupSocket {
   // <userId, [<restId, decision>, ...]>
   private static final Map<String, Map<String, List<String>>> SWIPING_PREF = new HashMap<>();
 
-  private enum MESSAGETYPE {
+  private enum MESSAGE_TYPE {
     CONNECT,
     UPDATE,
     SEND
@@ -55,14 +56,12 @@ public class GroupSocket {
   public void connected(Session session) throws IOException {
     // build CONNECT message
     JsonObject json = new JsonObject();
-    json.addProperty("type", MESSAGETYPE.CONNECT.ordinal());
+    json.addProperty("type", MESSAGE_TYPE.CONNECT.ordinal());
 
     JsonObject payload = new JsonObject();
     payload.addProperty("id", nextId++);
 
     json.add("payload", payload);
-    // make sure to send a unique id!
-    // Hint: can use ordinal to get the number position of an enum, MESSAGETYPE.CONNECT.ordinal());
 
     String message = GSON.toJson(json);
 
@@ -71,7 +70,6 @@ public class GroupSocket {
 
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
-    System.out.println("Socket closed");
     if (SESSION_ROOMS.get(session) == null) {
       return;
     }
@@ -82,9 +80,9 @@ public class GroupSocket {
     ROOMS.get(roomId).remove(session);
     USER_ROOMS.get(roomId).remove(user);
 
-    // prep udate message
+    // prep update message
     JsonObject updateMessage = new JsonObject();
-    updateMessage.addProperty("type", MESSAGETYPE.UPDATE.ordinal());
+    updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
 
     JsonObject payload = new JsonObject();
 
@@ -100,25 +98,8 @@ public class GroupSocket {
     } else {
       // same code as done
       if (USER_ROOMS.get(roomId).isEmpty()) {
-        // return a decision
-        JsonObject result = new JsonObject();
-
         try {
-          String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId),
-              USER_DECISIONS.get(roomId));
-
-          System.out.println("decision " + commonRes);
-          Map<String, String> rest = new HashMap<>();
-          try {
-            rest = Hub.getRestDB().queryRestByID(commonRes);
-          } catch (Exception e) {
-            System.out.println("ERROR: " + e);
-          }
-
-          result.add("result", GSON.toJsonTree(rest));
-
-          payload.addProperty("type", "done");
-          payload.add("senderMessage", result);
+          getResult(roomId, payload);
 
         } catch (SQLException | NoUserException e) {
           System.out.println("ERROR " + e);
@@ -153,7 +134,6 @@ public class GroupSocket {
   @OnWebSocketMessage
   public void message(Session session, String message) throws IOException {
     // convert message to JsonObject
-    System.out.println(message);
     try {
       JSONObject messageObj = new JSONObject(message);
       String type = messageObj.getJSONObject("message").getString("type");
@@ -161,12 +141,10 @@ public class GroupSocket {
 
       // prepare update message
       JsonObject updateMessage = new JsonObject();
-      updateMessage.addProperty("type", MESSAGETYPE.UPDATE.ordinal());
+      updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
 
       JsonObject payload = new JsonObject();
       payload.addProperty("senderId", messageObj.getInt("id"));
-
-      System.out.println(type);
 
       // boolean to keep track of if room can be cleared
       boolean doneWithRoom = false;
@@ -229,7 +207,6 @@ public class GroupSocket {
           break;
 
         case "swipe":
-          System.out.println(messageObj.getJSONObject("message"));
           String usern = messageObj.getJSONObject("message").getString("username");
           String resId = messageObj.getJSONObject("message").getString("resId");
           int decision = messageObj.getJSONObject("message").getInt("like");
@@ -251,25 +228,8 @@ public class GroupSocket {
 
           USER_ROOMS.get(roomId).remove(username);
           if (USER_ROOMS.get(roomId).isEmpty()) {
-            // return a decision
-            JsonObject result = new JsonObject();
-
             try {
-              String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId),
-                      USER_DECISIONS.get(roomId));
-
-              System.out.println("decision " + commonRes);
-              Map<String, String> rest = new HashMap<>();
-              try {
-                rest = Hub.getRestDB().queryRestByID(commonRes);
-              } catch (Exception e) {
-                System.out.println("ERROR: " + e);
-              }
-
-              result.add("result", GSON.toJsonTree(rest));
-
-              payload.addProperty("type", "done");
-              payload.add("senderMessage", result);
+              getResult(roomId, payload);
 
               doneWithRoom = true;
             } catch (SQLException | NoUserException e) {
@@ -299,6 +259,8 @@ public class GroupSocket {
 
     } catch (JSONException e) {
       System.out.println("ERROR: invalid json" + e);
+    } catch (CloseException e) {
+      System.out.println("Socket time out");
     }
   }
 
@@ -363,5 +325,30 @@ public class GroupSocket {
     for (String user : users) {
       SWIPING_PREF.remove(user);
     }
+  }
+
+  /**
+   * Gets restaurant result.
+   * @param roomId of current room
+   * @param payload to fill
+   * @throws NoUserException on error
+   * @throws SQLException on error
+   */
+  private static void getResult(int roomId, JsonObject payload) throws NoUserException, SQLException {
+    JsonObject result = new JsonObject();
+    String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId),
+        USER_DECISIONS.get(roomId));
+
+    Map<String, String> rest = new HashMap<>();
+    try {
+      rest = Hub.getRestDB().queryRestByID(commonRes);
+    } catch (Exception e) {
+      System.out.println("ERROR: " + e);
+    }
+
+    result.add("result", GSON.toJsonTree(rest));
+
+    payload.addProperty("type", "done");
+    payload.add("senderMessage", result);
   }
 }

@@ -112,6 +112,10 @@ function Host(props) {
     socket.current.send(JSON.stringify(message));
   }
 
+  const closeSocket = () => {
+    socket.current.close();
+  }
+
   let i = 0;
   return (
     <>
@@ -128,7 +132,7 @@ function Host(props) {
           })}
         </div>
       </div>
-      <div className="exit-home">
+      <div className="exit-home" onClick={closeSocket}>
         <Link to="/home" className="links">
           <i className="material-icons-outlined md-48">exit_to_app</i>
         </Link>
