@@ -114,9 +114,18 @@ public class Groups {
    * Checks if a code is available to create a new room.
    *
    * @param roomId - the room code to check
-   * @return is the room valid
+   * @return whether the room exists
    */
-  public static boolean valid(int roomId) {
-    return ROOMS.containsKey(roomId) && !ROOMS.get(roomId).started();
+  public static boolean exists(int roomId) {
+    return ROOMS.containsKey(roomId);
+  }
+
+  /**
+   * Checks if the room with given id has started.
+   * @param roomId room code to check
+   * @return whether the room has started
+   */
+  public static boolean started(int roomId) {
+    return exists(roomId) && ROOMS.get(roomId).started();
   }
 }

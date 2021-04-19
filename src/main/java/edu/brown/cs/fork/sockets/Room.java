@@ -132,9 +132,9 @@ public class Room {
   /**
    * Records a user swipe for a restaurant.
    *
-   * @param session
-   * @param resId
-   * @param like
+   * @param session current session
+   * @param resId restaurant id
+   * @param like 1 for like 0 for not like
    */
   public void swipe(Session session, String resId, int like) {
     String username = sessionToUser.get(session);
@@ -262,7 +262,7 @@ public class Room {
   }
 
   /**
-   * Add to SWIPE_PREF.
+   * Add to preferences to swipes.
    *
    * @param user     username
    * @param resId    restaurant id
