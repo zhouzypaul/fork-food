@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -35,7 +34,7 @@ public class GroupSocket {
   private static final Integer MIN_IN_HOURS = 60;
 
   private static final Hashtable<Integer, Queue<Session>> ROOMS = new Hashtable<>();
-  private static final Hashtable<Integer, List<Double>> ROOM_COORS = new Hashtable<>();
+  private static final Hashtable<Integer, double[]> ROOM_COORS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USER_ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USERS_COPY = new Hashtable<>();
   private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>>
@@ -75,7 +74,6 @@ public class GroupSocket {
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
     System.out.println("Socket closed");
-    // TODO: need to handle if user just dips
     cleanupOldRooms();
   }
 
@@ -125,8 +123,7 @@ public class GroupSocket {
         case "start":
           double lat = messageObj.getJSONObject("message").getDouble("lat");
           double lon = messageObj.getJSONObject("message").getDouble("lon");
-          List<Double> coor = Arrays.asList(lat, lon);
-          ROOM_COORS.put(roomId, coor);
+          ROOM_COORS.put(roomId, new double[]{lat, lon});
 
           Set<String> usernames = USER_ROOMS.get(roomId);
           STARTED_ROOMS.add(roomId);
@@ -166,26 +163,14 @@ public class GroupSocket {
           // add to the USER_DECISIONS table
           USER_DECISIONS.get(roomId).get(resId).replace(user, decision);
           // add to the SWIPING_PREF map
-          if (!SWIPING_PREF.containsKey(user)) {
-            Map<String, List<String>> prefs = new HashMap<>();
-            prefs.put("business_id", new ArrayList<>());
-            prefs.put("decisions", new ArrayList<>());
-            SWIPING_PREF.put(user, prefs);
-          }
-          List<String> restIds = SWIPING_PREF.get(user).get("business_id");
-          List<String> decisions = SWIPING_PREF.get(user).get("decisions");
-          restIds.add(resId);
-          decisions.add(String.valueOf(decision));
+          addToSwipePref(user, resId, String.valueOf(decision));
           return;
 
         case "done":
           String username = messageObj.getJSONObject("message").getString("username");
-          List<Double> doneCoor = ROOM_COORS.get(roomId);
+          double[] doneCoor = ROOM_COORS.get(roomId);
 
-          List<String> prefRestaurants = SWIPING_PREF.get(username).get("business_id");
-          List<String> prefDecisions = SWIPING_PREF.get(username).get("decisions");
-          boolean success = Hub.getUserDB().insertUserSwipePref(username, doneCoor.get(0),
-              doneCoor.get(1), prefRestaurants, prefDecisions);
+          boolean success = addToDatabase(username, doneCoor);
           if (!success) {
             System.out.println("ERROR: Can't add user swiping preferences.");
             return;
@@ -242,6 +227,38 @@ public class GroupSocket {
     } catch (JSONException e) {
       System.out.println("ERROR: invalid json" + e);
     }
+  }
+
+  /**
+   * Add to SWIPE_PREF.
+   * @param user username
+   * @param resId restaurant id
+   * @param decision whether user likes the restaurant
+   */
+  public void addToSwipePref(String user, String resId, String decision) {
+    if (!SWIPING_PREF.containsKey(user)) {
+      Map<String, List<String>> prefs = new HashMap<>();
+      prefs.put("business_id", new ArrayList<>());
+      prefs.put("decisions", new ArrayList<>());
+      SWIPING_PREF.put(user, prefs);
+    }
+    List<String> restIds = SWIPING_PREF.get(user).get("business_id");
+    List<String> decisions = SWIPING_PREF.get(user).get("decisions");
+    restIds.add(resId);
+    decisions.add(decision);
+  }
+
+  /**
+   * Add all swipe decisions to database.
+   * @param username user
+   * @param coor host coordinate
+   * @return whether the action is successful
+   */
+  public boolean addToDatabase(String username, double[] coor) {
+    List<String> prefRestaurants = SWIPING_PREF.get(username).get("business_id");
+    List<String> prefDecisions = SWIPING_PREF.get(username).get("decisions");
+    return Hub.getUserDB().insertUserSwipePref(username, coor[0],
+        coor[1], prefRestaurants, prefDecisions);
   }
 
   @OnWebSocketError
