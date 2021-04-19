@@ -15,8 +15,8 @@ public class Room {
   private final Hashtable<String, USER_STATUS> users = new Hashtable<>();
   private final Hashtable<Session, String> sessionToUser = new Hashtable<>();
   private final Hashtable<String, Hashtable<String, Integer>> decisions = new Hashtable<>();
-  private HashSet<Restaurant> restaurants;
-  private double[] coordinate;
+  // private HashSet<Restaurant> restaurants;
+  // private double[] coordinate;
   private boolean started = false;
 
   private static final Gson GSON = new Gson();
@@ -33,8 +33,6 @@ public class Room {
     SEND
   }
 
-  //TODO: how to keep track of which users are done
-
   /**
    * Add a user to the room with the associated socket Session.
    * @param session
@@ -45,31 +43,7 @@ public class Room {
     users.put(username, USER_STATUS.WAITING_ROOM);
     sessionToUser.put(session, username);
 
-    // send message to all rooms
-    JsonObject updateMessage = new JsonObject();
-    updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
-
-    JsonObject payload = new JsonObject();
-    payload.addProperty("senderId", senderId);
-
-    JsonObject users = new JsonObject();
-    users.add("users", GSON.toJsonTree(users()));
-
-    payload.addProperty("type", "update_user");
-    payload.add("senderMessage", users);
-
-    updateMessage.add("payload", payload);
-
-    // send message to everyone in room
-    String update = GSON.toJson(updateMessage);
-
-    try {
-      for (Session s : sessions()) {
-        s.getRemote().sendString(update); // sending to each session in room
-      }
-    } catch (IOException e) {
-      System.out.println("ERROR: " + e);
-    }
+    sendMessage("update_user", "users", users());
   }
 
   /**
@@ -79,7 +53,7 @@ public class Room {
    */
   public boolean removeUserSession(Session session) {
     // get associated username
-    if (sessionToUser.get(session) == null) {
+    if (!sessionToUser.containsKey(session)) {
       return false;
     }
 
@@ -88,26 +62,16 @@ public class Room {
     users.remove(username);
     sessionToUser.remove(session);
 
-    // prep update message
-    JsonObject updateMessage = new JsonObject();
-    updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
-
-    JsonObject payload = new JsonObject();
-
     if (!started) { // if room not started resend the userlist
-      // same code as update_users
-
-      JsonObject users = new JsonObject();
-      users.add("users", GSON.toJsonTree(users()));
-
-      payload.addProperty("type", "update_user");
-      payload.add("senderMessage", users);
-
+      sendMessage("update_users", "users", users());
     } else {
-      // same code as done
+      for (String resId : decisions.keySet()) {
+        decisions.get(resId).remove(username);
+      }
+
       if (allDone()) {
         try {
-          updateMessage.add("payload", getResult());
+          sendMessage("done", "result", getResult());
         } catch (SQLException | NoUserException e) {
           System.out.println("ERROR " + e);
           return false;
@@ -117,25 +81,34 @@ public class Room {
       }
     }
 
-    // send message to everyone in room
-    String update = GSON.toJson(updateMessage);
-    try {
-      for (Session s : sessions()) {
-        s.getRemote().sendString(update); // sending to each session in room
-      }
-    } catch (IOException e) {
-      System.out.println("ERROR: " + e);
-    }
-
     return users().isEmpty();
   }
 
   /**
    * Starts the restaurant swiping process.
    */
-  public void startSwiping() {
+  public void startSwiping(double[] coords) {
+    this.started = true;
+
     // generate and store list of recommended restaurants
+    List<Restaurant> recommendedRestaurants = new ArrayList<>();
+
+    try {
+      recommendedRestaurants = Hub.recommendRestaurants(users(), coords);
+    } catch (Exception e) {
+      System.out.println("ERROR: " + e);
+    }
+
+    for (Restaurant restaurant : recommendedRestaurants) {
+      Hashtable<String, Integer> userDecision = new Hashtable<>();
+      for (String username : users()) {
+        userDecision.put(username, 0);
+      }
+      decisions.put(restaurant.getId(), userDecision);
+    }
+
     // send start swiping message to all sockets
+    sendMessage("start", "restaurants", recommendedRestaurants);
   }
 
   /**
@@ -145,7 +118,8 @@ public class Room {
    * @param like
    */
   public void swipe(Session session, String resId, int like) {
-
+    String username = sessionToUser.get(session);
+    decisions.get(resId).replace(username, like);
   }
 
   /**
@@ -154,7 +128,19 @@ public class Room {
    */
   public void done(String username) {
     // mark user as done
+    users.replace(username, USER_STATUS.DONE);
     // check if all users done, then generate and send decision
+    if (allDone()) {
+      try {
+        sendMessage("done", "result", getResult());
+      } catch (SQLException | NoUserException e) {
+        System.out.println("ERROR " + e);
+      }
+    }
+  }
+
+  public boolean started() {
+    return started;
   }
 
   private Set<Session> sessions() {
@@ -179,22 +165,41 @@ public class Room {
    * @throws NoUserException on error
    * @throws SQLException on error
    */
-  private JsonObject getResult() throws NoUserException, SQLException {
-    JsonObject result = new JsonObject();
-    String commonRes = Hub.rankRestaurants(users(), decisions);
+  private Map<String, String> getResult() throws NoUserException, SQLException {
+    String resultId = Hub.rankRestaurants(users(), decisions);
 
-    Map<String, String> rest = new HashMap<>();
+    Map<String, String> resultRestaurant = new HashMap<>();
     try {
-      rest = Hub.getRestDB().queryRestByID(commonRes);
+      resultRestaurant = Hub.getRestDB().queryRestByID(resultId);
     } catch (Exception e) {
       System.out.println("ERROR: " + e);
     }
-    result.add("result", GSON.toJsonTree(rest));
+    return resultRestaurant;
+  }
+
+  private void sendMessage(String type, String label, Object load) {
+    JsonObject updateMessage = new JsonObject();
+    updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
 
     JsonObject payload = new JsonObject();
-    payload.addProperty("type", "done");
-    payload.add("senderMessage", result);
 
-    return payload;
+    JsonObject senderMessage = new JsonObject();
+    senderMessage.add(label, GSON.toJsonTree(load));
+
+    payload.addProperty("type", type);
+    payload.add("senderMessage", senderMessage);
+
+    updateMessage.add("payload", payload);
+
+    // send message to everyone in room
+    String update = GSON.toJson(updateMessage);
+
+    try {
+      for (Session s : sessions()) {
+        s.getRemote().sendString(update); // sending to each session in room
+      }
+    } catch (IOException e) {
+      System.out.println("ERROR: " + e);
+    }
   }
 }

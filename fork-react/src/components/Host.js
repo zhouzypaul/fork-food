@@ -3,7 +3,7 @@ import TopBar from "./TopBar";
 import { useSelector } from "react-redux";
 
 import Bubble from "./Bubble";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const MESSAGE_TYPE = {
   CONNECT: 0,
@@ -58,6 +58,7 @@ function Host(props) {
           break;
         case MESSAGE_TYPE.UPDATE:
           // check if updating users or starting
+          console.log(data.payload)
           if (data.payload.type === "update_user") {
             setUsers(data.payload.senderMessage.users);
           } else if (data.payload.type === "start") {
@@ -104,6 +105,7 @@ function Host(props) {
       id: id.current,
       message: {
         type: "start",
+        username: user,
         roomId: roomCode.current,
         lat: HOST_LATITUDE,
         lon: HOST_LONGITUDE
