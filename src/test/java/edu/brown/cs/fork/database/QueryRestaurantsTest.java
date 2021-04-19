@@ -27,20 +27,6 @@ public class QueryRestaurantsTest implements ITest {
   }
 
   @Test
-  public void testGetAllRestaurants() {
-    setUp();
-
-    try {
-      List<Map<String, String>> results = this.db.getAllRestaurants();
-      assertEquals(results.size(), 23529);
-    } catch (SQLException throwables) {
-      fail();
-    }
-
-    tearDown();
-  }
-
-  @Test
   public void testQueryRestByID() {
     setUp();
 

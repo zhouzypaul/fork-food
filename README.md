@@ -82,8 +82,6 @@ load user path_to_custom_user_db
 
 #### restaurants
 
-- ```/test``` no required body, returns all restaurants. This endpoint was for initial dataflow testing.
-
 - ```/getRestByID``` body format: ```{"id": rest_id}```, returns restaurant with ```rest_id``` in format ```{"name": rest_name, "numStars": stars, "numReviews": num_reviews, ...}``` For the specific format, please refer to ```database/queries/QueryRestaurants/getRestaurantsWithPrep```.
 
 - ```/getRestByRad``` body format: ```{“radius": rad, "lat": center_lat, "lon": center_lon}```, returns restaurants within the square bounding box with side length ```2*rad``` around the center coordinate.
@@ -106,7 +104,7 @@ load user path_to_custom_user_db
 
 - ```/getUserPwd``` body format: ```{"username": user_id}```, returns user's password in format ```{"pwd": user_pwd}```
 
-- ```/getUserPref``` gets user's survey response from /user/training table. body format: ```{"id": user_id}```, returns user with ```user_id``` in format ```{"types": [], "prices": [], "radius": "", "err": ""}```
+- ```/getUserPref``` gets user's survey response from /user/training table. body format: ```{"username": user_id}```, returns user with ```user_id``` in format ```{"types": [], "prices": [], "radius": "", "err": ""}```
 
 - ```/updateUserPref``` updates user's survey response in /user/training table. body format: ```{"username": user_id, "types": arr_of_food_types, "price": arr_of_preferred_price_ranges, "radius": preferred_radius}```
 

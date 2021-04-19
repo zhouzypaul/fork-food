@@ -78,29 +78,6 @@ public class QueryRestaurants {
   }
 
   /**
-   * Queries all restaurants in the database.
-   * @return a list of hashmaps representing restaurants.
-   * @throws SQLException SQLException
-   */
-  public List<Map<String, String>> getAllRestaurants() throws SQLException {
-    List<Map<String, String>> results = new ArrayList<>();
-    String sql = "SELECT res.name, res.state FROM restaurants as res;";
-    PreparedStatement prep = this.conn.prepareStatement(sql);
-    ResultSet rs = prep.executeQuery();
-    while (rs.next()) {
-      String resName = rs.getString(1);
-      String state = rs.getString(2);
-      Map<String, String> hMap = new HashMap<>();
-      hMap.put("name", resName);
-      hMap.put("state", state);
-      results.add(hMap);
-    }
-    prep.close();
-    rs.close();
-    return results;
-  }
-
-  /**
    * SQl query that selects all restaurants (selective attributes).
    * @return sql query string that would return all restaurants
    */

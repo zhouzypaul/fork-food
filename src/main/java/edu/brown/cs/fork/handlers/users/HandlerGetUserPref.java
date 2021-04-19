@@ -32,7 +32,7 @@ public class HandlerGetUserPref implements Route {
   @Override
   public Object handle(Request req, Response res) throws Exception {
     JSONObject data = new JSONObject(req.body());
-    String id = data.getString("id");
+    String username = data.getString("username");
 
     String err = "";
     Map<String, List<String>> user = new HashMap<>();
@@ -43,7 +43,7 @@ public class HandlerGetUserPref implements Route {
       err = "ERROR: No database connected";
     } else {
       try {
-        user = Hub.getUserDB().getUserPref(id);
+        user = Hub.getUserDB().getUserPref(username);
         foodTypes = user.get("foodType");
         priceRanges = user.get("priceRange");
         foodTypes = new ArrayList<>(new HashSet<>(foodTypes));
