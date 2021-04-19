@@ -5,13 +5,9 @@ import edu.brown.cs.fork.exceptions.NoUserException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Actions on recent restaurants' timestamps.
@@ -20,6 +16,10 @@ public class RecentTimestamps {
   private static final int RECENTSIZE = 10;
   private final Connection conn;
 
+  /**
+   * Establishes database connection.
+   * @param conn connection to database
+   */
   public RecentTimestamps(Connection conn) {
     this.conn = conn;
   }
@@ -35,28 +35,7 @@ public class RecentTimestamps {
     throws SQLException, NoUserException {
     List<String> results = new ArrayList<>();
     String sql = "SELECT recentTimes FROM login WHERE userId = ?;";
-    PreparedStatement prep = this.conn.prepareStatement(sql);
-    prep.setString(1, userId);
-    ResultSet rs = prep.executeQuery();
-    int count = 0;
-    while (rs.next()) {
-      count += 1;
-      String rests = rs.getString(1);
-
-      String pattern = "[^,\\s][^,]*[^,\\s]*";
-      Pattern r = Pattern.compile(pattern);
-      Matcher m = r.matcher(rests);
-      while (m.find()) {
-        String rest = Collections.singletonList(m.group()).get(0);
-        results.add(rest);
-      }
-    }
-    if (count == 0) {
-      throw new NoUserException("User: " + userId + " doesn't exist.");
-    }
-    prep.close();
-    rs.close();
-    return results;
+    return Recent.getStrings(userId, results, sql, this.conn);
   }
 
   /**
@@ -68,13 +47,7 @@ public class RecentTimestamps {
   public boolean updateMostRecentTimes(String userId, String timestamp) {
     try {
       List<String> recentTimes = getMostRecentTimes(userId);
-      if (recentTimes.size() < RECENTSIZE) {
-        recentTimes.add(timestamp);
-      } else if (recentTimes.size() == RECENTSIZE) {
-        recentTimes.remove(0);
-        recentTimes.add(timestamp);
-      } else {
-        System.out.println("ERROR: Too many recent restaurants.");
+      if (!Recent.updateMostRecent(timestamp, recentTimes, RECENTSIZE)) {
         return false;
       }
 
@@ -90,6 +63,7 @@ public class RecentTimestamps {
    * @param userId user id
    * @param idx index of restaurant timestamp to delete
    * @return whether the update is successful
+   * @throws NoRestaurantException NoRestaurantException
    */
   public boolean deleteRecentTime(String userId, int idx)
     throws NoRestaurantException {
@@ -114,14 +88,7 @@ public class RecentTimestamps {
    * @return whether the update is successful
    */
   public boolean setRecentTimestamps(String userId, List<String> timestamps) {
-    StringBuilder allRecentTimes = new StringBuilder();
-    for (int i = 0; i < timestamps.size(); i++) {
-      if (i == timestamps.size() - 1) {
-        allRecentTimes.append(timestamps.get(i));
-      } else {
-        allRecentTimes.append(timestamps.get(i)).append(", ");
-      }
-    }
+    StringBuilder allRecentTimes = Recent.setRecent(timestamps);
 
     String sql = "UPDATE login SET recentTimes = ? WHERE userId = ?;";
     try {

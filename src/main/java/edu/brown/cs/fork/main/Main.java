@@ -8,7 +8,6 @@ import edu.brown.cs.fork.handlers.login.HandlerUpdateUserPwd;
 import edu.brown.cs.fork.handlers.login.LoginHandler;
 import edu.brown.cs.fork.handlers.login.RegistrationHandler;
 
-import edu.brown.cs.fork.handlers.restaurants.HandlerAllRestaurants;
 import edu.brown.cs.fork.handlers.restaurants.HandlerDeleteMostRecentRests;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetMostRecentRests;
 import edu.brown.cs.fork.handlers.restaurants.HandlerGetRestByID;
@@ -79,29 +78,30 @@ public final class Main {
     Spark.before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
     Spark.exception(Exception.class, new ExceptionPrinter());
 
-    Spark.post("/test", new HandlerAllRestaurants());
-    // handles registering new users
+    // authentication
     Spark.post("/register", new RegistrationHandler());
-    // handles user login
     Spark.post("/login", new LoginHandler());
     Spark.post("/updatePwd", new HandlerUpdateUserPwd());
-
-    Spark.post("/getRestByID", new HandlerGetRestByID());
-    Spark.post("/getRestByRad", new HandlerGetRestByRad());
     Spark.post("/deleteUser", new HandlerDeleteUser());
     Spark.post("/getUserPwd", new HandlerGetUserPwd());
     Spark.post("/getAllUserIds", new HandlerAllUserIds());
+
+    // query restaurants
+    Spark.post("/getRestByID", new HandlerGetRestByID());
+    Spark.post("/getRestByRad", new HandlerGetRestByRad());
+    Spark.post("/getMostRecentRests", new HandlerGetMostRecentRests());
+    Spark.post("/deleteMostRecentRests", new HandlerDeleteMostRecentRests());
+
+    // query user preferences
     Spark.post("/getUserPref", new HandlerGetUserPref());
     Spark.post("/insertUserPref", new HandlerInsertUserPref());
     Spark.post("/updateUserPref", new HandlerUpdateUserPref());
-    Spark.post("/getMostRecentRests", new HandlerGetMostRecentRests());
-    Spark.post("/deleteMostRecentRests", new HandlerDeleteMostRecentRests());
 
     // using other registration endpoint
     // Spark.post("/registerUser", new HandlerRegisterUser());
 
+    // handle hosting / joining room
     Spark.post("/verifyCode", new RoomCheckHandler());
-
   }
 
   /**

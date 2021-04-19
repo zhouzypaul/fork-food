@@ -28,6 +28,9 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+/**
+ * Socket for handling hosting, joining a room and swiping.
+ */
 @WebSocket
 public class GroupSocket {
   private static final Gson GSON = new Gson();
@@ -46,17 +49,25 @@ public class GroupSocket {
   // <userId, [<restId, decision>, ...]>
   private static final Map<String, Map<String, List<String>>> SWIPING_PREF = new HashMap<>();
 
-  private enum MESSAGE_TYPE {
+  /**
+   * Message type of a session.
+   */
+  private enum MESSAGETYPE {
     CONNECT,
     UPDATE,
     SEND
   }
 
+  /**
+   * Connect to socket.
+   * @param session socket session
+   * @throws IOException IOException
+   */
   @OnWebSocketConnect
   public void connected(Session session) throws IOException {
     // build CONNECT message
     JsonObject json = new JsonObject();
-    json.addProperty("type", MESSAGE_TYPE.CONNECT.ordinal());
+    json.addProperty("type", MESSAGETYPE.CONNECT.ordinal());
 
     JsonObject payload = new JsonObject();
     payload.addProperty("id", nextId++);
@@ -66,9 +77,14 @@ public class GroupSocket {
     String message = GSON.toJson(json);
 
     session.getRemote().sendString(message);
-
   }
 
+  /**
+   * Close a socket.
+   * @param session socket session
+   * @param statusCode status code of session
+   * @param reason reason of session
+   */
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
     if (SESSION_ROOMS.get(session) == null) {
@@ -83,7 +99,7 @@ public class GroupSocket {
 
     // prep update message
     JsonObject updateMessage = new JsonObject();
-    updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
+    updateMessage.addProperty("type", MESSAGETYPE.UPDATE.ordinal());
 
     JsonObject payload = new JsonObject();
 
@@ -132,6 +148,12 @@ public class GroupSocket {
     SESSION_USER.remove(session);
   }
 
+  /**
+   * Socket session message.
+   * @param session socket session
+   * @param message message
+   * @throws IOException IOException
+   */
   @OnWebSocketMessage
   public void message(Session session, String message) throws IOException {
     // convert message to JsonObject
@@ -142,7 +164,7 @@ public class GroupSocket {
 
       // prepare update message
       JsonObject updateMessage = new JsonObject();
-      updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
+      updateMessage.addProperty("type", MESSAGETYPE.UPDATE.ordinal());
 
       JsonObject payload = new JsonObject();
       payload.addProperty("senderId", messageObj.getInt("id"));
@@ -297,6 +319,10 @@ public class GroupSocket {
         coor[1], prefRestaurants, prefDecisions);
   }
 
+  /**
+   * Throws error.
+   * @param error error
+   */
   @OnWebSocketError
   public void throwError(Throwable error) {
     error.printStackTrace();
@@ -335,7 +361,8 @@ public class GroupSocket {
    * @throws NoUserException on error
    * @throws SQLException on error
    */
-  private static void getResult(int roomId, JsonObject payload) throws NoUserException, SQLException {
+  private static void getResult(int roomId, JsonObject payload)
+      throws NoUserException, SQLException {
     JsonObject result = new JsonObject();
     String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId),
         USER_DECISIONS.get(roomId));

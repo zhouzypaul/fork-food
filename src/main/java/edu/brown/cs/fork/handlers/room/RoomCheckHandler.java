@@ -11,6 +11,9 @@ import spark.Route;
 
 import java.util.Map;
 
+/**
+ * Handles hosting and joining a room.
+ */
 public class RoomCheckHandler implements Route {
   private static final Gson GSON = new Gson();
 

@@ -82,7 +82,7 @@ function Survey(props) {
   // gets user preferences to display
   const getPreferences = () => {
     const toSend = {
-      id: user
+      username: user
     }
 
     axios.post(`${SERVER_URL}/getUserPref`, toSend, CONFIG)
