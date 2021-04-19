@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -34,6 +35,7 @@ public class GroupSocket {
   private static final Integer MIN_IN_HOURS = 60;
 
   private static final Hashtable<Integer, Queue<Session>> ROOMS = new Hashtable<>();
+  private static final Hashtable<Integer, List<Double>> ROOM_COORS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USER_ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USERS_COPY = new Hashtable<>();
   private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>>
@@ -41,6 +43,9 @@ public class GroupSocket {
   private static final Hashtable<Integer, LocalTime> ROOM_TIME = new Hashtable<>();
   private static final HashSet<Integer> STARTED_ROOMS = new HashSet<>();
   private static int nextId = 0;
+
+  // <userId, [<restId, decision>, ...]>
+  private static final Map<String, Map<String, List<String>>> SWIPING_PREF = new HashMap<>();
 
   private enum MESSAGETYPE {
     CONNECT,
@@ -71,6 +76,7 @@ public class GroupSocket {
   public void closed(Session session, int statusCode, String reason) {
     System.out.println("Socket closed");
     // TODO: need to handle if user just dips
+    cleanupOldRooms();
   }
 
   @OnWebSocketMessage
@@ -119,6 +125,8 @@ public class GroupSocket {
         case "start":
           double lat = messageObj.getJSONObject("message").getDouble("lat");
           double lon = messageObj.getJSONObject("message").getDouble("lon");
+          List<Double> coor = Arrays.asList(lat, lon);
+          ROOM_COORS.put(roomId, coor);
 
           Set<String> usernames = USER_ROOMS.get(roomId);
           STARTED_ROOMS.add(roomId);
@@ -151,15 +159,38 @@ public class GroupSocket {
           break;
 
         case "swipe":
+          System.out.println(messageObj.getJSONObject("message"));
           String user = messageObj.getJSONObject("message").getString("username");
           String resId = messageObj.getJSONObject("message").getString("resId");
+          int decision = messageObj.getJSONObject("message").getInt("like");
           // add to the USER_DECISIONS table
-          USER_DECISIONS.get(roomId).get(resId).replace(user,
-                  messageObj.getJSONObject("message").getInt("like"));
+          USER_DECISIONS.get(roomId).get(resId).replace(user, decision);
+          // add to the SWIPING_PREF map
+          if (!SWIPING_PREF.containsKey(user)) {
+            Map<String, List<String>> prefs = new HashMap<>();
+            prefs.put("business_id", new ArrayList<>());
+            prefs.put("decisions", new ArrayList<>());
+            SWIPING_PREF.put(user, prefs);
+          }
+          List<String> restIds = SWIPING_PREF.get(user).get("business_id");
+          List<String> decisions = SWIPING_PREF.get(user).get("decisions");
+          restIds.add(resId);
+          decisions.add(String.valueOf(decision));
           return;
 
         case "done":
           String username = messageObj.getJSONObject("message").getString("username");
+          List<Double> doneCoor = ROOM_COORS.get(roomId);
+
+          List<String> prefRestaurants = SWIPING_PREF.get(username).get("business_id");
+          List<String> prefDecisions = SWIPING_PREF.get(username).get("decisions");
+          boolean success = Hub.getUserDB().insertUserSwipePref(username, doneCoor.get(0),
+              doneCoor.get(1), prefRestaurants, prefDecisions);
+          if (!success) {
+            System.out.println("ERROR: Can't add user swiping preferences.");
+            return;
+          }
+
           USER_ROOMS.get(roomId).remove(username);
           if (USER_ROOMS.get(roomId).isEmpty()) {
             // return a decision
@@ -254,12 +285,17 @@ public class GroupSocket {
    * @param id of entry to remove
    */
   private static void cleanup(Integer id) {
+    HashSet<String> users = USER_ROOMS.get(id);
     USER_ROOMS.remove(id);
     USERS_COPY.remove(id);
     ROOMS.remove(id);
     STARTED_ROOMS.remove(id);
     ROOM_TIME.remove(id);
     USER_DECISIONS.remove(id);
+    ROOM_COORS.remove(id);
+    for (String user : users) {
+      SWIPING_PREF.remove(user);
+    }
   }
 
   /**
