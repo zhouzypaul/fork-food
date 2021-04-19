@@ -66,6 +66,9 @@ function Code(props) {
         } else if (name === "b2") {
           b1.current.select();
         }
+      } else if (key === "e" || key === ".") {
+        e.preventDefault();
+        e.stopPropagation();
       }
     }
   }
