@@ -31,15 +31,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @WebSocket
 public class GroupSocket {
   private static final Gson GSON = new Gson();
-  private static final Integer MIN_IN_HOURS = 60;
 
   private static final Hashtable<Integer, Queue<Session>> ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, double[]> ROOM_COORS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USER_ROOMS = new Hashtable<>();
   private static final Hashtable<Integer, HashSet<String>> USERS_COPY = new Hashtable<>();
+  private static final Hashtable<Session, Integer> SESSION_ROOMS = new Hashtable<>();
+  private static final Hashtable<Session, String> SESSION_USER = new Hashtable<>();
   private static final Hashtable<Integer, Hashtable<String, Hashtable<String, Integer>>>
           USER_DECISIONS = new Hashtable<>();
-  private static final Hashtable<Integer, LocalTime> ROOM_TIME = new Hashtable<>();
   private static final HashSet<Integer> STARTED_ROOMS = new HashSet<>();
   private static int nextId = 0;
 
@@ -74,7 +74,82 @@ public class GroupSocket {
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
     System.out.println("Socket closed");
-    cleanupOldRooms();
+    if (SESSION_ROOMS.get(session) == null) {
+      return;
+    }
+
+    int roomId = SESSION_ROOMS.get(session);
+    String user = SESSION_USER.get(session);
+
+    ROOMS.get(roomId).remove(session);
+    USER_ROOMS.get(roomId).remove(user);
+
+    // prep udate message
+    JsonObject updateMessage = new JsonObject();
+    updateMessage.addProperty("type", MESSAGETYPE.UPDATE.ordinal());
+
+    JsonObject payload = new JsonObject();
+
+    if (!STARTED_ROOMS.contains(roomId)) { // if room not started resend the userlist
+      // same code as update_users
+
+      JsonObject users = new JsonObject();
+      users.add("users", GSON.toJsonTree(USER_ROOMS.get(roomId)));
+
+      payload.addProperty("type", "update_user");
+      payload.add("senderMessage", users);
+
+    } else {
+      // same code as done
+      if (USER_ROOMS.get(roomId).isEmpty()) {
+        // return a decision
+        JsonObject result = new JsonObject();
+
+        try {
+          String commonRes = Hub.rankRestaurants(USERS_COPY.get(roomId),
+              USER_DECISIONS.get(roomId));
+
+          System.out.println("decision " + commonRes);
+          Map<String, String> rest = new HashMap<>();
+          try {
+            rest = Hub.getRestDB().queryRestByID(commonRes);
+          } catch (Exception e) {
+            System.out.println("ERROR: " + e);
+          }
+
+          result.add("result", GSON.toJsonTree(rest));
+
+          payload.addProperty("type", "done");
+          payload.add("senderMessage", result);
+
+        } catch (SQLException | NoUserException e) {
+          System.out.println("ERROR " + e);
+          return;
+        }
+      } else {
+        return;
+      }
+    }
+    updateMessage.add("payload", payload);
+
+    // send message to everyone in room
+    String update = GSON.toJson(updateMessage);
+    try {
+      for (Session sesh : ROOMS.get(roomId)) {
+        sesh.getRemote().sendString(update); // sending to each session in room
+      }
+    } catch (IOException e) {
+      System.out.println("ERROR: " + e);
+    }
+
+    USERS_COPY.get(roomId).remove(user);
+    if (USER_ROOMS.get(roomId).isEmpty()) {
+      cleanup(roomId);
+    }
+
+    // cleanup
+    SESSION_ROOMS.remove(session);
+    SESSION_USER.remove(session);
   }
 
   @OnWebSocketMessage
@@ -100,18 +175,18 @@ public class GroupSocket {
 
       switch (type) {
         case "update_user":
-          // cleanup any unfinished rooms
-          cleanupOldRooms();
           // add current session to correct room
           if (ROOMS.get(roomId) == null) {
             ROOMS.put(roomId, new ConcurrentLinkedQueue<>());
             USER_ROOMS.put(roomId, new HashSet<>());
             USERS_COPY.put(roomId, new HashSet<>());
-            ROOM_TIME.put(roomId, LocalTime.now());
           }
-          USER_ROOMS.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
-          USERS_COPY.get(roomId).add(messageObj.getJSONObject("message").getString("username"));
+          String user = messageObj.getJSONObject("message").getString("username");
+          USER_ROOMS.get(roomId).add(user);
+          USERS_COPY.get(roomId).add(user);
           ROOMS.get(roomId).add(session);
+          SESSION_ROOMS.put(session, roomId);
+          SESSION_USER.put(session, user);
 
           JsonObject users = new JsonObject();
           users.add("users", GSON.toJsonTree(USER_ROOMS.get(roomId)));
@@ -139,8 +214,8 @@ public class GroupSocket {
           Hashtable<String, Hashtable<String, Integer>> restaurantVotes = new Hashtable<>();
           for (Restaurant restaurant : recommendedRestaurants) {
             Hashtable<String, Integer> userDecision = new Hashtable<>();
-            for (String user : usernames) {
-              userDecision.put(user, 0);
+            for (String username : usernames) {
+              userDecision.put(username, 0);
             }
             restaurantVotes.put(restaurant.getId(), userDecision);
           }
@@ -157,13 +232,13 @@ public class GroupSocket {
 
         case "swipe":
           System.out.println(messageObj.getJSONObject("message"));
-          String user = messageObj.getJSONObject("message").getString("username");
+          String usern = messageObj.getJSONObject("message").getString("username");
           String resId = messageObj.getJSONObject("message").getString("resId");
           int decision = messageObj.getJSONObject("message").getInt("like");
           // add to the USER_DECISIONS table
-          USER_DECISIONS.get(roomId).get(resId).replace(user, decision);
+          USER_DECISIONS.get(roomId).get(resId).replace(usern, decision);
           // add to the SWIPING_PREF map
-          addToSwipePref(user, resId, String.valueOf(decision));
+          addToSwipePref(usern, resId, String.valueOf(decision));
           return;
 
         case "done":
@@ -276,28 +351,6 @@ public class GroupSocket {
   }
 
   /**
-   * Method to cleanup any old rooms that did not complete.
-   */
-  private static void cleanupOldRooms() {
-    Set<Integer> toRemove = new HashSet<>();
-    Set<Integer> rooms = ROOM_TIME.keySet();
-
-    // check time of room to see how long it has existed for
-    for (Integer id : rooms) {
-      Integer started = getTime(ROOM_TIME.get(id));
-      Integer current = getTime(LocalTime.now());
-
-      // remove rooms that have been active for more than an hour
-      if (Math.abs(current - started) > MIN_IN_HOURS) {
-        toRemove.add(id);
-      }
-    }
-    for (Integer id : toRemove) {
-      cleanup(id);
-    }
-  }
-
-  /**
    * Removes entry with id as key from all data structures.
    * @param id of entry to remove
    */
@@ -307,20 +360,10 @@ public class GroupSocket {
     USERS_COPY.remove(id);
     ROOMS.remove(id);
     STARTED_ROOMS.remove(id);
-    ROOM_TIME.remove(id);
     USER_DECISIONS.remove(id);
     ROOM_COORS.remove(id);
     for (String user : users) {
       SWIPING_PREF.remove(user);
     }
-  }
-
-  /**
-   * Converts LocalTime into time in minutes.
-   * @param time to convert into minutes
-   * @return integer representing minutes
-   */
-  private static Integer getTime(LocalTime time) {
-    return time.getHour() * MIN_IN_HOURS + time.getMinute();
   }
 }
