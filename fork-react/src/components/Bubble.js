@@ -3,7 +3,7 @@
  */
 function Bubble(props) {
   return (
-    <div className="bubble">
+    <div className="bubble" style={{backgroundColor: props.host ? "#FFC6BA" : "#A5D4FF"}}>
       {props.user.charAt(0).toLowerCase()}
     </div>
   );

@@ -75,7 +75,8 @@ public class Groups {
       String type = messageObj.getJSONObject("message").getString("type");
       switch (type) { // check what type of message
         case "update_user": // updates waiting room with new users
-          room.addUserSession(session, username);
+          boolean isHost = messageObj.getJSONObject("message").getBoolean("host");
+          room.addUserSession(session, username, isHost);
           SESSION_ROOM.put(session, roomId);
           break;
 
@@ -107,7 +108,7 @@ public class Groups {
 
   @OnWebSocketError
   public void throwError(Throwable error) {
-    error.printStackTrace();
+    System.out.println(error.getMessage());
   }
 
   /**
