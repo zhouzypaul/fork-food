@@ -9,7 +9,12 @@ import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Class representing Rooms.
@@ -21,10 +26,13 @@ public class Room {
   private String host;
 
   // users and their statuses
-  private final Hashtable<String, USER_STATUS> users = new Hashtable<>();
+  private final Hashtable<String, USERSTATUS> users = new Hashtable<>();
   private final Hashtable<Session, String> sessionToUser = new Hashtable<>();
 
-  private enum USER_STATUS {
+  /**
+   * User status of a session.
+   */
+  private enum USERSTATUS {
     WAITING_ROOM,
     DONE
   }
@@ -36,7 +44,10 @@ public class Room {
   // for socket utility
   private static final Gson GSON = new Gson();
 
-  private enum MESSAGE_TYPE {
+  /**
+   * Message type of a session.
+   */
+  private enum MESSAGETYPE {
     CONNECT,
     UPDATE,
     SEND
@@ -47,12 +58,13 @@ public class Room {
    *
    * @param session  - the session to add to the room
    * @param username - the username of the user to add
+   * @param isHost - if user is a host
    */
-  public void addUserSession(Session session, String username, boolean host) {
+  public void addUserSession(Session session, String username, boolean isHost) {
     // add session and username
-    users.put(username, USER_STATUS.WAITING_ROOM);
+    users.put(username, USERSTATUS.WAITING_ROOM);
     sessionToUser.put(session, username);
-    if (host) {
+    if (isHost) {
       this.host = username;
     }
 
@@ -161,7 +173,7 @@ public class Room {
    */
   public void done(String username) {
     // mark user as done
-    users.replace(username, USER_STATUS.DONE);
+    users.replace(username, USERSTATUS.DONE);
 
     // send user swipe preferences to database
     if (!addToDatabase(username, coordinate)) {
@@ -215,8 +227,8 @@ public class Room {
     if (users.isEmpty()) {
       return false;
     }
-    for (USER_STATUS status : users.values()) {
-      if (status != USER_STATUS.DONE) {
+    for (USERSTATUS status : users.values()) {
+      if (status != USERSTATUS.DONE) {
         return false;
       }
     }
@@ -250,7 +262,7 @@ public class Room {
    */
   private void sendMessage(String type, String label, Object load) {
     JsonObject updateMessage = new JsonObject();
-    updateMessage.addProperty("type", MESSAGE_TYPE.UPDATE.ordinal());
+    updateMessage.addProperty("type", MESSAGETYPE.UPDATE.ordinal());
 
     JsonObject payload = new JsonObject();
 
@@ -290,9 +302,9 @@ public class Room {
       swipes.put(user, prefs);
     }
     List<String> restIds = swipes.get(user).get("business_id");
-    List<String> decisions = swipes.get(user).get("decisions");
+    List<String> restDecisions = swipes.get(user).get("decisions");
     restIds.add(resId);
-    decisions.add(decision);
+    restDecisions.add(decision);
   }
 
   /**

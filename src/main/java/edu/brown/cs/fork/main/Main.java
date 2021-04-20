@@ -20,7 +20,6 @@ import edu.brown.cs.fork.handlers.users.HandlerGetUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerGetUserPwd;
 import edu.brown.cs.fork.handlers.users.HandlerInsertUserPref;
 import edu.brown.cs.fork.handlers.users.HandlerUpdateUserPref;
-import com.google.gson.Gson;
 import edu.brown.cs.fork.sockets.Groups;
 import spark.ExceptionHandler;
 import spark.Request;
