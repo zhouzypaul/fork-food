@@ -213,7 +213,6 @@ public class Room {
    */
   private boolean allDone() {
     if (users.isEmpty()) {
-      System.out.println("empty");
       return false;
     }
     for (USER_STATUS status : users.values()) {
