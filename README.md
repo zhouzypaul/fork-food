@@ -134,6 +134,11 @@ Here are some of the system tests we have conducted to make sure users have a gr
 - Selecting some food types but not price ranges.
 - Selecting price ranges but not food types.
 - Not swiping right on any of the suggested restaurants. 
+- Trying to brute force to certain pages using URLs without signing in.
+- Trying to brute force to room with room code without starting a session.
+- Host leaving the room before starting.
+- Member leaving the room before starting.
+- Member leaving the room after starting.
 
   
 ### How To Run
