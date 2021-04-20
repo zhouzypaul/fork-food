@@ -18,6 +18,7 @@ public class Room {
   // room data
   private double[] coordinate; // of host
   private boolean started = false; // has swiping started
+  private String host;
 
   // users and their statuses
   private final Hashtable<String, USER_STATUS> users = new Hashtable<>();
@@ -25,13 +26,12 @@ public class Room {
 
   private enum USER_STATUS {
     WAITING_ROOM,
-    SWIPING,
     DONE
   }
 
   // keep track of user swipes
   private final Hashtable<String, Hashtable<String, Integer>> decisions = new Hashtable<>();
-  private final Map<String, Map<String, List<String>>> swipes = new HashMap<>();
+  private final Hashtable<String, Hashtable<String, List<String>>> swipes = new Hashtable<>();
 
   // for socket utility
   private static final Gson GSON = new Gson();
@@ -48,10 +48,13 @@ public class Room {
    * @param session  - the session to add to the room
    * @param username - the username of the user to add
    */
-  public void addUserSession(Session session, String username) {
+  public void addUserSession(Session session, String username, boolean host) {
     // add session and username
     users.put(username, USER_STATUS.WAITING_ROOM);
     sessionToUser.put(session, username);
+    if (host) {
+      this.host = username;
+    }
 
     // send update message
     sendMessage("update_user", "users", users());
@@ -69,13 +72,20 @@ public class Room {
       return false;
     }
     String username = sessionToUser.get(session);
+    boolean hostLeft = username.equals(host);
 
     // remove user
     users.remove(username);
     sessionToUser.remove(session);
 
+    boolean empty = users.isEmpty();
+
     // has the room started swiping yet?
     if (!started) { // still in waiting room
+      if (hostLeft && !empty) {
+        this.host = users().toArray(new String[0])[0];
+        System.out.println(this.host);
+      }
       sendMessage("update_user", "users", users());
     } else { // swiping has started
       // remove the users swipes
@@ -95,7 +105,7 @@ public class Room {
     }
 
     // return if the room is empty
-    return users().isEmpty();
+    return users.isEmpty();
   }
 
   /**
@@ -248,6 +258,7 @@ public class Room {
     senderMessage.add(label, GSON.toJsonTree(load));
 
     payload.addProperty("type", type);
+    payload.addProperty("host", host);
     payload.add("senderMessage", senderMessage);
 
     updateMessage.add("payload", payload);
@@ -273,7 +284,7 @@ public class Room {
    */
   private void addToSwipePref(String user, String resId, String decision) {
     if (!swipes.containsKey(user)) {
-      Map<String, List<String>> prefs = new HashMap<>();
+      Hashtable<String, List<String>> prefs = new Hashtable<>();
       prefs.put("business_id", new ArrayList<>());
       prefs.put("decisions", new ArrayList<>());
       swipes.put(user, prefs);
@@ -288,13 +299,13 @@ public class Room {
    * Add all swipe decisions to database.
    *
    * @param username user
-   * @param coor     host coordinate
+   * @param cord     host coordinate
    * @return whether the action is successful
    */
-  private boolean addToDatabase(String username, double[] coor) {
+  private boolean addToDatabase(String username, double[] cord) {
     List<String> prefRestaurants = swipes.get(username).get("business_id");
     List<String> prefDecisions = swipes.get(username).get("decisions");
-    return Hub.getUserDB().insertUserSwipePref(username, coor[0],
-        coor[1], prefRestaurants, prefDecisions);
+    return Hub.getUserDB().insertUserSwipePref(username, cord[0],
+        cord[1], prefRestaurants, prefDecisions);
   }
 }
