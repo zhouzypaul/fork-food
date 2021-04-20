@@ -50,8 +50,16 @@ public final class Main {
     hub.run();
   }
 
+  static int getHerokuAssignedPort() {
+    ProcessBuilder processBuilder = new ProcessBuilder();
+    if (processBuilder.environment().get("PORT") != null) {
+      return Integer.parseInt(processBuilder.environment().get("PORT"));
+    }
+    return DEFAULT_PORT; //return default port if heroku-port isn't set (i.e. on localhost)
+  }
+
   private void runSparkServer(int port) {
-    Spark.port(port);
+    Spark.port(getHerokuAssignedPort());
     Spark.externalStaticFileLocation("fork-react/build/");
 
     // websocket
