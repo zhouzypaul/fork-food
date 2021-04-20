@@ -108,7 +108,9 @@ public class Groups {
 
   @OnWebSocketError
   public void throwError(Throwable error) {
-    System.out.println(error.getMessage());
+    if (error.getMessage() != null) {
+      System.out.println(error.getMessage());
+    }
   }
 
   /**

@@ -78,13 +78,10 @@ public class Room {
     users.remove(username);
     sessionToUser.remove(session);
 
-    boolean empty = users.isEmpty();
-
     // has the room started swiping yet?
     if (!started) { // still in waiting room
-      if (hostLeft && !empty) {
+      if (hostLeft && !users.isEmpty()) {
         this.host = users().toArray(new String[0])[0];
-        System.out.println(this.host);
       }
       sendMessage("update_user", "users", users());
     } else { // swiping has started

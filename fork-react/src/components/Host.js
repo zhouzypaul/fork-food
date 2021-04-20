@@ -44,6 +44,9 @@ function Host(props) {
     }
     return () => {
       window.onbeforeunload = null;
+      if (props.history.location.pathname !== "/swipe") {
+        closeSocket();
+      }
     }
   }, []);
 
@@ -60,7 +63,6 @@ function Host(props) {
           break;
         case MESSAGE_TYPE.UPDATE:
           // check if updating users or starting
-          console.log(data.payload)
           if (data.payload.type === "update_user") {
             hostName.current = data.payload.host;
             setHost(hostName.current === user);
