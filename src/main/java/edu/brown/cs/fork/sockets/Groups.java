@@ -2,20 +2,21 @@ package edu.brown.cs.fork.sockets;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import edu.brown.cs.fork.Hub;
-import edu.brown.cs.fork.exceptions.NoUserException;
-import edu.brown.cs.fork.restaurants.Restaurant;
-import org.eclipse.jetty.websocket.api.CloseException;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.*;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Hashtable;
 
+/**
+ * Socket for handling hosting, joining a room and swiping.
+ */
 @WebSocket
 public class Groups {
 
@@ -23,7 +24,10 @@ public class Groups {
   private static final Hashtable<Integer, Room> ROOMS = new Hashtable<>();
   private static final Hashtable<Session, Integer> SESSION_ROOM = new Hashtable<>();
 
-  private enum MESSAGE_TYPE {
+  /**
+   * Message type of a session.
+   */
+  private enum MESSAGETYPE {
     CONNECT,
     UPDATE,
     SEND
@@ -31,11 +35,16 @@ public class Groups {
 
   private static int nextId = 0;
 
+  /**
+   * Connect to socket.
+   * @param session socket session
+   * @throws IOException IOException
+   */
   @OnWebSocketConnect
   public void connected(Session session) throws IOException {
     // build CONNECT message
     JsonObject json = new JsonObject();
-    json.addProperty("type", MESSAGE_TYPE.CONNECT.ordinal());
+    json.addProperty("type", MESSAGETYPE.CONNECT.ordinal());
 
     JsonObject payload = new JsonObject();
     payload.addProperty("id", nextId++);
@@ -47,6 +56,12 @@ public class Groups {
     session.getRemote().sendString(message);
   }
 
+  /**
+   * Closes a socket.
+   * @param session socket session
+   * @param statusCode status code of session
+   * @param reason reason of session
+   */
   @OnWebSocketClose
   public void closed(Session session, int statusCode, String reason) {
     int roomId = SESSION_ROOM.get(session); // get room ID
@@ -58,6 +73,12 @@ public class Groups {
     }
   }
 
+  /**
+   * Socket session message.
+   * @param session socket session
+   * @param message message
+   * @throws IOException IOException
+   */
   @OnWebSocketMessage
   public void message(Session session, String message) throws IOException {
     try {
@@ -106,6 +127,10 @@ public class Groups {
 
   }
 
+  /**
+   * Throws an error.
+   * @param error error
+   */
   @OnWebSocketError
   public void throwError(Throwable error) {
     if (error.getMessage() != null) {
