@@ -1,8 +1,45 @@
 cs0320 Term Project 2021
 
+### Project Description
+
+**fork**, for those fork-in-the-road moments. it’s Tinder but for food.
+
+Join a group or go it solo, create an account and log in to fork™. Based on individual and aggregated group preferences, we’ll find restaurants within your area and within your budget. Swipe left or right to reject a restaurant or give it an upvote, and based on the group’s decisions, we’ll pick a winner for the perfect breakfast, lunch, brunch, dinner, supper, or any other meal/snack/food consumption event.
+
 ### Team Members: 
 
 Alan Gu, Edward Xing, Sean Zhan, Zhiyuan "Paul" Zhou
+
+### Technical explanation of the project
+
+Our frontend consists of 2 main parts:
+1. a food preference survey 
+2. a group swiping session where a top restaurant will be suggested to all group members.
+
+Our backend consists of 4 main parts: 
+1. a recommendation algorithm that aggregates a group's preference and suggests 10 restaurants 
+2. a ranking algorithm that takes all group members' swiping decisions and produces a top restaurant 
+3. a socket implementation that keeps track of groups and swiping sessions 
+4. an API that allows for communication between the frontend, the algorithms and sockets, and the two databases (restaurants database and users database)
+
+User authentication is implemented by keeping users' usernames and hashed passwords in the **users.sqlite3/login** table.
+
+After successful login for the first time, users will be required to take a short survey of their preferences. 
+- Users will be asked to pick what types of food they like.
+- Users will be asked what price range they are comfortable with.
+- Users will be asked how far they are willing to go to eat.
+
+Their preferences will be stored into **users.sqlite3/training** table. Users can change their survey preferences anytime. 
+
+On the home page, users can either host or join a room. This is implemented with sockets, and the socket knows which users are in which room. Note that rooms are shared with a unique 4-digit code.
+
+Once the host starts a swiping session, the socket communicates with the recommendation algorithm, which takes all group members' preference data from **users.sqlite3/training** table, performs naive bayes classification, and talks to the socket again to send 10 recommended restaurants to all users in the group. 
+
+The restaurants are presented to users one by one, and each user can say yes or no to each restaurant. Their decisions are stored in **users.sqlite3/training** table, which means that as users interact with the app more, the recommended restaurants will be closer to what users actually like as the recommendation algorithm has more data to analyze.
+
+At the end of a swiping session, all users' decisions for each restaurant are sent to the ranking algorithm. The ranking algorithm will produce a weighted popular vote. The weight is decided by the number of times a user has been suggested a top restaurant that they have said yes to during recent swiping sessions. Users who have gotten their way frequently will have less say in the final decision. In this way, the ranking algorithm does its best to keep the final decision fair for all group members.
+
+There are some extra features as well. At the end of a swiping session, the frontend offers users options to locate the top restaurant via google maps or learn more about the restaurant via a link to google search results. Users will also be able to see a list of their recent top restaurants in case they want to revisit great eateries.
 
 ### Data Preparation
 
@@ -43,41 +80,6 @@ WHERE reviews.business_id = rest.business_id GROUP BY rest.business_id
 ON rev_id = yelp_academic_dataset_business.business_id
 ```
 
-These SQL commands are much faster than the naive, deprecated ```ActionPreprocess.java``` in ```actions/```.
-
-### How To Run
-
-- Get all ```sqlite``` data from: [here](https://drive.google.com/drive/folders/1GUGTRPzdTwJg88stwNtSrPvzzjVUiwq4?usp=sharing)
-
-- Put all ```sqlite``` data into the project folder such that it follows the following structure:
-
-```
-term-project-...
-    |
-    |- data
-    |    |- restaurants.sqlite
-    |    |- users.sqlite
-    |    |- ...
-    |- src
-    |- tests
-    . 
-    .
-```
-
-- Execute 
-  
-```
-// compiles project
-mvn package
-
-// stars the backend, databases will be automatically loaded
-./run
-
-// load custom databases
-load rest path_to_custom_restaurants_db
-load user path_to_custom_user_db
-```
-
 ### API Documentation
 
 #### restaurants
@@ -109,6 +111,44 @@ load user path_to_custom_user_db
 - ```/updateUserPref``` updates user's survey response in /user/training table. body format: ```{"username": user_id, "types": arr_of_food_types, "price": arr_of_preferred_price_ranges, "radius": preferred_radius}```
 
 - ```/insertUserPref``` inserts user's swiping responses into /user/training table. body format: ```{"username": user_id, "latitude": lat, "longitude": lon, "business_id_arr", arr_of_recommended_restaurants, "swipe_decision_arr", arr_of_1s_and_0s}``` 
+
+### Algorithms
+
+#### Recommendation Algorithm
+
+[TODO] some more detailed explanation than "Techincal explanation of the project"
+
+#### Ranking Algorithm
+
+[TODO] some more detailed explanation than "Techincal explanation of the project"
+
+### Testing
+
+This project has thoroughly tested the two algorithms and various backend methods. The socket implementation, the handlers, and the frontend are tested by system tests (interacting with the frontend).
+
+Here are some of the system tests we have conducted to make sure users have a great experience:
+
+- Trying to sign up with existing username
+- Trying to sign in with a deleted account
+- Not selecting anything when prompted the preferences survey.
+- Selecting some food types but not price ranges.
+- Selecting price ranges but not food types.
+- Not swiping right on any of the suggested restaurants. 
+
+  
+### How To Run
+
+```
+// compiles project
+mvn package
+
+// starts the backend, databases will be automatically loaded
+./run
+
+// load custom databases
+load rest path_to_custom_restaurants_db
+load user path_to_custom_user_db
+```
 
 ### Team Strengths and Weaknesses:
 
