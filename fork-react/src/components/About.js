@@ -16,10 +16,10 @@ function About() {
         </p>
         <h1>the team</h1>
         <ul>
-          <li>Edward Xing - big brain, bigger heart</li>
-          <li>Alan Gu - the lover</li>
-          <li>Paul Zhou - the algos guy</li>
-          <li>Sean Zhan - puts the P in OOP</li>
+          <li>Edward Xing</li>
+          <li>Alan Gu</li>
+          <li>Paul Zhou</li>
+          <li>Sean Zhan</li>
         </ul>
       </div>
     </>
