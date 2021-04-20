@@ -59,15 +59,15 @@ https://pypi.org/project/csv-to-sqlite/
 
 #### SQL Commands to Preprocess Data
 
-```
+```sqlite
 // keep only restaurants data
 DELETE FROM yelp_academic_dataset_business AS bus WHERE
 bus.categories NOT LIKE '%Food%' OR
-bus.categories NOT LIKE '%Restaurants%'
+bus.categories NOT LIKE '%Restaurants%';
 
 // in DB Browser, attach reviews.sqlite3 to yelp_academic_dataset_business.sqlite3
 // then create a table in yelp_academic_dataset called reviews containing all business reviews
-INSERT INTO reviews SELECT * FROM review.yelp_academic_dataset_review
+INSERT INTO reviews SELECT * FROM review.yelp_academic_dataset_review;
 
 // detach reviews.sqlite3, then
 // create another table that has another column numReviews representing
@@ -77,7 +77,7 @@ SELECT COUNT(reviews.stars) as numReviews, rest.business_id as rev_id
 FROM reviews, yelp_academic_dataset_business AS rest
 WHERE reviews.business_id = rest.business_id GROUP BY rest.business_id 
 ) AS new INNER JOIN yelp_academic_dataset_business
-ON rev_id = yelp_academic_dataset_business.business_id
+ON rev_id = yelp_academic_dataset_business.business_id;
 ```
 
 ### API Documentation
@@ -116,13 +116,27 @@ ON rev_id = yelp_academic_dataset_business.business_id
 
 #### Recommendation Algorithm
 
-[TODO] some more detailed explanation than "Techincal explanation of the project"
+This projects hosts an easily extensible recommendation package. The currently in use recommendation
+algorithm is a Naive Bayes Classifier. The Naive Bayes classifier uses the bayes rule is statistics to
+compute the posterior probability. Given the attributes of a resutarant, the classifier will be able to
+output the probability that the user likes the restaurant. It is implemented together with Laplace smoothing
+to handle restaurant attributes that's not in the training data.
 
 #### Ranking Algorithm
 
-[TODO] some more detailed explanation than "Techincal explanation of the project"
+The ranking algorithm is a weighted average of the votes of each user on each of the 10 recommended restaurants.
+But in order to make the process fairer for every users, the ranking is a weighted average, taking into
+account the number of times the ranking algorithm picked something the user liked in the past. This is accomplished
+by keeping record of a `gottenWay` variable that's between 0 and 1, representing the weight of each person's vote (the
+larger the heavier the weight), and is updated on each run of the ranking algorithm.
 
 ### Testing
+
+TO run unit tests, run
+```bash
+mvn package
+mvn test
+```
 
 This project has thoroughly tested the two algorithms and various backend methods. The socket implementation, the handlers, and the frontend are tested by system tests (interacting with the frontend).
 
