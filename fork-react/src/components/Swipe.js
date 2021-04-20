@@ -42,7 +42,7 @@ function Swipe(props) {
     return () => {
       window.onbeforeunload = null;
     }
-  })
+  }, [])
 
   // sends message once done swiping
   useEffect(() => {
@@ -136,7 +136,7 @@ function Swipe(props) {
       <div className="content">
         {waiting ?
           <div className="title-text">
-            waiting for others
+            waiting
             <span className="d1">.</span>
             <span className="d2">.</span>
             <span className="d3">.</span>

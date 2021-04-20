@@ -19,21 +19,23 @@ const HOST_LONGITUDE = -71.059709;
  */
 function Host(props) {
   const roomCode = useRef(9999);
-  const host = useRef(false);
   const user = useSelector(state => state.user);
   const [users, setUsers] = useState([]);
   const socket = useRef(null);
   const id = useRef(0);
-
+  const hostName = useRef("");
   const roomProps = props.location.roomProps;
 
   // if undefined go back home
+  let host = false;
   if (roomProps) {
     roomCode.current = roomProps.roomCode;
-    host.current = roomProps.isHost;
+    host = roomProps.isHost;
   } else {
     props.history.push("/home");
   }
+
+  const [isHost, setHost] = useState(host);
 
   // generates warning before page unloads
   useEffect(() => {
@@ -43,7 +45,7 @@ function Host(props) {
     return () => {
       window.onbeforeunload = null;
     }
-  })
+  }, []);
 
   // creates socket and handles messages
   useEffect(() => {
@@ -60,6 +62,8 @@ function Host(props) {
           // check if updating users or starting
           console.log(data.payload)
           if (data.payload.type === "update_user") {
+            hostName.current = data.payload.host;
+            setHost(hostName.current === user);
             setUsers(data.payload.senderMessage.users);
           } else if (data.payload.type === "start") {
             props.history.push({
@@ -93,7 +97,8 @@ function Host(props) {
       message: {
         type: "update_user",
         roomId: roomCode.current,
-        username: user
+        username: user,
+        host: isHost
       }
     };
     socket.current.send(JSON.stringify(message));
@@ -127,11 +132,9 @@ function Host(props) {
           share the code
         </div>
         <div className="code">{roomCode.current}</div>
-        {host.current ? <button className="primary-button" onClick={startSwiping}>start</button> : <></>}
+        {isHost ? <button className="primary-button" onClick={startSwiping}>start</button> : null}
         <div className="joined">
-          {users.map((user) => {
-            return (<Bubble user={user} key={i++} />)
-          })}
+          {users.map(user => {return (<Bubble user={user} host={hostName.current === user} key={i++} />)})}
         </div>
       </div>
       <div className="exit-home" onClick={closeSocket}>

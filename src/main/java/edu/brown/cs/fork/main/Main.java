@@ -33,7 +33,6 @@ import spark.Spark;
 public final class Main {
 
   private static final int DEFAULT_PORT = 4567;
-  private static final Gson GSON = new Gson();
 
   /**
    * The initial method called when execution begins.
@@ -96,9 +95,6 @@ public final class Main {
     Spark.post("/getUserPref", new HandlerGetUserPref());
     Spark.post("/insertUserPref", new HandlerInsertUserPref());
     Spark.post("/updateUserPref", new HandlerUpdateUserPref());
-
-    // using other registration endpoint
-    // Spark.post("/registerUser", new HandlerRegisterUser());
 
     // handle hosting / joining room
     Spark.post("/verifyCode", new RoomCheckHandler());

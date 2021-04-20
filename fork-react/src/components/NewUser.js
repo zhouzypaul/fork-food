@@ -106,7 +106,6 @@ function NewUser(props) {
     setAgree(true);
     toggleTerms();
   }
-  console.log(agree)
 
   return (
     <>
