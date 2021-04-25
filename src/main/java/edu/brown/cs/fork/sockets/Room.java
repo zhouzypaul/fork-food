@@ -23,6 +23,7 @@ public class Room {
   // room data
   private double[] coordinate; // of host
   private boolean started = false; // has swiping started
+  private boolean finished = false;
   private String host;
 
   // users and their statuses
@@ -103,7 +104,7 @@ public class Room {
       }
 
       // check if we're ready to send a decision
-      if (allDone()) {
+      if (allDone() && !finished) {
         try {
           sendMessage("done", "result", getResult());
         } catch (SQLException | NoUserException e) {
@@ -180,6 +181,7 @@ public class Room {
 
     // check if all users done, then generate and send decision
     if (allDone()) {
+      this.finished = true;
       try {
         sendMessage("done", "result", getResult());
       } catch (SQLException | NoUserException e) {

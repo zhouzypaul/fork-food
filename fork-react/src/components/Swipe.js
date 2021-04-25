@@ -2,6 +2,7 @@ import {Link} from "react-router-dom";
 import Option from "./Option";
 import { useRef, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import Progress from "./Progress";
 
 const MESSAGE_TYPE = {
   CONNECT: 0,
@@ -39,8 +40,16 @@ function Swipe(props) {
     window.onbeforeunload = () => {
       return true;
     }
+    window.onkeydown = (e) => {
+      if (e.key === "ArrowRight") {
+        sendDecision(1);
+      } else if (e.key === "ArrowLeft") {
+        sendDecision(0);
+      }
+    }
     return () => {
       window.onbeforeunload = null;
+      window.onkeydown = null;
       closeSocket();
     }
   }, [])
@@ -149,6 +158,7 @@ function Swipe(props) {
           </div>
         }
       </div>
+      <Progress number={counter.current} total={restaurants.current.length}/>
       <div className="exit-home" onClick={closeSocket}>
         <Link to="/home" className="links">
           <i className="material-icons-outlined md-48">exit_to_app</i>
