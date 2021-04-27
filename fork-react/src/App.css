@@ -354,6 +354,11 @@
   color: #DDAFF9;
 }
 
+.progress {
+  color: #DDAFF9;
+  font-size: 34px;
+}
+
 .restaurant {
   padding: 32px;
   border-radius: 8px;
