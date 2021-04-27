@@ -11,8 +11,8 @@ const MESSAGE_TYPE = {
   SEND: 2
 };
 
-const HOST_LATITUDE = 42.359335;
-const HOST_LONGITUDE = -71.059709;
+let HOST_LATITUDE = 42.359335;
+let HOST_LONGITUDE = -71.059709;
 
 /**
  * Renders host page.
@@ -119,6 +119,20 @@ function Host(props) {
       }
     };
     socket.current.send(JSON.stringify(message));
+  }
+
+  const start = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(getPosition);
+    } else {
+      alert("Location services blocked!");
+    }
+  }
+
+  const getPosition = (position) => {
+    HOST_LATITUDE = position.coords.latitude;
+    HOST_LONGITUDE = position.coords.longitude;
+    startSwiping();
   }
 
   const closeSocket = () => {
