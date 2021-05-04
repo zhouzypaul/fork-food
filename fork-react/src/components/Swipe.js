@@ -40,19 +40,26 @@ function Swipe(props) {
     window.onbeforeunload = () => {
       return true;
     }
-    window.onkeydown = (e) => {
-      if (e.key === "ArrowRight") {
-        sendDecision(1);
-      } else if (e.key === "ArrowLeft") {
-        sendDecision(0);
-      }
-    }
     return () => {
       window.onbeforeunload = null;
-      window.onkeydown = null;
       closeSocket();
     }
-  }, [])
+  }, []);
+
+  const decide = (e) => {
+    if (e.key === "ArrowRight") {
+      sendDecision(1);
+    } else if (e.key === "ArrowLeft") {
+      sendDecision(0);
+    }
+  }
+
+  useEffect(() => {
+    window.onkeydown = decide;
+    return () => {
+      window.onkeydown = null;
+    }
+  });
 
   // sends message once done swiping
   useEffect(() => {
@@ -127,6 +134,7 @@ function Swipe(props) {
         like: choice
       }
     };
+    console.log(message);
     socket.current.send(JSON.stringify(message));
 
     // check if there are more restaurants to swipe on
